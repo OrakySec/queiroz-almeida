@@ -1,8 +1,8 @@
 'use client'
-export const dynamic = 'force-dynamic'
+import { Suspense } from 'react'
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { Plus, Search, Pencil, Trash2, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import api from '@/lib/api'
 import { StatusBadge } from '@/components/admin/StatusBadge'
@@ -27,9 +27,8 @@ const STATUS_OPTIONS = [
   { value: 'REJEITADO', label: 'Rejeitado' },
 ]
 
-export default function EmpreendimentosAdminPage() {
+function EmpreendimentosContent() {
   const { user } = useAdmin()
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [items, setItems] = useState<Emp[]>([])
   const [loading, setLoading] = useState(true)
@@ -222,5 +221,17 @@ export default function EmpreendimentosAdminPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function EmpreendimentosAdminPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-64">
+        <Loader2 size={24} className="animate-spin text-brand-marinho" />
+      </div>
+    }>
+      <EmpreendimentosContent />
+    </Suspense>
   )
 }
