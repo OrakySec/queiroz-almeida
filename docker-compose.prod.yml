@@ -1,0 +1,140 @@
+version: "3.9"
+
+# Docker Compose para PRODUÇÃO com Traefik (OrionDesign)
+# Rede Traefik: YkaroNET
+# Certresolver: letsencryptresolver
+
+services:
+  # ─── Infraestrutura ───────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: always
+    networks:
+      - internal
+
+  minio:
+    image: minio/minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    restart: always
+    networks:
+      - internal
+      - YkaroNET
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=YkaroNET"
+      - "traefik.http.routers.qa-minio.rule=Host(`storage.${DOMAIN}`)"
+      - "traefik.http.routers.qa-minio.entrypoints=websecure"
+      - "traefik.http.routers.qa-minio.tls.certresolver=letsencryptresolver"
+      - "traefik.http.routers.qa-minio.service=qa-minio"
+      - "traefik.http.services.qa-minio.loadbalancer.server.port=9000"
+
+  minio-init:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+        sleep 5;
+        mc alias set local http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY};
+        mc mb --ignore-existing local/empreendimentos;
+        mc anonymous set download local/empreendimentos;
+        echo 'MinIO pronto.';
+      "
+    networks:
+      - internal
+
+  # ─── Backend (Fastify) ────────────────────────────────────────
+  backend:
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: "9000"
+      MINIO_USE_SSL: "false"
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET: empreendimentos
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_FROM: ${RESEND_FROM}
+      PORT: "3001"
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    networks:
+      - internal
+      - YkaroNET
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=YkaroNET"
+      - "traefik.http.routers.qa-backend.rule=Host(`api.${DOMAIN}`)"
+      - "traefik.http.routers.qa-backend.entrypoints=websecure"
+      - "traefik.http.routers.qa-backend.tls.certresolver=letsencryptresolver"
+      - "traefik.http.services.qa-backend.loadbalancer.server.port=3001"
+
+  # ─── Frontend (Next.js) ───────────────────────────────────────
+  frontend:
+    build:
+      context: ./packages/frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://api.${DOMAIN}
+    environment:
+      NODE_ENV: production
+    restart: always
+    networks:
+      - YkaroNET
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=YkaroNET"
+      - "traefik.http.routers.qa-frontend.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.qa-frontend.entrypoints=websecure"
+      - "traefik.http.routers.qa-frontend.tls.certresolver=letsencryptresolver"
+      - "traefik.http.services.qa-frontend.loadbalancer.server.port=3000"
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+
+networks:
+  internal:
+    internal: true
+  YkaroNET:
+    external: true

@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  GERENTE
+  EDITOR
+}
+
+enum StatusEmpreendimento {
+  RASCUNHO
+  AGUARDANDO_APROVACAO
+  PUBLICADO
+  REJEITADO
+}
+
+model User {
+  id         String   @id @default(uuid())
+  nome       String
+  email      String   @unique
+  senha_hash String
+  role       Role     @default(EDITOR)
+  ativo      Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  criados   Empreendimento[] @relation("CriadoPor")
+  aprovados Empreendimento[] @relation("AprovadoPor")
+}
+
+model Empreendimento {
+  id                String               @id @default(uuid())
+  nome              String
+  slug              String               @unique
+  descricao         String?
+  status            StatusEmpreendimento @default(RASCUNHO)
+  progresso         Int                  @default(0)
+  localizacao       String
+  area_min          Decimal?
+  area_max          Decimal?
+  quartos           String?
+  banheiros         Int?
+  vagas             String?
+  fotos             Json                 @default("[]")
+  video_url         String?
+  is_lancamento     Boolean              @default(false)
+  rejection_comment String?
+  created_by_id     String
+  approved_by_id    String?
+  created_at        DateTime             @default(now())
+  updated_at        DateTime             @updatedAt
+
+  created_by  User  @relation("CriadoPor", fields: [created_by_id], references: [id])
+  approved_by User? @relation("AprovadoPor", fields: [approved_by_id], references: [id])
+}
+
+model Lead {
+  id         String   @id @default(uuid())
+  nome       String
+  email      String
+  whatsapp   String
+  interesse  String?
+  origem     String?
+  lido       Boolean  @default(false)
+  created_at DateTime @default(now())
+}

@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Backend (Fastify API)",
+      "runtimeExecutable": "C:\\Users\\MrDel\\AppData\\Roaming\\npm\\pnpm.cmd",
+      "runtimeArgs": ["--filter", "backend", "dev"],
+      "port": 3001
+    },
+    {
+      "name": "Frontend (Next.js)",
+      "runtimeExecutable": "C:\\Users\\MrDel\\AppData\\Roaming\\npm\\pnpm.cmd",
+      "runtimeArgs": ["--filter", "frontend", "dev"],
+      "port": 3000
+    }
+  ]
+}
