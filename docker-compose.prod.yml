@@ -121,6 +121,17 @@ services:
       - "traefik.http.routers.qa-frontend.tls.certresolver=letsencryptresolver"
       - "traefik.http.services.qa-frontend.loadbalancer.server.port=3000"
 
+  # ─── Watchtower (auto-update de imagens) ─────────────────────
+  watchtower:
+    image: containrrr/watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json:ro
+    command: --interval 300 --cleanup queiroz-almeida_backend queiroz-almeida_frontend
+    networks:
+      - internal
+
 volumes:
   postgres_data:
   redis_data:

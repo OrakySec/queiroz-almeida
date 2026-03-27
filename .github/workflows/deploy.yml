@@ -11,8 +11,8 @@ env:
   BACKEND_IMAGE: ghcr.io/orakysec/qa-backend
 
 jobs:
-  build-and-deploy:
-    name: Build, Push e Deploy
+  build-and-push:
+    name: Build e Push das imagens
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -45,7 +45,5 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
 
-      - name: Acionar redeploy no Portainer
-        run: |
-          curl -s -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}"
-          echo "✅ Portainer notificado — redeploy em andamento"
+      - name: Concluído
+        run: echo "✅ Imagens publicadas — Watchtower fará o redeploy em até 5 minutos"
