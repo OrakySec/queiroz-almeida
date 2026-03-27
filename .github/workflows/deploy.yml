@@ -1,0 +1,23 @@
+name: Deploy para Produção
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy na VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Conectar na VPS e executar deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            cd /srv/queiroz-almeida
+            bash deploy.sh
