@@ -3,6 +3,7 @@ version: "3.9"
 # Docker Compose para PRODUÇÃO com Traefik (OrionDesign)
 # Rede Traefik: YkaroNET
 # Certresolver: letsencryptresolver
+# Imagens hospedadas no GitHub Container Registry (ghcr.io)
 
 services:
   # ─── Infraestrutura ───────────────────────────────────────────
@@ -74,9 +75,7 @@ services:
 
   # ─── Backend (Fastify) ────────────────────────────────────────
   backend:
-    build:
-      context: ./packages/backend
-      dockerfile: Dockerfile
+    image: ghcr.io/orakysec/qa-backend:latest
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://redis:6379
@@ -110,11 +109,7 @@ services:
 
   # ─── Frontend (Next.js) ───────────────────────────────────────
   frontend:
-    build:
-      context: ./packages/frontend
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: https://api.${DOMAIN}
+    image: ghcr.io/orakysec/qa-frontend:latest
     environment:
       NODE_ENV: production
     restart: always

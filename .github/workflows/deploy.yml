@@ -5,19 +5,47 @@ on:
     branches:
       - main
 
+env:
+  REGISTRY: ghcr.io
+  FRONTEND_IMAGE: ghcr.io/orakysec/qa-frontend
+  BACKEND_IMAGE: ghcr.io/orakysec/qa-backend
+
 jobs:
-  deploy:
-    name: Deploy na VPS
+  build-and-deploy:
+    name: Build, Push e Deploy
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-      - name: Conectar na VPS e executar deploy
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: 22
-          script: |
-            cd /srv/queiroz-almeida
-            bash deploy.sh
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build e Push — Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./packages/backend
+          push: true
+          tags: ${{ env.BACKEND_IMAGE }}:latest
+
+      - name: Build e Push — Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./packages/frontend
+          push: true
+          tags: ${{ env.FRONTEND_IMAGE }}:latest
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+
+      - name: Acionar redeploy no Portainer
+        run: |
+          curl -s -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}"
+          echo "✅ Portainer notificado — redeploy em andamento"
