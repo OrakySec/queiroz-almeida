@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { PrismaClient } from '@prisma/client'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { addToBlacklist } from '../services/redis.service'

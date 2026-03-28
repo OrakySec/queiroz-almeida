@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { PrismaClient, Role } from '@prisma/client'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { requireRole } from '../middlewares/requireRole'
