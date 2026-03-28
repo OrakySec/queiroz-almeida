@@ -1,12 +1,13 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useDropzone } from 'react-dropzone'
 import api from '@/lib/api'
 import { FotoUploader } from './FotoUploader'
-import { Save, Loader2, Send, RotateCcw } from 'lucide-react'
+import { Save, Loader2, Send, RotateCcw, Upload, X, ImageIcon } from 'lucide-react'
 import { useAdmin } from '@/context/AdminContext'
 
 const schema = z.object({
@@ -44,8 +45,59 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [empId, setEmpId] = useState<string | undefined>(initialData?.id)
 
-  // fotos já vem como string[] da API (URLs diretas)
+  // Fotos já confirmadas (URLs no servidor)
   const [fotos, setFotos] = useState<string[]>(initialData?.fotos ?? [])
+
+  // Arquivos pendentes para enviar junto com a criação
+  const [pendingFiles, setPendingFiles] = useState<File[]>([])
+  const [pendingPreviews, setPendingPreviews] = useState<string[]>([])
+  // Guarda as URLs de objeto para liberar memória ao desmontar
+  const previewUrlsRef = useRef<string[]>([])
+
+  useEffect(() => {
+    return () => {
+      previewUrlsRef.current.forEach(url => URL.revokeObjectURL(url))
+    }
+  }, [])
+
+  const onDropPending = useCallback((files: File[]) => {
+    const urls = files.map(f => URL.createObjectURL(f))
+    previewUrlsRef.current.push(...urls)
+    setPendingFiles(prev => [...prev, ...files])
+    setPendingPreviews(prev => [...prev, ...urls])
+  }, [])
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: onDropPending,
+    accept: { 'image/jpeg': [], 'image/png': [], 'image/webp': [] },
+    maxSize: 10 * 1024 * 1024,
+    disabled: saving || submitting,
+  })
+
+  function removePending(index: number) {
+    URL.revokeObjectURL(pendingPreviews[index])
+    setPendingFiles(prev => prev.filter((_, i) => i !== index))
+    setPendingPreviews(prev => prev.filter((_, i) => i !== index))
+  }
+
+  /** Envia os arquivos pendentes para um ID já existente */
+  async function uploadPendingFiles(id: string) {
+    if (pendingFiles.length === 0) return
+    const form = new FormData()
+    pendingFiles.forEach(f => form.append('files', f))
+    try {
+      const res = await api.post(
+        `/api/admin/empreendimentos/${id}/fotos`,
+        form,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
+      setFotos(res.data.fotos ?? [])
+      setPendingFiles([])
+      setPendingPreviews([])
+    } catch {
+      // não bloqueia — empreendimento foi criado, fotos podem ser enviadas depois
+    }
+  }
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -71,12 +123,13 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
   async function onSave(data: FormData) {
     setSaving(true)
     try {
-      const payload = { ...data, status: 'RASCUNHO' }
       if (mode === 'create') {
-        const res = await api.post('/api/admin/empreendimentos', payload)
-        setEmpId(res.data.id)
+        const res = await api.post('/api/admin/empreendimentos', { ...data, status: 'RASCUNHO' })
+        const newId: string = res.data.id
+        setEmpId(newId)
+        await uploadPendingFiles(newId)
       } else {
-        await api.put(`/api/admin/empreendimentos/${empId}`, payload)
+        await api.put(`/api/admin/empreendimentos/${empId}`, data)
       }
     } catch (err: any) {
       alert(err?.response?.data?.message ?? 'Erro ao salvar')
@@ -85,7 +138,7 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
     }
   }
 
-  async function onSubmitForApproval(data: FormData) {
+  async function publishWith(data: FormData, targetStatus: 'PUBLICADO' | 'AGUARDANDO_APROVACAO') {
     setSubmitting(true)
     try {
       let id = empId
@@ -96,10 +149,11 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
       } else {
         await api.put(`/api/admin/empreendimentos/${id}`, data)
       }
-      await api.patch(`/api/admin/empreendimentos/${id}/status`, { status: 'AGUARDANDO_APROVACAO' })
+      await uploadPendingFiles(id!)
+      await api.patch(`/api/admin/empreendimentos/${id}/status`, { status: targetStatus })
       router.push('/admin/empreendimentos')
     } catch (err: any) {
-      alert(err?.response?.data?.message ?? 'Erro ao enviar para aprovação')
+      alert(err?.response?.data?.message ?? 'Erro ao publicar')
     } finally {
       setSubmitting(false)
     }
@@ -187,18 +241,59 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
         </section>
 
         {/* Fotos */}
-        {empId && (
-          <section className="bg-white rounded-2xl border border-brand-navy/5 shadow-sm p-6 lg:p-8">
-            <h2 className="font-semibold text-brand-navy mb-6 text-lg">Fotos</h2>
-            <FotoUploader empreendimentoId={empId} fotos={fotos} onChange={setFotos} />
-          </section>
-        )}
+        <section className="bg-white rounded-2xl border border-brand-navy/5 shadow-sm p-6 lg:p-8">
+          <h2 className="font-semibold text-brand-navy mb-6 text-lg">Fotos</h2>
 
-        {!empId && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-700">
-            Salve o empreendimento primeiro para habilitar o upload de fotos.
-          </div>
-        )}
+          {empId ? (
+            /* Modo edição — upload direto com FotoUploader */
+            <FotoUploader empreendimentoId={empId} fotos={fotos} onChange={setFotos} />
+          ) : (
+            /* Modo criação — acumula localmente, envia ao salvar */
+            <div>
+              <div
+                {...getRootProps()}
+                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+                  isDragActive
+                    ? 'border-brand-marinho bg-cyan-50'
+                    : 'border-brand-navy/10 hover:border-brand-marinho hover:bg-brand-navy/[0.02]'
+                }`}
+              >
+                <input {...getInputProps()} />
+                <div className="flex flex-col items-center gap-2 text-brand-navy/40">
+                  <Upload size={24} />
+                  <p className="text-sm">
+                    {isDragActive ? 'Solte as fotos aqui' : 'Arraste fotos ou clique para selecionar'}
+                  </p>
+                  <p className="text-xs text-brand-navy/30">
+                    JPG, PNG, WebP · Máx 10 MB · As fotos serão enviadas ao salvar
+                  </p>
+                </div>
+              </div>
+
+              {pendingPreviews.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-4">
+                  {pendingPreviews.map((url, i) => (
+                    <div key={url} className="relative aspect-square group rounded-lg overflow-hidden border border-brand-navy/10">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
+                      <button
+                        type="button"
+                        onClick={() => removePending(i)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X size={12} />
+                      </button>
+                      <div className="absolute bottom-1 left-1 bg-brand-navy/60 text-white rounded px-1.5 py-0.5 text-[9px] font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ImageIcon size={9} /> Pendente
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
@@ -215,25 +310,7 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
           {canApprove ? (
             <button
               type="button"
-              onClick={handleSubmit(async (data) => {
-                setSubmitting(true)
-                try {
-                  let id = empId
-                  if (mode === 'create' || !id) {
-                    const res = await api.post('/api/admin/empreendimentos', data)
-                    id = res.data.id
-                    setEmpId(id)
-                  } else {
-                    await api.put(`/api/admin/empreendimentos/${id}`, data)
-                  }
-                  await api.patch(`/api/admin/empreendimentos/${id}/status`, { status: 'PUBLICADO' })
-                  router.push('/admin/empreendimentos')
-                } catch (err: any) {
-                  alert(err?.response?.data?.message ?? 'Erro')
-                } finally {
-                  setSubmitting(false)
-                }
-              })}
+              onClick={handleSubmit(data => publishWith(data, 'PUBLICADO'))}
               disabled={submitting}
               className="flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 transition disabled:opacity-50"
             >
@@ -243,7 +320,7 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
           ) : (
             <button
               type="button"
-              onClick={handleSubmit(onSubmitForApproval)}
+              onClick={handleSubmit(data => publishWith(data, 'AGUARDANDO_APROVACAO'))}
               disabled={submitting}
               className="flex items-center gap-2 px-6 py-3 rounded-full bg-brand-marinho text-white font-semibold text-sm hover:bg-brand-marinho/90 transition disabled:opacity-50"
             >
