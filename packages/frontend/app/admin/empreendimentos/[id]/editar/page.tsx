@@ -5,6 +5,33 @@ import api from '@/lib/api'
 import { EmpreendimentoForm } from '@/components/admin/EmpreendimentoForm'
 import { Loader2 } from 'lucide-react'
 
+/** Converte a resposta snake_case da API para o formato camelCase do formulário */
+function apiToForm(d: any) {
+  return {
+    id: d.id,
+    status: d.status,
+    fotos: (d.fotos as string[]) ?? [],
+    nome: d.nome ?? '',
+    slug: d.slug ?? '',
+    cidade: d.cidade ?? '',
+    estado: d.estado ?? '',
+    descricaoBreve: d.descricao_breve ?? '',
+    descricaoCompleta: d.descricao ?? '',
+    tipologia: d.tipologia ?? '',
+    areaMin: d.area_min ?? '',
+    areaMax: d.area_max ?? '',
+    precoMin: d.preco_min ?? '',
+    precoMax: d.preco_max ?? '',
+    totalUnidades: d.total_unidades ?? '',
+    unidadesDisponiveis: d.unidades_disponiveis ?? '',
+    percentualObra: d.progresso ?? 0,
+    dataEntrega: d.data_entrega ? String(d.data_entrega).slice(0, 10) : '',
+    videoUrl: d.video_url ?? '',
+    whatsapp: d.whatsapp ?? '',
+    destaque: d.is_lancamento ?? false,
+  }
+}
+
 export default function EditarEmpreendimentoPage() {
   const { id } = useParams<{ id: string }>()
   const [data, setData] = useState<any>(null)
@@ -13,7 +40,7 @@ export default function EditarEmpreendimentoPage() {
 
   useEffect(() => {
     api.get(`/api/admin/empreendimentos/${id}`)
-      .then(res => setData(res.data))
+      .then(res => setData(apiToForm(res.data)))
       .catch(() => setError('Empreendimento não encontrado.'))
       .finally(() => setLoading(false))
   }, [id])

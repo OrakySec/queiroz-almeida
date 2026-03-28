@@ -1,11 +1,11 @@
 import * as Minio from 'minio'
-import { randomBytes } from 'crypto'
 import slugify from 'slugify'
 
 const BUCKET = process.env.MINIO_BUCKET || 'empreendimentos'
 const PUBLIC_URL = process.env.MINIO_PUBLIC_URL || 'http://localhost:9000'
 
 let client: Minio.Client | null = null
+let bucketReady = false
 
 function getClient(): Minio.Client {
   if (!client) {
@@ -20,12 +20,34 @@ function getClient(): Minio.Client {
   return client
 }
 
+/** Garante que o bucket existe e tem política de leitura pública */
+async function ensureBucket(): Promise<void> {
+  if (bucketReady) return
+  const minio = getClient()
+  const exists = await minio.bucketExists(BUCKET)
+  if (!exists) {
+    await minio.makeBucket(BUCKET, 'us-east-1')
+    const policy = JSON.stringify({
+      Version: '2012-10-17',
+      Statement: [{
+        Effect: 'Allow',
+        Principal: { AWS: ['*'] },
+        Action: ['s3:GetObject'],
+        Resource: [`arn:aws:s3:::${BUCKET}/*`],
+      }],
+    })
+    await minio.setBucketPolicy(BUCKET, policy)
+  }
+  bucketReady = true
+}
+
 export async function uploadFoto(
   empreendimentoId: string,
   filename: string,
   buffer: Buffer,
   mimetype: string
 ): Promise<string> {
+  await ensureBucket()
   const minio = getClient()
   const safeName = slugify(filename.replace(/\.[^/.]+$/, ''), { lower: true, strict: true })
   const ext = filename.split('.').pop()

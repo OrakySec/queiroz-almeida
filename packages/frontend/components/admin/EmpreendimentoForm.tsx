@@ -33,7 +33,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 interface Props {
-  initialData?: FormData & { id?: string; status?: string; fotos?: { id: string; url: string; ordem: number; legenda: string | null }[] }
+  initialData?: FormData & { id?: string; status?: string; fotos?: string[] }
   mode: 'create' | 'edit'
 }
 
@@ -44,9 +44,8 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [empId, setEmpId] = useState<string | undefined>(initialData?.id)
 
-  const [fotos, setFotos] = useState<string[]>(
-    initialData?.fotos?.map((f) => f.url) ?? []
-  )
+  // fotos já vem como string[] da API (URLs diretas)
+  const [fotos, setFotos] = useState<string[]>(initialData?.fotos ?? [])
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
