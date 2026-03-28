@@ -90,6 +90,20 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
     return reply.status(201).send(empreendimento)
   })
 
+  // GET /api/admin/empreendimentos/:id
+  app.get('/:id', { preHandler }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const empreendimento = await prisma.empreendimento.findUnique({
+      where: { id },
+      include: {
+        created_by: { select: { nome: true, email: true } },
+        approved_by: { select: { nome: true, email: true } },
+      },
+    })
+    if (!empreendimento) return reply.status(404).send({ message: 'Empreendimento não encontrado.' })
+    return reply.send(empreendimento)
+  })
+
   // PUT /api/admin/empreendimentos/:id
   app.put('/:id', { preHandler }, async (request, reply) => {
     const user = request.user as { id: string; role: string }
