@@ -29,7 +29,8 @@ export async function uploadFoto(
   const minio = getClient()
   const safeName = slugify(filename.replace(/\.[^/.]+$/, ''), { lower: true, strict: true })
   const ext = filename.split('.').pop()
-  const objectName = `empreendimentos/${empreendimentoId}/${Date.now()}-${safeName}.${ext}`
+  // objectName NÃO inclui o bucket — a URL pública já o insere via /${BUCKET}/
+  const objectName = `${empreendimentoId}/${Date.now()}-${safeName}.${ext}`
 
   await minio.putObject(BUCKET, objectName, buffer, buffer.length, {
     'Content-Type': mimetype,
