@@ -49,14 +49,15 @@ services:
     networks:
       - internal
       - YkaroNET
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=YkaroNET"
-      - "traefik.http.routers.qa-minio.rule=Host(`storage.${DOMAIN}`)"
-      - "traefik.http.routers.qa-minio.entrypoints=websecure"
-      - "traefik.http.routers.qa-minio.tls.certresolver=letsencryptresolver"
-      - "traefik.http.routers.qa-minio.service=qa-minio"
-      - "traefik.http.services.qa-minio.loadbalancer.server.port=9000"
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=YkaroNET"
+        - "traefik.http.routers.qa-minio.rule=Host(`storage.${DOMAIN}`)"
+        - "traefik.http.routers.qa-minio.entrypoints=websecure"
+        - "traefik.http.routers.qa-minio.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.qa-minio.service=qa-minio"
+        - "traefik.http.services.qa-minio.loadbalancer.server.port=9000"
 
   minio-init:
     image: minio/mc
@@ -105,13 +106,14 @@ services:
     networks:
       - internal
       - YkaroNET
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=YkaroNET"
-      - "traefik.http.routers.qa-backend.rule=Host(`api.${DOMAIN}`)"
-      - "traefik.http.routers.qa-backend.entrypoints=websecure"
-      - "traefik.http.routers.qa-backend.tls.certresolver=letsencryptresolver"
-      - "traefik.http.services.qa-backend.loadbalancer.server.port=3001"
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=YkaroNET"
+        - "traefik.http.routers.qa-backend.rule=Host(`api.${DOMAIN}`)"
+        - "traefik.http.routers.qa-backend.entrypoints=websecure"
+        - "traefik.http.routers.qa-backend.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.qa-backend.loadbalancer.server.port=3001"
 
   # ─── Frontend (Next.js) ───────────────────────────────────────
   frontend:
@@ -127,15 +129,16 @@ services:
     restart: always
     networks:
       - YkaroNET
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=YkaroNET"
-      - "traefik.http.routers.qa-frontend.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.qa-frontend.entrypoints=websecure"
-      - "traefik.http.routers.qa-frontend.tls=true"
-      - "traefik.http.routers.qa-frontend.tls.certresolver=letsencryptresolver"
-      - "traefik.http.routers.qa-frontend.tls.domains[0].main=${DOMAIN}"
-      - "traefik.http.services.qa-frontend.loadbalancer.server.port=3000"
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=YkaroNET"
+        - "traefik.http.routers.qa-frontend.rule=Host(`${DOMAIN}`)"
+        - "traefik.http.routers.qa-frontend.entrypoints=websecure"
+        - "traefik.http.routers.qa-frontend.tls=true"
+        - "traefik.http.routers.qa-frontend.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.qa-frontend.tls.domains[0].main=${DOMAIN}"
+        - "traefik.http.services.qa-frontend.loadbalancer.server.port=3000"
 
   # ─── Watchtower (auto-update de imagens) ─────────────────────
   watchtower:
