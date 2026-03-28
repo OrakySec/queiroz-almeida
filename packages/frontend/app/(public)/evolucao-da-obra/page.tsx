@@ -36,7 +36,7 @@ function ObraCard({ e }: { e: Empreendimento }) {
         <h3 className="font-serif font-bold text-2xl text-brand-azul mb-2">{e.nome}</h3>
         <div className="flex items-center gap-2 text-brand-texto/60 mb-5">
           <MapPin size={14} className="text-brand-dourado" />
-          <span className="font-sans text-sm">{e.localizacao}</span>
+          <span className="font-sans text-sm">{e.cidade}{e.estado ? `, ${e.estado}` : ''}</span>
         </div>
         <div className="flex justify-between items-center mb-2">
           <span className="font-sans text-sm text-brand-texto">Progresso</span>

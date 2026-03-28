@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, Maximize2, BedDouble, Bath, Car, ArrowRight, TrendingUp } from 'lucide-react'
+import { MapPin, Maximize2, BedDouble, Car, ArrowRight, TrendingUp } from 'lucide-react'
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { useLeadModal } from '@/context/LeadModalContext'
@@ -89,7 +89,7 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
                   <div className="h-10 w-px bg-white/20" />
                   <div>
                     <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 mb-1.5">Tipologia</p>
-                    <p className="font-serif text-2xl font-bold text-white">{e.quartos || 'Studio'}</p>
+                    <p className="font-serif text-2xl font-bold text-white">{e.tipologia || 'Studio'}</p>
                   </div>
                   <div className="flex flex-col items-center gap-1">
                     <TrendingUp size={18} className="text-brand-marinho-glow" />
@@ -121,7 +121,7 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
 
                 <div className="flex items-center gap-3 text-brand-navy/60">
                   <div className="w-2 h-2 rounded-full bg-brand-marinho-glow animate-pulse" />
-                  <span className="font-sans text-xs font-bold uppercase tracking-[0.2em]">{e.localizacao}</span>
+                  <span className="font-sans text-xs font-bold uppercase tracking-[0.2em]">{e.cidade}{e.estado ? `, ${e.estado}` : ''}</span>
                 </div>
               </div>
 
@@ -129,9 +129,8 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
               <div className="flex flex-wrap gap-3">
                 {[
                   { icon: Maximize2, label: 'Área', value: e.area_min ? `${e.area_min}${e.area_max && e.area_max !== e.area_min ? `–${e.area_max}` : ''} m²` : null },
-                  { icon: BedDouble, label: 'Quartos', value: e.quartos },
-                  { icon: Bath, label: 'Banh.', value: e.banheiros?.toString() },
-                  { icon: Car, label: 'Vagas', value: e.vagas },
+                  { icon: BedDouble, label: 'Tipologia', value: e.tipologia },
+                  { icon: Car, label: 'Unidades', value: e.total_unidades?.toString() },
                 ].filter(s => s.value).map((spec, i) => (
                   <motion.div 
                     key={i}

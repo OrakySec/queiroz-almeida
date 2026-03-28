@@ -16,7 +16,7 @@ interface RecentLead {
   nome: string
   email: string
   interesse: string | null
-  createdAt: string
+  created_at: string
   lido: boolean
 }
 
@@ -26,7 +26,7 @@ interface RecentEmpreendimento {
   slug: string
   status: string
   cidade: string
-  updatedAt: string
+  updated_at: string
 }
 
 export default function DashboardPage() {
@@ -61,7 +61,7 @@ export default function DashboardPage() {
           },
           leads: {
             total: allLeads.length,
-            hoje: allLeads.filter((l: RecentLead) => new Date(l.createdAt).toDateString() === today).length,
+            hoje: allLeads.filter((l: RecentLead) => new Date(l.created_at).toDateString() === today).length,
             naoLidos: allLeads.filter((l: RecentLead) => !l.lido).length,
           },
         })
@@ -177,7 +177,7 @@ export default function DashboardPage() {
                       </span>
                     )}
                     <p className="text-[10px] text-brand-navy/30 mt-1">
-                      {new Date(lead.createdAt).toLocaleDateString('pt-BR')}
+                      {new Date(lead.created_at).toLocaleDateString('pt-BR')}
                     </p>
                   </div>
                 </div>
