@@ -92,6 +92,8 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_BUCKET: empreendimentos
+      MINIO_PUBLIC_URL: https://storage.${DOMAIN}
+      FRONTEND_URL: https://${DOMAIN}
       RESEND_API_KEY: ${RESEND_API_KEY}
       RESEND_FROM: ${RESEND_FROM}
       PORT: "3001"
