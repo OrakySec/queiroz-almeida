@@ -1,11 +1,9 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
-import { PrismaClient } from '@prisma/client'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { addToBlacklist } from '../services/redis.service'
-
-const prisma = new PrismaClient()
+import { prisma } from '../lib/prisma'
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -13,8 +11,8 @@ const loginSchema = z.object({
 })
 
 export async function authRoutes(app: FastifyInstance) {
-  // POST /api/auth/login
-  app.post('/login', async (request, reply) => {
+  // POST /api/auth/login — rate limit restrito para evitar brute force
+  app.post('/login', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { email, password } = loginSchema.parse(request.body)
 
     const user = await prisma.user.findUnique({ where: { email } })

@@ -9,6 +9,19 @@ import { empreendimentosAdminRoutes } from './routes/empreendimentos.admin'
 import { leadsRoutes } from './routes/leads'
 import { usuariosRoutes } from './routes/usuarios'
 
+// Valida variáveis obrigatórias antes de iniciar
+const REQUIRED_ENVS = ['JWT_SECRET', 'DATABASE_URL', 'MINIO_ACCESS_KEY', 'MINIO_SECRET_KEY']
+for (const key of REQUIRED_ENVS) {
+  if (!process.env[key]) {
+    console.error(`FATAL: variável de ambiente "${key}" não definida. Encerrando.`)
+    process.exit(1)
+  }
+}
+
+if (!process.env.MINIO_PUBLIC_URL) {
+  console.warn('WARN: MINIO_PUBLIC_URL não definida — URLs de fotos podem estar incorretas em produção.')
+}
+
 const app = Fastify({ logger: true })
 
 async function bootstrap() {

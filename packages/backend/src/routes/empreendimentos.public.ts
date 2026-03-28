@@ -1,14 +1,11 @@
 import type { FastifyInstance } from 'fastify'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '../lib/prisma'
 
 const SELECT_PUBLIC = {
   id: true,
   nome: true,
   slug: true,
   descricao: true,
-  status: true,
   progresso: true,
   localizacao: true,
   area_min: true,

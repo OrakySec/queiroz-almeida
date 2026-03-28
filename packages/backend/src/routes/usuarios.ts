@@ -1,12 +1,11 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
-import { PrismaClient, Role } from '@prisma/client'
+import { Role } from '@prisma/client'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { requireRole } from '../middlewares/requireRole'
 import { getRedis } from '../services/redis.service'
-
-const prisma = new PrismaClient()
+import { prisma } from '../lib/prisma'
 
 const createSchema = z.object({
   nome: z.string().min(1),

@@ -1,12 +1,10 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { PrismaClient } from '@prisma/client'
 import slugify from 'slugify'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { requireRole } from '../middlewares/requireRole'
 import { uploadFoto, deleteFoto } from '../services/minio.service'
-
-const prisma = new PrismaClient()
+import { prisma } from '../lib/prisma'
 
 const ACCEPTED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp']
 

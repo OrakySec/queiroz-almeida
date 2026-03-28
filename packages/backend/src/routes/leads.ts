@@ -1,11 +1,9 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { PrismaClient } from '@prisma/client'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { requireRole } from '../middlewares/requireRole'
 import { sendLeadEmail } from '../services/email.service'
-
-const prisma = new PrismaClient()
+import { prisma } from '../lib/prisma'
 
 const leadSchema = z.object({
   nome: z.string().min(1),

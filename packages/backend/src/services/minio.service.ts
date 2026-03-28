@@ -12,7 +12,7 @@ function getClient(): Minio.Client {
     client = new Minio.Client({
       endPoint: process.env.MINIO_ENDPOINT || 'localhost',
       port: Number(process.env.MINIO_PORT) || 9000,
-      useSSL: process.env.NODE_ENV === 'production',
+      useSSL: false, // MinIO interno — SSL é tratado pelo Traefik
       accessKey: process.env.MINIO_ACCESS_KEY!,
       secretKey: process.env.MINIO_SECRET_KEY!,
     })
