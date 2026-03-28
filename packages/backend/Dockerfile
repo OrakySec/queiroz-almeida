@@ -20,6 +20,10 @@ ENV NODE_ENV=production
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package.json ./package.json
+
+# Regera o Prisma client para o platform correto (linux-musl Alpine)
+RUN npx prisma generate
 
 EXPOSE 3001
 # Roda migrations automaticamente antes de iniciar
