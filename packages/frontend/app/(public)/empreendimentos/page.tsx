@@ -1,10 +1,10 @@
 import { Metadata } from 'next'
 import { EmpreendimentoCard } from '@/components/public/EmpreendimentoCard'
-import { RevealText, Reveal } from '@/components/public/RevealText'
+import { Reveal } from '@/components/public/RevealText'
 import type { Empreendimento } from '@/types'
 
 export const metadata: Metadata = {
-  title: 'Empreendimentos',
+  title: 'Empreendimentos | Queiroz Almeida',
   description: 'Conheça os empreendimentos da Queiroz Almeida em Porto de Galinhas e Maragogi.',
 }
 
@@ -24,51 +24,73 @@ export default async function EmpreendimentosPage() {
   const empreendimentos = await getEmpreendimentos()
 
   return (
-    <>
-      {/* Hero da página */}
-      <section className="bg-brand-azul pt-40 pb-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <RevealText>
-            <span className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-brand-dourado">
-              Portfólio
-            </span>
-          </RevealText>
-          <RevealText delay={0.1}>
-            <h1 className="font-serif font-bold text-5xl md:text-6xl text-white mt-4 leading-tight">
-              Nossos empreendimentos
+    <div className="min-h-screen bg-brand-dark">
+
+      {/* ── Hero ────────────────────────────────────────────────── */}
+      <section className="relative pt-44 pb-24 overflow-hidden">
+        {/* Background grid texture */}
+        <div className="absolute inset-0 bg-blueprint opacity-[0.025] pointer-events-none" />
+        {/* Ambient glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-brand-marinho-glow/8 blur-[120px] rounded-full pointer-events-none" />
+
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+          <Reveal>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-1.5 h-1.5 rounded-full bg-brand-marinho-glow animate-pulse" />
+              <span className="font-sans text-[10px] font-black uppercase tracking-[0.35em] text-brand-marinho-glow">
+                Portfólio
+              </span>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <h1
+              className="font-serif font-bold text-white leading-[1.0] tracking-tight mb-6"
+              style={{ fontSize: 'clamp(2.8rem, 7vw, 5.5rem)' }}
+            >
+              Nossos{' '}
+              <em className="not-italic text-brand-marinho-glow">empreendimentos.</em>
             </h1>
-          </RevealText>
+          </Reveal>
+
           <Reveal delay={0.2}>
-            <p className="font-sans text-lg text-white/60 mt-4 max-w-xl">
-              Flats de investimento no litoral nordestino com alto padrão construtivo e localização privilegiada.
+            <p className="font-sans text-lg text-white/40 max-w-xl leading-relaxed">
+              Flats de alto padrão em Porto de Galinhas e Maragogi — onde a valorização imobiliária encontra o litoral.
             </p>
           </Reveal>
         </div>
       </section>
 
-      {/* Grid */}
-      <section className="bg-white py-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      {/* ── Grid ────────────────────────────────────────────────── */}
+      <section className="relative pb-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+
+          {/* Thin separator */}
+          <div className="h-px w-full bg-white/[0.05] mb-16" />
+
           {empreendimentos.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="font-sans text-brand-texto/60 text-lg">
-                Nenhum empreendimento disponível no momento.
+            <div className="flex flex-col items-center justify-center py-32 text-center">
+              <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center mb-6">
+                <div className="w-6 h-6 rounded-full border-2 border-dashed border-white/20" />
+              </div>
+              <p className="font-serif font-bold text-white/20 text-2xl mb-2">
+                Nenhum empreendimento disponível
+              </p>
+              <p className="font-sans text-white/20 text-sm">
+                Novos projetos em breve.
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
               {empreendimentos.map((e, i) => (
-                <Reveal key={e.id} delay={0.05 * i}>
-                  {/* Adaptar card para grid (não horizontal scroll) */}
-                  <div className="w-full">
-                    <EmpreendimentoCard empreendimento={e} />
-                  </div>
+                <Reveal key={e.id} delay={0.07 * i}>
+                  <EmpreendimentoCard empreendimento={e} />
                 </Reveal>
               ))}
             </div>
           )}
         </div>
       </section>
-    </>
+    </div>
   )
 }
