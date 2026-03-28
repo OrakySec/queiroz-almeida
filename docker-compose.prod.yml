@@ -128,9 +128,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=YkaroNET"
-      - "traefik.http.routers.qa-frontend.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.qa-frontend.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.qa-frontend.entrypoints=websecure"
+      - "traefik.http.routers.qa-frontend.tls=true"
       - "traefik.http.routers.qa-frontend.tls.certresolver=letsencryptresolver"
+      - "traefik.http.routers.qa-frontend.tls.domains[0].main=${DOMAIN}"
       - "traefik.http.services.qa-frontend.loadbalancer.server.port=3000"
 
   # ─── Watchtower (auto-update de imagens) ─────────────────────
