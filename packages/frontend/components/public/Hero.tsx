@@ -1,6 +1,6 @@
 'use client'
 import { useRef } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
 import { ArrowRight, Play, MapPin } from 'lucide-react'
 import { useLeadModal } from '@/context/LeadModalContext'
 
@@ -12,10 +12,18 @@ const locations = [
 export function Hero() {
   const { open: openLead } = useLeadModal()
   const containerRef = useRef<HTMLElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end start'],
+  })
+
+  // Scrub video timeline based on scroll position
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (videoRef.current && Number.isFinite(videoRef.current.duration)) {
+      videoRef.current.currentTime = latest * videoRef.current.duration
+    }
   })
 
   const videoY = useTransform(scrollYProgress, [0, 1], ['0%', '20%'])
@@ -28,7 +36,8 @@ export function Hero() {
       {/* Cinematic Background */}
       <motion.div className="absolute inset-0 z-0" style={{ y: videoY, scale }}>
         <video
-          autoPlay muted loop playsInline
+          ref={videoRef}
+          muted playsInline preload="auto"
           className="absolute inset-0 w-full h-full object-cover grayscale-[20%] contrast-[1.1]"
           poster="/hero-poster.jpg"
         >
