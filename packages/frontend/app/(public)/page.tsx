@@ -1,4 +1,5 @@
 import { Hero } from '@/components/public/Hero'
+import { ConstrucaoScrollVideo } from '@/components/public/ConstrucaoScrollVideo'
 import { QuemSomos } from '@/components/public/QuemSomos'
 import { Lancamento } from '@/components/public/Lancamento'
 import { EmpreendimentosSection } from '@/components/public/EmpreendimentosSection'
@@ -38,6 +39,7 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
+      <ConstrucaoScrollVideo />
       <QuemSomos />
       {lancamento && <Lancamento empreendimento={lancamento} />}
       {empreendimentos.length > 0 && (
