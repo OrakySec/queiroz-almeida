@@ -16,36 +16,38 @@ export function Hero() {
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start start', 'end start'],
+    offset: ['start start', 'end end'],
   })
 
   // Scrub video timeline based on scroll position
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (videoRef.current && Number.isFinite(videoRef.current.duration)) {
-      videoRef.current.currentTime = latest * videoRef.current.duration
+      const targetTime = latest * videoRef.current.duration;
+      // Prevent seeking past duration which can cause errors
+      videoRef.current.currentTime = targetTime >= videoRef.current.duration ? videoRef.current.duration - 0.1 : targetTime;
     }
   })
 
-  const videoY = useTransform(scrollYProgress, [0, 1], ['0%', '20%'])
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+  const opacity = useTransform(scrollYProgress, [0.8, 1], [1, 0])
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.08])
 
   return (
-    <section ref={containerRef} className="relative min-h-screen flex flex-col overflow-hidden bg-brand-dark">
-      
-      {/* Cinematic Background */}
-      <motion.div className="absolute inset-0 z-0" style={{ y: videoY, scale }}>
-        <video
-          ref={videoRef}
-          muted playsInline preload="auto"
-          className="absolute inset-0 w-full h-full object-cover grayscale-[20%] contrast-[1.1]"
-          poster="/hero-poster.jpg"
-        >
-          <source src="/hero-video.mp4" type="video/mp4" />
-        </video>
+    <section ref={containerRef} className="relative h-[400vh] bg-brand-dark">
+      <div className="sticky top-0 h-screen w-full flex flex-col overflow-hidden">
         
-        {/* Layered Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/50 via-brand-dark/30 to-brand-dark" />
+        {/* Cinematic Background */}
+        <motion.div className="absolute inset-0 z-0" style={{ scale, opacity }}>
+          <video
+            ref={videoRef}
+            muted playsInline preload="auto"
+            className="absolute inset-0 w-full h-full object-cover grayscale-[20%] contrast-[1.1]"
+            poster="/hero-poster.jpg"
+          >
+            <source src="/hero-video-scrub.mp4" type="video/mp4" />
+          </video>
+          
+          {/* Layered Overlays */}
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/50 via-brand-dark/30 to-brand-dark" />
         <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/80 via-brand-dark/30 to-transparent" />
         <div className="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none" />
       </motion.div>
@@ -191,6 +193,7 @@ export function Hero() {
 
       {/* Blueprint */}
       <div className="absolute inset-0 bg-blueprint opacity-[0.03] pointer-events-none z-[1]" />
+      </div>
     </section>
   )
 }

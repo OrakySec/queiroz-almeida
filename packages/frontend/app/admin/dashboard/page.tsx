@@ -39,21 +39,18 @@ export default function DashboardPage() {
     async function load() {
       try {
         const [leadsRes, empRes] = await Promise.all([
-          api.get('/api/leads?limit=5&sort=createdAt:desc'),
-          api.get('/api/admin/empreendimentos?limit=5&sort=updatedAt:desc'),
+          api.get('/api/admin/leads?page=1'),
+          api.get('/api/admin/empreendimentos'),
         ])
 
-        const leads = leadsRes.data.data ?? leadsRes.data
+        const leads = leadsRes.data.leads ?? leadsRes.data
         const emps  = empRes.data.data  ?? empRes.data
 
         setRecentLeads(leads.slice(0, 5))
         setRecentEmp(emps.slice(0, 5))
 
-        // Derive stats from returned data
-        const allLeadsRes = await api.get('/api/leads')
-        const allLeads = allLeadsRes.data.data ?? allLeadsRes.data
-        const allEmpRes = await api.get('/api/admin/empreendimentos?limit=100')
-        const allEmps = allEmpRes.data.data ?? allEmpRes.data
+        const allLeads = leads
+        const allEmps = emps
 
         const today = new Date().toDateString()
         setStats({

@@ -10,17 +10,45 @@ const ACCEPTED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 const empreendimentoSchema = z.object({
   nome: z.string().min(1),
-  localizacao: z.string().min(1),
-  descricao: z.string().optional(),
-  progresso: z.number().int().min(0).max(100).default(0),
-  area_min: z.number().optional(),
-  area_max: z.number().optional(),
-  quartos: z.string().optional(),
-  banheiros: z.number().int().optional(),
-  vagas: z.string().optional(),
-  video_url: z.string().url().optional().or(z.literal('')),
-  is_lancamento: z.boolean().default(false),
+  cidade: z.string().min(1),
+  estado: z.string().min(2).max(2),
+  descricaoBreve: z.string().optional(),
+  descricaoCompleta: z.string().optional(),
+  tipologia: z.string().optional(),
+  areaMin: z.coerce.number().optional().or(z.literal('')),
+  areaMax: z.coerce.number().optional().or(z.literal('')),
+  precoMin: z.coerce.number().optional().or(z.literal('')),
+  precoMax: z.coerce.number().optional().or(z.literal('')),
+  totalUnidades: z.coerce.number().int().optional().or(z.literal('')),
+  unidadesDisponiveis: z.coerce.number().int().optional().or(z.literal('')),
+  percentualObra: z.coerce.number().min(0).max(100).optional().or(z.literal('')),
+  dataEntrega: z.string().optional().or(z.literal('')),
+  videoUrl: z.string().url().optional().or(z.literal('')),
+  whatsapp: z.string().optional(),
+  destaque: z.boolean().default(false),
 })
+
+function toDbData(data: z.infer<typeof empreendimentoSchema>) {
+  return {
+    nome: data.nome,
+    cidade: data.cidade,
+    estado: data.estado,
+    descricao_breve: data.descricaoBreve || null,
+    descricao: data.descricaoCompleta || null,
+    tipologia: data.tipologia || null,
+    progresso: Number(data.percentualObra ?? 0),
+    area_min: data.areaMin !== '' && data.areaMin != null ? data.areaMin : null,
+    area_max: data.areaMax !== '' && data.areaMax != null ? data.areaMax : null,
+    preco_min: data.precoMin !== '' && data.precoMin != null ? data.precoMin : null,
+    preco_max: data.precoMax !== '' && data.precoMax != null ? data.precoMax : null,
+    total_unidades: data.totalUnidades !== '' && data.totalUnidades != null ? Number(data.totalUnidades) : null,
+    unidades_disponiveis: data.unidadesDisponiveis !== '' && data.unidadesDisponiveis != null ? Number(data.unidadesDisponiveis) : null,
+    data_entrega: data.dataEntrega ? new Date(data.dataEntrega) : null,
+    video_url: data.videoUrl || null,
+    whatsapp: data.whatsapp || null,
+    is_lancamento: data.destaque ?? false,
+  }
+}
 
 export async function empreendimentosAdminRoutes(app: FastifyInstance) {
   const preHandler = [verifyJWT]
@@ -47,11 +75,9 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
   app.post('/', { preHandler }, async (request, reply) => {
     const user = request.user as { id: string }
     const data = empreendimentoSchema.parse(request.body)
-
     const slug = slugify(data.nome, { lower: true, strict: true, locale: 'pt' })
 
-    // Se is_lancamento, desmarca o anterior
-    if (data.is_lancamento) {
+    if (data.destaque) {
       await prisma.empreendimento.updateMany({
         where: { is_lancamento: true },
         data: { is_lancamento: false },
@@ -59,12 +85,7 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
     }
 
     const empreendimento = await prisma.empreendimento.create({
-      data: {
-        ...data,
-        slug,
-        created_by_id: user.id,
-        status: 'RASCUNHO',
-      },
+      data: { ...toDbData(data), slug, created_by_id: user.id, status: 'RASCUNHO' },
     })
     return reply.status(201).send(empreendimento)
   })
@@ -78,17 +99,13 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
     const existing = await prisma.empreendimento.findUnique({ where: { id } })
     if (!existing) return reply.status(404).send({ message: 'Empreendimento não encontrado.' })
 
-    // EDITOR só pode editar RASCUNHO ou REJEITADO
-    if (user.role === 'EDITOR') {
-      if (!['RASCUNHO', 'REJEITADO'].includes(existing.status)) {
-        return reply.status(403).send({ message: 'Você não pode editar este empreendimento no status atual.' })
-      }
+    if (user.role === 'EDITOR' && !['RASCUNHO', 'REJEITADO'].includes(existing.status)) {
+      return reply.status(403).send({ message: 'Você não pode editar este empreendimento no status atual.' })
     }
 
-    // Se estava REJEITADO e está sendo editado, volta para RASCUNHO
     const novoStatus = existing.status === 'REJEITADO' ? 'RASCUNHO' : existing.status
 
-    if (data.is_lancamento) {
+    if (data.destaque) {
       await prisma.empreendimento.updateMany({
         where: { is_lancamento: true, id: { not: id } },
         data: { is_lancamento: false },
@@ -98,13 +115,33 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
     const updated = await prisma.empreendimento.update({
       where: { id },
       data: {
-        ...data,
+        ...toDbData(data),
         status: novoStatus,
         ...(novoStatus === 'RASCUNHO' && existing.status === 'REJEITADO' ? { rejection_comment: null } : {}),
       },
     })
     return reply.send(updated)
   })
+
+  // PATCH /api/admin/empreendimentos/:id/status
+  app.patch(
+    '/:id/status',
+    { preHandler: [verifyJWT, requireRole('GERENTE', 'ADMIN')] },
+    async (request, reply) => {
+      const user = request.user as { id: string }
+      const { id } = request.params as { id: string }
+      const { status } = z.object({
+        status: z.enum(['RASCUNHO', 'AGUARDANDO_APROVACAO', 'PUBLICADO', 'REJEITADO']),
+      }).parse(request.body)
+
+      const data: any = { status }
+      if (status === 'PUBLICADO') data.approved_by_id = user.id
+      if (status === 'PUBLICADO' || status === 'RASCUNHO') data.rejection_comment = null
+
+      const updated = await prisma.empreendimento.update({ where: { id }, data })
+      return reply.send(updated)
+    }
+  )
 
   // DELETE /api/admin/empreendimentos/:id
   app.delete('/:id', { preHandler: [verifyJWT, requireRole('GERENTE', 'ADMIN')] }, async (request, reply) => {
@@ -129,39 +166,30 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
   })
 
   // POST /api/admin/empreendimentos/:id/aprovar
-  app.post(
-    '/:id/aprovar',
-    { preHandler: [verifyJWT, requireRole('GERENTE', 'ADMIN')] },
-    async (request, reply) => {
-      const user = request.user as { id: string }
-      const { id } = request.params as { id: string }
-      const updated = await prisma.empreendimento.update({
-        where: { id },
-        data: { status: 'PUBLICADO', approved_by_id: user.id, rejection_comment: null },
-      })
-      return reply.send(updated)
-    }
-  )
+  app.post('/:id/aprovar', { preHandler: [verifyJWT, requireRole('GERENTE', 'ADMIN')] }, async (request, reply) => {
+    const user = request.user as { id: string }
+    const { id } = request.params as { id: string }
+    const updated = await prisma.empreendimento.update({
+      where: { id },
+      data: { status: 'PUBLICADO', approved_by_id: user.id, rejection_comment: null },
+    })
+    return reply.send(updated)
+  })
 
   // POST /api/admin/empreendimentos/:id/rejeitar
-  app.post(
-    '/:id/rejeitar',
-    { preHandler: [verifyJWT, requireRole('GERENTE', 'ADMIN')] },
-    async (request, reply) => {
-      const { comentario } = z.object({ comentario: z.string().min(1) }).parse(request.body)
-      const { id } = request.params as { id: string }
-      const updated = await prisma.empreendimento.update({
-        where: { id },
-        data: { status: 'REJEITADO', rejection_comment: comentario },
-      })
-      return reply.send(updated)
-    }
-  )
+  app.post('/:id/rejeitar', { preHandler: [verifyJWT, requireRole('GERENTE', 'ADMIN')] }, async (request, reply) => {
+    const { comentario } = z.object({ comentario: z.string().min(1) }).parse(request.body)
+    const { id } = request.params as { id: string }
+    const updated = await prisma.empreendimento.update({
+      where: { id },
+      data: { status: 'REJEITADO', rejection_comment: comentario },
+    })
+    return reply.send(updated)
+  })
 
-  // POST /api/admin/empreendimentos/:id/fotos — upload multipart
+  // POST /api/admin/empreendimentos/:id/fotos
   app.post('/:id/fotos', { preHandler }, async (request, reply) => {
     const { id } = request.params as { id: string }
-
     const existing = await prisma.empreendimento.findUnique({ where: { id } })
     if (!existing) return reply.status(404).send({ message: 'Empreendimento não encontrado.' })
 
@@ -198,7 +226,6 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
     if (!existing) return reply.status(404).send({ message: 'Empreendimento não encontrado.' })
 
     await deleteFoto(url)
-
     const fotos = ((existing.fotos as string[]) || []).filter((f) => f !== url)
     const updated = await prisma.empreendimento.update({ where: { id }, data: { fotos } })
     return reply.send(updated)
