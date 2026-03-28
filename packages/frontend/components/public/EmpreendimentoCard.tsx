@@ -71,7 +71,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
             </h3>
             <div className="flex items-center gap-2 text-brand-navy/40">
               <div className="w-1.5 h-1.5 rounded-full bg-brand-marinho-glow" />
-              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] truncate">{e.localizacao}</span>
+              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] truncate">{e.cidade}{e.estado ? `, ${e.estado}` : ''}</span>
             </div>
           </div>
           <Link
@@ -89,9 +89,9 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
               <span>{e.area_min}{e.area_max && e.area_max !== e.area_min ? `–${e.area_max}` : ''} m²</span>
             </div>
           )}
-          {e.quartos && (
+          {e.tipologia && (
             <div className="flex items-center gap-2 font-sans text-[10px] font-bold text-brand-navy/60 bg-brand-navy/[0.03] px-4 py-2 rounded-full border border-brand-navy/5 group-hover:bg-brand-navy group-hover:text-white transition-colors duration-500">
-              <span>{e.quartos} {parseInt(e.quartos) === 1 ? 'quarto' : 'quartos'}</span>
+              <span>{e.tipologia}</span>
             </div>
           )}
           <Link

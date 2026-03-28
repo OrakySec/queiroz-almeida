@@ -15,8 +15,8 @@ interface Emp {
   cidade: string
   estado: string
   status: string
-  destaque: boolean
-  updatedAt: string
+  is_lancamento: boolean
+  updated_at: string
 }
 
 const STATUS_OPTIONS = [
@@ -44,7 +44,7 @@ function EmpreendimentosContent() {
     try {
       const params = new URLSearchParams()
       if (statusFilter) params.set('status', statusFilter)
-      if (search) params.set('search', search)
+      if (search) params.set('q', search)
       const res = await api.get(`/api/admin/empreendimentos?${params}`)
       setItems(res.data.data ?? res.data)
     } catch {
@@ -149,7 +149,7 @@ function EmpreendimentosContent() {
                   <tr key={emp.id} className="hover:bg-brand-navy/[0.02] transition-colors">
                     <td className="px-5 py-4">
                       <p className="font-semibold text-brand-navy">{emp.nome}</p>
-                      {emp.destaque && (
+                      {emp.is_lancamento && (
                         <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
                           Destaque
                         </span>
@@ -160,7 +160,7 @@ function EmpreendimentosContent() {
                       <StatusBadge status={emp.status as any} />
                     </td>
                     <td className="px-5 py-4 text-brand-navy/40 text-xs">
-                      {new Date(emp.updatedAt).toLocaleDateString('pt-BR')}
+                      {new Date(emp.updated_at).toLocaleDateString('pt-BR')}
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-1">

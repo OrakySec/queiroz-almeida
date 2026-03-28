@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import { MapPin, Maximize2, BedDouble, Bath, Car } from 'lucide-react'
+import { MapPin, Maximize2, BedDouble, Car } from 'lucide-react'
 import { RevealText, Reveal, RevealImage } from '@/components/public/RevealText'
 import { LeadCTAButton } from '@/components/public/LeadCTAButton'
 import type { Empreendimento } from '@/types'
@@ -28,7 +28,7 @@ export async function generateMetadata({
   if (!e) return { title: 'Empreendimento não encontrado' }
   return {
     title: e.nome,
-    description: e.descricao?.slice(0, 160) || `${e.nome} em ${e.localizacao}`,
+    description: e.descricao?.slice(0, 160) || `${e.nome} em ${e.cidade}`,
   }
 }
 
@@ -71,7 +71,7 @@ export default async function EmpreendimentoPage({
           <Reveal delay={0.2}>
             <div className="flex items-center gap-2 mt-4 text-white/60">
               <MapPin size={16} className="text-brand-dourado" />
-              <span className="font-sans text-base">{e.localizacao}</span>
+              <span className="font-sans text-base">{e.cidade}{e.estado ? `, ${e.estado}` : ''}</span>
             </div>
           </Reveal>
         </div>
@@ -95,25 +95,18 @@ export default async function EmpreendimentoPage({
                       <p className="font-sans text-xs text-brand-texto/60">Área</p>
                     </div>
                   )}
-                  {e.quartos && (
+                  {e.tipologia && (
                     <div className="bg-brand-gelo rounded-xl p-4 text-center border border-brand-borda">
                       <BedDouble size={20} className="text-brand-dourado mx-auto mb-2" />
-                      <p className="font-serif font-bold text-lg text-brand-azul">{e.quartos}</p>
-                      <p className="font-sans text-xs text-brand-texto/60">Quartos</p>
+                      <p className="font-serif font-bold text-lg text-brand-azul">{e.tipologia}</p>
+                      <p className="font-sans text-xs text-brand-texto/60">Tipologia</p>
                     </div>
                   )}
-                  {e.banheiros && (
-                    <div className="bg-brand-gelo rounded-xl p-4 text-center border border-brand-borda">
-                      <Bath size={20} className="text-brand-dourado mx-auto mb-2" />
-                      <p className="font-serif font-bold text-lg text-brand-azul">{e.banheiros}</p>
-                      <p className="font-sans text-xs text-brand-texto/60">Banheiros</p>
-                    </div>
-                  )}
-                  {e.vagas && (
+                  {e.total_unidades && (
                     <div className="bg-brand-gelo rounded-xl p-4 text-center border border-brand-borda">
                       <Car size={20} className="text-brand-dourado mx-auto mb-2" />
-                      <p className="font-serif font-bold text-lg text-brand-azul">{e.vagas}</p>
-                      <p className="font-sans text-xs text-brand-texto/60">Vagas</p>
+                      <p className="font-serif font-bold text-lg text-brand-azul">{e.unidades_disponiveis ?? e.total_unidades}</p>
+                      <p className="font-sans text-xs text-brand-texto/60">Unidades</p>
                     </div>
                   )}
                 </div>
