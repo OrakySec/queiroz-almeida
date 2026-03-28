@@ -27,4 +27,4 @@ RUN npx prisma generate
 
 EXPOSE 3001
 # Roda migrations automaticamente antes de iniciar
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npx tsx prisma/seed.ts && node dist/server.js"]
