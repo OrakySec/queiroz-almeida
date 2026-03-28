@@ -2,6 +2,9 @@
 node_modules/
 .pnpm-store/
 
+# Claude Code local settings (pode conter tokens)
+.claude/settings.local.json
+
 # Environment
 .env
 .env.local
