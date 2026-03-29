@@ -43,13 +43,14 @@ function faixa(min?: number, max?: number, suffix = '') {
   return `${min ?? max}${suffix}`
 }
 
-function formatPreco(valor?: number) {
-  if (!valor) return null
+function formatPreco(valor?: number | string | null) {
+  const n = Number(valor)
+  if (!n) return null
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
     maximumFractionDigits: 0,
-  }).format(valor)
+  }).format(n)
 }
 
 function formatDate(iso?: string) {

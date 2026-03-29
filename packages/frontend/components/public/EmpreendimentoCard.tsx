@@ -9,13 +9,14 @@ interface Props {
   empreendimento: Empreendimento
 }
 
-function formatPreco(valor?: number) {
-  if (!valor) return null
+function formatPreco(valor?: number | string | null) {
+  const n = Number(valor)
+  if (!n) return null
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
     maximumFractionDigits: 0,
-  }).format(valor)
+  }).format(n)
 }
 
 function faixa(min?: number, max?: number, suffix = '') {
@@ -169,7 +170,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
 
           {/* Price + progress row */}
           <div className="flex items-end justify-between border-t border-white/5 pt-6 mt-auto">
-            {preco ? (
+            {preco && (
               <div>
                 <p className="font-sans text-[9px] font-black uppercase tracking-widest text-white/20 mb-1.5">
                   A partir de
@@ -178,10 +179,6 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
                   {precoMin}
                 </p>
               </div>
-            ) : (
-              <p className="font-sans text-[10px] font-black uppercase tracking-widest text-white/10">
-                Consulte condições
-              </p>
             )}
  
             {e.progresso > 0 && (
