@@ -33,22 +33,40 @@ export function ConstrucaoScrollVideo() {
 
     video.pause() // controle total via currentTime
 
-    let animTime = 0   // posição "animada" (separada de video.currentTime)
-    let targetTime = 0 // onde o scroll quer que estejamos
+    let animTime = 0    // posição "animada" (separada de video.currentTime)
+    let targetTime = 0  // onde o scroll quer que estejamos
+    let lastScrollAt = 0 // timestamp do último evento de scroll
     let rafId = 0
     let running = true
 
-    const LERP = 0.12    // 12%/frame → suave mas responsivo
-    const EPSILON = 0.004 // para de iterar quando estamos a menos de ~1 frame
+    // Lerp enquanto o scroll está ativo e o diff é grande.
+    // Snap (seek único) quando:
+    //   a) diff < SNAP_THRESHOLD  → não vale fazer micro-seeks de <4 frames
+    //   b) scroll parou há > SETTLE_MS → finaliza posição com um seek só
+    const LERP          = 0.15  // 15%/frame → segue rápido sem ser abrupto
+    const SNAP_THRESHOLD = 0.12 // <~4 frames a 30fps → snap direto
+    const SETTLE_MS     = 80    // ms sem scroll → snap para encerrar suavemente
+    const EPSILON       = 0.005 // já chegamos — nem seek
 
     function tick() {
       if (!running) return
       rafId = requestAnimationFrame(tick)
       const v = videoRef.current
       if (!v || !v.duration || !isFinite(v.duration)) return
+
       const diff = targetTime - animTime
-      if (Math.abs(diff) < EPSILON) return
-      animTime += diff * LERP
+      if (Math.abs(diff) < EPSILON) return // já no alvo, nada a fazer
+
+      const settled = (performance.now() - lastScrollAt) > SETTLE_MS
+
+      if (settled || Math.abs(diff) < SNAP_THRESHOLD) {
+        // Snap: um único seek, elimina micro-seeks do lerp ao desacelerar
+        animTime = targetTime
+      } else {
+        // Lerp: scroll ativo e diff grande → animação fluida
+        animTime += diff * LERP
+      }
+
       animTime = Math.max(0, Math.min(v.duration - 0.033, animTime))
       v.currentTime = animTime
     }
@@ -58,6 +76,7 @@ export function ConstrucaoScrollVideo() {
     const unsub = scrollYProgress.on('change', (latest) => {
       const v = videoRef.current
       if (!v || !v.duration || !isFinite(v.duration)) return
+      lastScrollAt = performance.now()
       const mapped = Math.max(0, Math.min(1, (latest - 0.1) / 0.8))
       targetTime = mapped * (v.duration - 0.033)
     })
