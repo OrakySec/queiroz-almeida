@@ -183,7 +183,10 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
  
             {e.progresso > 0 && (
               <div className="text-right">
-                <span className="font-sans text-[10px] font-black uppercase tracking-widest text-brand-marinho-glow">
+                <p className="font-sans text-[7px] font-black uppercase tracking-widest text-white/20 mb-1">
+                  Obras
+                </p>
+                <span className="font-sans text-[10px] font-black uppercase tracking-widest text-brand-marinho-glow leading-none block">
                   {e.progresso}%
                 </span>
               </div>
