@@ -177,13 +177,24 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
             )}
  
             {e.progresso > 0 && (
-              <div className="text-right">
-                <p className="font-sans text-[7px] font-black uppercase tracking-widest text-white/20 mb-1">
+              <div className="text-right min-w-[80px]">
+                <p className="font-sans text-[7px] font-black uppercase tracking-widest text-white/20 mb-1.5">
                   Andamento da Obra
                 </p>
-                <span className="font-sans text-[10px] font-black uppercase tracking-widest text-brand-marinho-glow leading-none block">
-                  {e.progresso}%
-                </span>
+                <div className="flex items-center justify-end gap-2">
+                  <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${e.progresso}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
+                      className="h-full bg-brand-marinho-glow rounded-full"
+                    />
+                  </div>
+                  <span className="font-sans text-[10px] font-black uppercase tracking-widest text-brand-marinho-glow leading-none">
+                    {e.progresso}%
+                  </span>
+                </div>
               </div>
             )}
           </div>
