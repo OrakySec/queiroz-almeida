@@ -138,7 +138,7 @@ export function ConstrucaoScrollVideo() {
                 preload="auto"
                 className="w-full h-full object-cover"
               >
-                <source src="/hero-video.mp4" type="video/mp4" />
+                <source src="/construct-video-scrub.mp4" type="video/mp4" />
               </video>
 
               {/* Overlay with subtle vignette */}
