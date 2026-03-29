@@ -61,7 +61,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative flex-shrink-0 w-full bg-white border border-slate-100 rounded-[2.5rem] overflow-hidden hover:border-brand-marinho/30 hover:shadow-2xl hover:shadow-brand-navy/5 transition-all duration-700"
+      className="group relative flex-shrink-0 w-full bg-brand-navy border border-white/10 rounded-[2.5rem] overflow-hidden hover:border-brand-marinho-glow/30 shadow-xl shadow-brand-navy/5 transition-all duration-700"
     >
       <Link href={`/empreendimentos/${e.slug}`} className="block">
 
@@ -77,7 +77,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
           )}
 
           {/* Gradient veil */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/40 to-transparent" />
 
           {/* Badges — top left */}
           <div className="absolute top-5 left-5 flex items-center gap-2">
@@ -85,7 +85,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
               {label}
             </span>
             {e.tipo_imovel && (
-              <span className="font-sans text-[8px] font-black uppercase tracking-[0.25em] px-3 py-2 rounded-full backdrop-blur-md border border-brand-navy/10 bg-white/60 text-brand-navy/80">
+              <span className="font-sans text-[8px] font-black uppercase tracking-[0.25em] px-3 py-2 rounded-full backdrop-blur-md border border-white/10 bg-brand-navy/60 text-white/70">
                 {e.tipo_imovel}
               </span>
             )}
@@ -98,7 +98,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
                 {e.padrao}
               </span>
             )}
-            <div className="w-10 h-10 rounded-full bg-brand-navy/80 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110">
+            <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110">
               <ArrowUpRight size={16} className="text-white" />
             </div>
           </div>
@@ -111,7 +111,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
                 whileInView={{ width: `${e.progresso}%` }}
                 viewport={{ once: true }}
                 transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-                className="h-full bg-brand-marinho"
+                className="h-full bg-gradient-to-r from-brand-marinho to-brand-marinho-glow"
               />
             </div>
           )}
@@ -122,15 +122,15 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
 
           {/* Location */}
           <div className="flex items-center gap-2.5 mb-2">
-            <MapPin size={11} className="text-brand-marinho shrink-0" />
-            <span className="font-sans text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">
+            <MapPin size={11} className="text-brand-marinho-glow shrink-0" />
+            <span className="font-sans text-[9px] font-black uppercase tracking-[0.25em] text-white/40">
               {localizacao}
             </span>
           </div>
 
           {/* Name */}
           <h3
-            className="font-serif font-bold text-brand-navy leading-tight tracking-tight mb-4 group-hover:text-brand-marinho transition-colors duration-500"
+            className="font-serif font-bold text-white leading-tight tracking-tight mb-4 group-hover:text-brand-marinho-glow transition-colors duration-500"
             style={{ fontSize: 'clamp(1.5rem, 3vw, 1.85rem)' }}
           >
             {e.nome}
@@ -138,27 +138,27 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
 
           {/* Descrição breve */}
           {e.descricao_breve && (
-            <p className="font-sans text-[13px] text-slate-500 leading-relaxed mb-6 line-clamp-2 font-light">
+            <p className="font-sans text-[13px] text-white/40 leading-relaxed mb-6 line-clamp-2 font-light">
               {e.descricao_breve}
             </p>
           )}
 
           {/* Divider */}
-          <div className="h-px w-full bg-slate-100 mb-6" />
+          <div className="h-px w-full bg-white/5 mb-6" />
 
           {/* Specs grid — 2 colunas */}
           {specs.length > 0 && (
             <div className="grid grid-cols-2 gap-x-6 gap-y-4 mb-8">
               {specs.map(({ icon: Icon, label: specLabel, value }) => (
                 <div key={specLabel} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
-                    <Icon size={12} className="text-brand-marinho" />
+                  <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                    <Icon size={12} className="text-brand-marinho-glow" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-sans text-[9px] font-bold uppercase tracking-widest text-slate-300 leading-none mb-1">
+                    <p className="font-sans text-[9px] font-bold uppercase tracking-widest text-white/20 leading-none mb-1">
                       {specLabel}
                     </p>
-                    <p className="font-sans text-sm font-bold text-brand-navy/80 leading-none truncate">
+                    <p className="font-sans text-sm font-bold text-white/80 leading-none truncate">
                       {value}
                     </p>
                   </div>
@@ -168,25 +168,25 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
           )}
 
           {/* Price + progress row */}
-          <div className="flex items-end justify-between border-t border-slate-50 pt-6 mt-auto">
+          <div className="flex items-end justify-between border-t border-white/5 pt-6 mt-auto">
             {preco ? (
               <div>
-                <p className="font-sans text-[9px] font-black uppercase tracking-widest text-brand-navy/30 mb-1.5">
+                <p className="font-sans text-[9px] font-black uppercase tracking-widest text-white/20 mb-1.5">
                   A partir de
                 </p>
-                <p className="font-serif font-bold text-brand-navy text-xl leading-none">
+                <p className="font-serif font-bold text-white text-xl leading-none">
                   {precoMin}
                 </p>
               </div>
             ) : (
-              <p className="font-sans text-[10px] font-black uppercase tracking-widest text-slate-300">
+              <p className="font-sans text-[10px] font-black uppercase tracking-widest text-white/10">
                 Consulte condições
               </p>
             )}
  
             {e.progresso > 0 && (
               <div className="text-right">
-                <span className="font-sans text-[10px] font-black uppercase tracking-widest text-brand-marinho">
+                <span className="font-sans text-[10px] font-black uppercase tracking-widest text-brand-marinho-glow">
                   {e.progresso}%
                 </span>
               </div>
