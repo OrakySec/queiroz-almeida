@@ -31,8 +31,6 @@ const schema = z.object({
   suitesMax: optInt,
   banheirosMin: optInt,
   banheirosMax: optInt,
-  vagasMin: optInt,
-  vagasMax: optInt,
   numTorres: optInt,
   numAndares: optInt,
   latitude: z.coerce.number().optional().or(z.literal('')),
@@ -85,6 +83,30 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
     setAmenidades(prev =>
       prev.includes(item) ? prev.filter(a => a !== item) : [...prev, item]
     )
+  }
+
+  // Vagas (selects independentes do RHF)
+  const initVagasTipo = (initialData as any)?.vagasTipo ?? ''
+  const [vagasTipo, setVagasTipo] = useState<string>(initVagasTipo)
+  const [vagasMin, setVagasMin] = useState<string>(
+    initVagasTipo === 'ROTATIVA' ? 'ROTATIVA'
+      : (initialData as any)?.vagasMin != null && (initialData as any)?.vagasMin !== ''
+        ? String((initialData as any).vagasMin) : ''
+  )
+  const [vagasMax, setVagasMax] = useState<string>(
+    (initialData as any)?.vagasMax != null && (initialData as any)?.vagasMax !== ''
+      ? String((initialData as any).vagasMax) : ''
+  )
+
+  function handleVagasMinChange(val: string) {
+    if (val === 'ROTATIVA') {
+      setVagasTipo('ROTATIVA')
+      setVagasMin('ROTATIVA')
+      setVagasMax('')
+    } else {
+      setVagasTipo('')
+      setVagasMin(val)
+    }
   }
 
   // Arquivos pendentes para enviar junto com a criação
@@ -160,7 +182,13 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
   }, [nomeValue, mode, setValue])
 
   function withAmenidades(data: FormData) {
-    return { ...data, amenidades }
+    return {
+      ...data,
+      amenidades,
+      vagasMin: vagasTipo === 'ROTATIVA' ? '' : vagasMin,
+      vagasMax: vagasTipo === 'ROTATIVA' ? '' : vagasMax,
+      vagasTipo: vagasTipo || undefined,
+    }
   }
 
   async function onSave(data: FormData) {
@@ -319,11 +347,35 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
             <Field label="Banheiros (máx)" error={errors.banheirosMax?.message}>
               <input {...register('banheirosMax')} type="number" min={0} className={input()} placeholder="3" />
             </Field>
-            <Field label="Vagas (mín)" error={errors.vagasMin?.message}>
-              <input {...register('vagasMin')} type="number" min={0} className={input()} placeholder="1" />
+            <Field label="Vagas (mín / tipo)">
+              <select
+                value={vagasMin}
+                onChange={e => handleVagasMinChange(e.target.value)}
+                className={input()}
+              >
+                <option value="">—</option>
+                <option value="ROTATIVA">Rotativa</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
             </Field>
-            <Field label="Vagas (máx)" error={errors.vagasMax?.message}>
-              <input {...register('vagasMax')} type="number" min={0} className={input()} placeholder="2" />
+            <Field label="Vagas (máx)">
+              <select
+                value={vagasMax}
+                onChange={e => setVagasMax(e.target.value)}
+                disabled={vagasTipo === 'ROTATIVA'}
+                className={input(vagasTipo === 'ROTATIVA' ? 'opacity-40 cursor-not-allowed' : '')}
+              >
+                <option value="">—</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
             </Field>
             <Field label="Nº de Torres" error={errors.numTorres?.message}>
               <input {...register('numTorres')} type="number" min={1} className={input()} placeholder="2" />

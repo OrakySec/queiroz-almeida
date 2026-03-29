@@ -19,8 +19,8 @@ function formatPreco(valor?: number) {
 }
 
 function faixa(min?: number, max?: number, suffix = '') {
-  if (!min && !max) return null
-  if (min && max && min !== max) return `${min}–${max}${suffix}`
+  if (min == null && max == null) return null
+  if (min != null && max != null && min !== max) return `${min}–${max}${suffix}`
   return `${min ?? max}${suffix}`
 }
 
@@ -40,7 +40,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
   const quartos   = faixa(e.quartos_min, e.quartos_max)
   const suites    = faixa(e.suites_min, e.suites_max)
   const banheiros = faixa(e.banheiros_min, e.banheiros_max)
-  const vagas     = faixa(e.vagas_min, e.vagas_max)
+  const vagas     = e.vagas_tipo === 'ROTATIVA' ? 'Rotativa' : faixa(e.vagas_min, e.vagas_max)
   const precoMin  = formatPreco(e.preco_min)
   const precoMax  = formatPreco(e.preco_max)
   const preco     = precoMin

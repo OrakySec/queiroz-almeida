@@ -19,6 +19,7 @@ export interface Empreendimento {
   banheiros_max?: number
   vagas_min?: number
   vagas_max?: number
+  vagas_tipo?: string
   num_torres?: number
   num_andares?: number
   latitude?: number

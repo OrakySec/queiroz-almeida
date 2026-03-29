@@ -38,8 +38,8 @@ export async function generateMetadata({
 }
 
 function faixa(min?: number, max?: number, suffix = '') {
-  if (!min && !max) return null
-  if (min && max && min !== max) return `${min}–${max}${suffix}`
+  if (min == null && max == null) return null
+  if (min != null && max != null && min !== max) return `${min}–${max}${suffix}`
   return `${min ?? max}${suffix}`
 }
 
@@ -84,7 +84,7 @@ export default async function EmpreendimentoPage({
     { icon: Maximize2, label: 'Área', value: faixa(e.area_min, e.area_max, ' m²') },
     { icon: BedDouble, label: 'Quartos', value: faixa(e.quartos_min, e.quartos_max) },
     { icon: Bath,      label: 'Suítes',  value: faixa(e.suites_min, e.suites_max) },
-    { icon: Car,       label: 'Vagas',   value: faixa(e.vagas_min, e.vagas_max) },
+    { icon: Car,       label: 'Vagas',   value: e.vagas_tipo === 'ROTATIVA' ? 'Rotativa' : faixa(e.vagas_min, e.vagas_max) },
     { icon: Building2, label: 'Unidades', value: e.total_unidades?.toString() ?? null },
     { icon: TrendingUp, label: 'Progresso', value: e.progresso > 0 ? `${e.progresso}%` : null },
   ].filter(s => s.value)
@@ -97,7 +97,7 @@ export default async function EmpreendimentoPage({
     faixa(e.quartos_min, e.quartos_max) && { label: 'Quartos', value: faixa(e.quartos_min, e.quartos_max)! },
     faixa(e.suites_min, e.suites_max)   && { label: 'Suítes',  value: faixa(e.suites_min, e.suites_max)! },
     faixa(e.banheiros_min, e.banheiros_max) && { label: 'Banheiros', value: faixa(e.banheiros_min, e.banheiros_max)! },
-    faixa(e.vagas_min, e.vagas_max)     && { label: 'Vagas',   value: faixa(e.vagas_min, e.vagas_max)! },
+    (e.vagas_tipo === 'ROTATIVA' || faixa(e.vagas_min, e.vagas_max)) && { label: 'Vagas', value: e.vagas_tipo === 'ROTATIVA' ? 'Rotativa' : faixa(e.vagas_min, e.vagas_max)! },
     faixa(e.area_min, e.area_max, ' m²') && { label: 'Área privativa', value: faixa(e.area_min, e.area_max, ' m²')! },
     e.num_torres             && { label: 'Torres',           value: String(e.num_torres) },
     e.num_andares            && { label: 'Andares',          value: String(e.num_andares) },
@@ -284,7 +284,7 @@ export default async function EmpreendimentoPage({
                 <Reveal delay={0.05}>
                   <div className="py-2">
                     <SectionTitle>Sobre o empreendimento</SectionTitle>
-                    <p className="font-sans text-slate-600 text-lg leading-relaxed max-w-2xl font-light">
+                    <p className="font-sans text-slate-600 text-lg leading-relaxed max-w-2xl font-light whitespace-pre-line">
                       {e.descricao}
                     </p>
                   </div>
@@ -428,8 +428,8 @@ export default async function EmpreendimentoPage({
                         {faixa(e.area_min, e.area_max, ' m²') && (
                           <SidebarInfo icon={Maximize2} label="Área" value={faixa(e.area_min, e.area_max, ' m²')!} />
                         )}
-                        {faixa(e.vagas_min, e.vagas_max) && (
-                          <SidebarInfo icon={Car} label="Vagas" value={faixa(e.vagas_min, e.vagas_max)!} />
+                        {(e.vagas_tipo === 'ROTATIVA' || faixa(e.vagas_min, e.vagas_max)) && (
+                          <SidebarInfo icon={Car} label="Vagas" value={e.vagas_tipo === 'ROTATIVA' ? 'Rotativa' : faixa(e.vagas_min, e.vagas_max)!} />
                         )}
                         {e.data_entrega && (
                           <SidebarInfo icon={Calendar} label="Entrega" value={formatDate(e.data_entrega)!} />

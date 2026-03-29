@@ -22,6 +22,7 @@ const SELECT_PUBLIC = {
   banheiros_max: true,
   vagas_min: true,
   vagas_max: true,
+  vagas_tipo: true,
   num_torres: true,
   num_andares: true,
   latitude: true,

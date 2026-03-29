@@ -31,6 +31,7 @@ function apiToForm(d: any) {
     banheirosMax: d.banheiros_max ?? '',
     vagasMin: d.vagas_min ?? '',
     vagasMax: d.vagas_max ?? '',
+    vagasTipo: d.vagas_tipo ?? '',
     numTorres: d.num_torres ?? '',
     numAndares: d.num_andares ?? '',
     latitude: d.latitude ?? '',

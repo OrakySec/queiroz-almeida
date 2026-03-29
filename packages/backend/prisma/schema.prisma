@@ -65,6 +65,7 @@ model Empreendimento {
   banheiros_max         Int?
   vagas_min             Int?
   vagas_max             Int?
+  vagas_tipo            String?
   num_torres            Int?
   num_andares           Int?
   latitude              Decimal?
