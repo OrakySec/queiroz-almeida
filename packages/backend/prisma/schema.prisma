@@ -53,6 +53,23 @@ model Empreendimento {
   total_unidades        Int?
   unidades_disponiveis  Int?
   data_entrega          DateTime?
+  bairro                String?
+  endereco              String?
+  tipo_imovel           String?
+  padrao                String?
+  quartos_min           Int?
+  quartos_max           Int?
+  suites_min            Int?
+  suites_max            Int?
+  banheiros_min         Int?
+  banheiros_max         Int?
+  vagas_min             Int?
+  vagas_max             Int?
+  num_torres            Int?
+  num_andares           Int?
+  latitude              Decimal?
+  longitude             Decimal?
+  amenidades            Json                 @default("[]")
   whatsapp              String?
   fotos                 Json                 @default("[]")
   video_url             String?

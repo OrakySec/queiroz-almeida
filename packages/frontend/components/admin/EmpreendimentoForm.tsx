@@ -10,18 +10,38 @@ import { FotoUploader } from './FotoUploader'
 import { Save, Loader2, Send, RotateCcw, Upload, X, ImageIcon } from 'lucide-react'
 import { useAdmin } from '@/context/AdminContext'
 
+const optNum = z.coerce.number().positive().optional().or(z.literal(''))
+const optInt = z.coerce.number().int().min(0).optional().or(z.literal(''))
+
 const schema = z.object({
   nome: z.string().min(3, 'Nome obrigatório'),
   slug: z.string().min(3, 'Slug obrigatório').regex(/^[a-z0-9-]+$/, 'Use apenas letras minúsculas, números e hífens'),
   cidade: z.string().min(2, 'Cidade obrigatória'),
   estado: z.string().length(2, 'UF com 2 letras'),
+  bairro: z.string().optional(),
+  endereco: z.string().optional(),
+  tipoImovel: z.string().optional(),
+  padrao: z.string().optional(),
   descricaoBreve: z.string().min(10, 'Descrição breve obrigatória'),
   descricaoCompleta: z.string().optional(),
   tipologia: z.string().optional(),
-  areaMin: z.coerce.number().positive().optional().or(z.literal('')),
-  areaMax: z.coerce.number().positive().optional().or(z.literal('')),
-  precoMin: z.coerce.number().positive().optional().or(z.literal('')),
-  precoMax: z.coerce.number().positive().optional().or(z.literal('')),
+  quartoMin: optInt,
+  quartoMax: optInt,
+  suitesMin: optInt,
+  suitesMax: optInt,
+  banheirosMin: optInt,
+  banheirosMax: optInt,
+  vagasMin: optInt,
+  vagasMax: optInt,
+  numTorres: optInt,
+  numAndares: optInt,
+  latitude: z.coerce.number().optional().or(z.literal('')),
+  longitude: z.coerce.number().optional().or(z.literal('')),
+  amenidades: z.array(z.string()).optional(),
+  areaMin: optNum,
+  areaMax: optNum,
+  precoMin: optNum,
+  precoMax: optNum,
   totalUnidades: z.coerce.number().int().positive().optional().or(z.literal('')),
   unidadesDisponiveis: z.coerce.number().int().min(0).optional().or(z.literal('')),
   percentualObra: z.coerce.number().min(0).max(100).optional().or(z.literal('')),
@@ -30,6 +50,15 @@ const schema = z.object({
   videoUrl: z.string().url('URL inválida').optional().or(z.literal('')),
   whatsapp: z.string().optional(),
 })
+
+const AMENIDADES_LISTA = [
+  'Piscina', 'Academia / Fitness', 'Salão de Festas', 'Churrasqueira',
+  'Playground', 'Bicicletário', 'Coworking', 'Espaço Gourmet',
+  'Sauna', 'Quadra Poliesportiva', 'Quadra de Tênis', 'Campo de Futebol',
+  'Espaço Kids', 'Pet Place', 'Lavanderia', 'Rooftop',
+  'Cinema', 'Espaço Zen', 'Portaria 24h', 'Gerador',
+  'Elevador', 'Câmeras de Segurança', 'Estacionamento de Visitantes',
+]
 
 type FormData = z.infer<typeof schema>
 
@@ -47,6 +76,16 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
 
   // Fotos já confirmadas (URLs no servidor)
   const [fotos, setFotos] = useState<string[]>(initialData?.fotos ?? [])
+
+  // Amenidades (checkboxes)
+  const [amenidades, setAmenidades] = useState<string[]>(
+    (initialData as any)?.amenidades ?? []
+  )
+  function toggleAmenidade(item: string) {
+    setAmenidades(prev =>
+      prev.includes(item) ? prev.filter(a => a !== item) : [...prev, item]
+    )
+  }
 
   // Arquivos pendentes para enviar junto com a criação
   const [pendingFiles, setPendingFiles] = useState<File[]>([])
@@ -120,16 +159,21 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
     }
   }, [nomeValue, mode, setValue])
 
+  function withAmenidades(data: FormData) {
+    return { ...data, amenidades }
+  }
+
   async function onSave(data: FormData) {
     setSaving(true)
     try {
+      const payload = withAmenidades(data)
       if (mode === 'create') {
-        const res = await api.post('/api/admin/empreendimentos', { ...data, status: 'RASCUNHO' })
+        const res = await api.post('/api/admin/empreendimentos', { ...payload, status: 'RASCUNHO' })
         const newId: string = res.data.id
         setEmpId(newId)
         await uploadPendingFiles(newId)
       } else {
-        await api.put(`/api/admin/empreendimentos/${empId}`, data)
+        await api.put(`/api/admin/empreendimentos/${empId}`, payload)
       }
     } catch (err: any) {
       alert(err?.response?.data?.message ?? 'Erro ao salvar')
@@ -141,13 +185,14 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
   async function publishWith(data: FormData, targetStatus: 'PUBLICADO' | 'AGUARDANDO_APROVACAO') {
     setSubmitting(true)
     try {
+      const payload = withAmenidades(data)
       let id = empId
       if (mode === 'create' || !id) {
-        const res = await api.post('/api/admin/empreendimentos', data)
+        const res = await api.post('/api/admin/empreendimentos', payload)
         id = res.data.id
         setEmpId(id)
       } else {
-        await api.put(`/api/admin/empreendimentos/${id}`, data)
+        await api.put(`/api/admin/empreendimentos/${id}`, payload)
       }
       await uploadPendingFiles(id!)
       await api.patch(`/api/admin/empreendimentos/${id}/status`, { status: targetStatus })
@@ -185,6 +230,33 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
             </Field>
             <Field label="Descrição Completa (Markdown)" error={errors.descricaoCompleta?.message} className="md:col-span-2">
               <textarea {...register('descricaoCompleta')} className={input('h-40 resize-y font-mono text-sm')} placeholder="Descrição detalhada do empreendimento..." />
+            </Field>
+            <Field label="Bairro" error={errors.bairro?.message}>
+              <input {...register('bairro')} className={input()} placeholder="Meireles" />
+            </Field>
+            <Field label="Endereço / Logradouro" error={errors.endereco?.message} className="md:col-span-2">
+              <input {...register('endereco')} className={input()} placeholder="Av. Beira Mar, 1234" />
+            </Field>
+            <Field label="Tipo do Imóvel" error={errors.tipoImovel?.message}>
+              <select {...register('tipoImovel')} className={input()}>
+                <option value="">Selecione...</option>
+                <option value="Apartamento">Apartamento</option>
+                <option value="Flat">Flat</option>
+                <option value="Studio">Studio</option>
+                <option value="Cobertura">Cobertura</option>
+                <option value="Casa">Casa</option>
+                <option value="Casa em Condomínio">Casa em Condomínio</option>
+                <option value="Loft">Loft</option>
+              </select>
+            </Field>
+            <Field label="Padrão" error={errors.padrao?.message}>
+              <select {...register('padrao')} className={input()}>
+                <option value="">Selecione...</option>
+                <option value="Econômico">Econômico</option>
+                <option value="Médio">Médio</option>
+                <option value="Alto">Alto</option>
+                <option value="Luxo">Luxo</option>
+              </select>
             </Field>
             <Field label="Tipologia" error={errors.tipologia?.message}>
               <input {...register('tipologia')} className={input()} placeholder="Flat 1 suíte / Flat 2 suítes" />
@@ -228,6 +300,45 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
             </Field>
           </div>
 
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mt-5">
+            <Field label="Quartos (mín)" error={errors.quartoMin?.message}>
+              <input {...register('quartoMin')} type="number" min={0} className={input()} placeholder="1" />
+            </Field>
+            <Field label="Quartos (máx)" error={errors.quartoMax?.message}>
+              <input {...register('quartoMax')} type="number" min={0} className={input()} placeholder="4" />
+            </Field>
+            <Field label="Suítes (mín)" error={errors.suitesMin?.message}>
+              <input {...register('suitesMin')} type="number" min={0} className={input()} placeholder="1" />
+            </Field>
+            <Field label="Suítes (máx)" error={errors.suitesMax?.message}>
+              <input {...register('suitesMax')} type="number" min={0} className={input()} placeholder="3" />
+            </Field>
+            <Field label="Banheiros (mín)" error={errors.banheirosMin?.message}>
+              <input {...register('banheirosMin')} type="number" min={0} className={input()} placeholder="1" />
+            </Field>
+            <Field label="Banheiros (máx)" error={errors.banheirosMax?.message}>
+              <input {...register('banheirosMax')} type="number" min={0} className={input()} placeholder="3" />
+            </Field>
+            <Field label="Vagas (mín)" error={errors.vagasMin?.message}>
+              <input {...register('vagasMin')} type="number" min={0} className={input()} placeholder="1" />
+            </Field>
+            <Field label="Vagas (máx)" error={errors.vagasMax?.message}>
+              <input {...register('vagasMax')} type="number" min={0} className={input()} placeholder="2" />
+            </Field>
+            <Field label="Nº de Torres" error={errors.numTorres?.message}>
+              <input {...register('numTorres')} type="number" min={1} className={input()} placeholder="2" />
+            </Field>
+            <Field label="Nº de Andares" error={errors.numAndares?.message}>
+              <input {...register('numAndares')} type="number" min={1} className={input()} placeholder="12" />
+            </Field>
+            <Field label="Latitude" error={errors.latitude?.message}>
+              <input {...register('latitude')} type="number" step="any" className={input()} placeholder="-3.7318" />
+            </Field>
+            <Field label="Longitude" error={errors.longitude?.message}>
+              <input {...register('longitude')} type="number" step="any" className={input()} placeholder="-38.5011" />
+            </Field>
+          </div>
+
           <div className="mt-5">
             <label className="flex items-center gap-3 cursor-pointer w-fit">
               <input
@@ -237,6 +348,38 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
               />
               <span className="text-sm font-medium text-brand-navy">Marcar como Destaque (aparece em primeiro na listagem)</span>
             </label>
+          </div>
+        </section>
+
+        {/* Amenidades */}
+        <section className="bg-white rounded-2xl border border-brand-navy/5 shadow-sm p-6 lg:p-8">
+          <h2 className="font-semibold text-brand-navy mb-2 text-lg">Amenidades / Diferenciais</h2>
+          <p className="text-xs text-brand-navy/40 mb-5">Marque os itens disponíveis no empreendimento</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {AMENIDADES_LISTA.map(item => (
+              <label key={item} className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors select-none ${
+                amenidades.includes(item)
+                  ? 'border-brand-marinho bg-brand-marinho/5 text-brand-marinho'
+                  : 'border-brand-navy/10 text-brand-navy/50 hover:border-brand-marinho/40'
+              }`}>
+                <input
+                  type="checkbox"
+                  checked={amenidades.includes(item)}
+                  onChange={() => toggleAmenidade(item)}
+                  className="hidden"
+                />
+                <span className={`w-3.5 h-3.5 rounded border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
+                  amenidades.includes(item) ? 'border-brand-marinho bg-brand-marinho' : 'border-brand-navy/20'
+                }`}>
+                  {amenidades.includes(item) && (
+                    <svg viewBox="0 0 10 8" fill="none" className="w-2 h-2">
+                      <path d="M1 4l2.5 2.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </span>
+                <span className="text-xs font-medium leading-snug">{item}</span>
+              </label>
+            ))}
           </div>
         </section>
 

@@ -4,9 +4,26 @@ export interface Empreendimento {
   slug: string
   cidade: string
   estado: string
+  bairro?: string
+  endereco?: string
+  tipo_imovel?: string
+  padrao?: string
   descricao_breve?: string
   descricao?: string
   tipologia?: string
+  quartos_min?: number
+  quartos_max?: number
+  suites_min?: number
+  suites_max?: number
+  banheiros_min?: number
+  banheiros_max?: number
+  vagas_min?: number
+  vagas_max?: number
+  num_torres?: number
+  num_andares?: number
+  latitude?: number
+  longitude?: number
+  amenidades?: string[]
   status: 'RASCUNHO' | 'AGUARDANDO_APROVACAO' | 'PUBLICADO' | 'REJEITADO'
   progresso: number
   area_min?: number

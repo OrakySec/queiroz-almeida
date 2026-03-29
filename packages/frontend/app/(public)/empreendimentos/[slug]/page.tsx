@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, Maximize2, BedDouble, Car, TrendingUp, ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { MapPin, Maximize2, BedDouble, Car, TrendingUp, ArrowLeft, CheckCircle2, Bath, Building2, Star } from 'lucide-react'
 import { Reveal } from '@/components/public/RevealText'
 import { LeadCTAButton } from '@/components/public/LeadCTAButton'
 import type { Empreendimento } from '@/types'
@@ -45,10 +45,18 @@ export default async function EmpreendimentoPage({
   const fotoPrincipal = fotos[0]
   const label = e.is_lancamento ? 'Lançamento' : 'Em Obra'
 
+  function faixaInt(min?: number, max?: number) {
+    if (!min && !max) return null
+    if (min && max && min !== max) return `${min}–${max}`
+    return String(min ?? max)
+  }
+
   const specs = [
     { icon: Maximize2, label: 'Área', value: e.area_min ? `${e.area_min}${e.area_max && e.area_max !== e.area_min ? `–${e.area_max}` : ''} m²` : null },
-    { icon: BedDouble, label: 'Tipologia', value: e.tipologia },
-    { icon: Car, label: 'Unidades', value: e.total_unidades?.toString() },
+    { icon: BedDouble, label: 'Quartos', value: faixaInt(e.quartos_min, e.quartos_max) },
+    { icon: Bath, label: 'Suítes', value: faixaInt(e.suites_min, e.suites_max) },
+    { icon: Car, label: 'Vagas', value: faixaInt(e.vagas_min, e.vagas_max) },
+    { icon: Building2, label: 'Unidades', value: e.total_unidades?.toString() },
     { icon: TrendingUp, label: 'Progresso', value: e.progresso ? `${e.progresso}%` : null },
   ].filter(s => s.value)
 
@@ -117,9 +125,19 @@ export default async function EmpreendimentoPage({
           </Reveal>
 
           <Reveal delay={0.2}>
-            <div className="flex items-center gap-2 text-white/50">
-              <MapPin size={14} className="text-brand-marinho-glow shrink-0" />
-              <span className="font-sans text-sm">{e.cidade}{e.estado ? `, ${e.estado}` : ''}</span>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-white/50">
+              <div className="flex items-center gap-2">
+                <MapPin size={14} className="text-brand-marinho-glow shrink-0" />
+                <span className="font-sans text-sm">
+                  {[e.bairro, e.cidade, e.estado].filter(Boolean).join(', ')}
+                </span>
+              </div>
+              {e.padrao && (
+                <div className="flex items-center gap-1.5">
+                  <Star size={12} className="text-brand-marinho-glow" />
+                  <span className="font-sans text-xs font-bold uppercase tracking-widest text-brand-marinho-glow">{e.padrao}</span>
+                </div>
+              )}
             </div>
           </Reveal>
         </div>
@@ -184,6 +202,31 @@ export default async function EmpreendimentoPage({
                     <p className="font-sans text-white/60 text-base leading-relaxed max-w-2xl">
                       {e.descricao}
                     </p>
+                  </div>
+                </Reveal>
+              )}
+
+              {/* Amenidades */}
+              {e.amenidades && e.amenidades.length > 0 && (
+                <Reveal delay={0.12}>
+                  <div>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-1.5 h-1.5 rounded-full bg-brand-marinho-glow" />
+                      <h2 className="font-sans text-[10px] font-black uppercase tracking-[0.3em] text-brand-marinho-glow">
+                        Amenidades & Diferenciais
+                      </h2>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {e.amenidades.map(item => (
+                        <span
+                          key={item}
+                          className="flex items-center gap-1.5 font-sans text-[11px] font-semibold text-white/70 bg-white/[0.05] border border-white/[0.08] rounded-full px-4 py-2"
+                        >
+                          <CheckCircle2 size={11} className="text-brand-marinho-glow shrink-0" />
+                          {item}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </Reveal>
               )}
