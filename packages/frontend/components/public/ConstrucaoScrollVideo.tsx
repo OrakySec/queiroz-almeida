@@ -31,26 +31,24 @@ export function ConstrucaoScrollVideo() {
     const video = videoRef.current
     if (!video) return
 
-    let animTime   = 0  // posição física (atualizada todo frame — sem custo)
-    let targetTime = 0  // destino do scroll
-    let lastTarget = 0  // para calcular delta real de velocity
-    let velocity   = 0  // inércia (EWMA dos deltas de targetTime)
+    let targetTime   = 0
+    let velocity     = 0   // inércia para desktop (mobile usa momentum nativo)
+    let lastTarget   = 0
     let lastScrollAt = 0
-    let lastSeekAt   = 0  // timestamp do último seekTo() real
-    let rafId = 0
-    let running = true
+    let lastSeekAt   = 0
+    let rafId        = 0
+    let running      = true
 
-    const LERP        = 0.15  // 15%/frame — lerp ativo
-    const FRICTION    = 0.85  // decaimento da inércia
-    const EWMA        = 0.4   // suavização da velocity
-    const SETTLE_MS   = 60    // ms sem scroll → inércia
-    const EPSILON     = 0.005 // threshold de parada
-    // ─── Throttle de seek ────────────────────────────────────────────────
-    // Separa física (animTime, todo frame) do decoder (seekTo, max 20×/s).
-    // Independente da velocidade do scroll, o decoder nunca recebe mais de
-    // 20 seeks/segundo — elimina micro-seeks ao desacelerar em qualquer plataforma.
-    const SEEK_MS   = 50    // intervalo mínimo entre seeks (50ms = 20fps)
-    const MIN_SEEK  = 0.033 // só seek se moveu ≥ 1 frame de vídeo (30fps)
+    // Seek direto ao alvo (sem lerp) → sem passos decrescentes ao desacelerar.
+    // Mobile (iOS/Android) já tem momentum nativo no scroll, então o
+    // scrollYProgress continua disparando eventos após o dedo levantar —
+    // a "inércia" no mobile é grátis. No desktop adicionamos velocity manual.
+    const FRICTION  = 0.82   // decaimento da inércia (desktop)
+    const EWMA      = 0.35   // suavização da velocity
+    const SETTLE_MS = 80     // ms sem scroll → fase de inércia
+    const SEEK_MS   = 33     // máx 30 seeks/segundo (imperceptível, ≈ 1 frame RAF)
+    const MIN_SEEK  = 0.033  // ignora seeks < 1 frame de vídeo (30fps)
+    const EPSILON   = 0.004
 
     function seekTo(el: HTMLVideoElement, t: number) {
       const v = el as any
@@ -59,8 +57,7 @@ export function ConstrucaoScrollVideo() {
     }
 
     // ── iOS warm-up ──────────────────────────────────────────────────────
-    // iOS Safari não decodifica frames sem um play() prévio. Disparamos um
-    // play() silencioso + pause() imediato para aquecer o decoder.
+    // iOS Safari não decodifica frames sem um play() prévio.
     function warmUp() {
       const v = videoRef.current
       if (!v) return
@@ -69,7 +66,6 @@ export function ConstrucaoScrollVideo() {
         .catch(() => {})
     }
     video.addEventListener('loadedmetadata', warmUp, { once: true })
-
     function onPlay() { videoRef.current?.pause() }
     video.addEventListener('play', onPlay)
 
@@ -82,29 +78,32 @@ export function ConstrucaoScrollVideo() {
       const now     = performance.now()
       const settled = (now - lastScrollAt) > SETTLE_MS
 
-      // ── Física: atualiza animTime todo frame (sem I/O) ──
+      let seekTarget: number
+
       if (!settled) {
-        const diff = targetTime - animTime
-        if (Math.abs(diff) > EPSILON) {
-          animTime += diff * LERP
-        }
+        // ── Scroll ativo: seek DIRETO ao alvo ──────────────────────────
+        // Sem lerp → sem passos decrescentes → sem micro-stutters.
+        // O browser interpola internamente entre frames; nós apenas dizemos
+        // onde o vídeo deve estar agora.
+        seekTarget = targetTime
+
       } else if (Math.abs(velocity) > EPSILON) {
-        animTime += velocity
-        velocity *= FRICTION
-      } else if (Math.abs(targetTime - animTime) > EPSILON) {
-        animTime = targetTime  // snap final
-        velocity  = 0
+        // ── Inércia (desktop): aplica velocity com atrito ────────────
+        targetTime += velocity
+        targetTime  = Math.max(0, Math.min(v.duration - 0.033, targetTime))
+        velocity   *= FRICTION
+        seekTarget  = targetTime
+
       } else {
-        return // já no alvo, nada a fazer
+        return // parado no alvo
       }
 
-      animTime = Math.max(0, Math.min(v.duration - 0.033, animTime))
+      seekTarget = Math.max(0, Math.min(v.duration - 0.033, seekTarget))
 
-      // ── Seek throttled: dispara no máximo 20×/segundo ──
-      // Só seek se: passaram ≥ 50ms E movemos ≥ 1 frame de vídeo
-      const moved = Math.abs(animTime - v.currentTime)
+      // Throttle: no máximo 30 seeks/segundo + mínimo 1 frame de movimento
+      const moved = Math.abs(seekTarget - v.currentTime)
       if (moved >= MIN_SEEK && (now - lastSeekAt) >= SEEK_MS) {
-        seekTo(v, animTime)
+        seekTo(v, seekTarget)
         lastSeekAt = now
       }
     }
@@ -115,7 +114,7 @@ export function ConstrucaoScrollVideo() {
       const v = videoRef.current
       if (!v || !v.duration || !isFinite(v.duration)) return
       const newTarget = Math.max(0, Math.min(1, (latest - 0.1) / 0.8)) * (v.duration - 0.033)
-      const delta = newTarget - lastTarget
+      const delta  = newTarget - lastTarget
       velocity     = velocity * (1 - EWMA) + delta * EWMA
       lastTarget   = newTarget
       targetTime   = newTarget
