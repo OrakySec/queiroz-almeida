@@ -33,21 +33,25 @@ export function ConstrucaoScrollVideo() {
 
     video.pause() // controle total via currentTime
 
-    let animTime = 0    // posição animada (separada de video.currentTime)
-    let targetTime = 0  // onde o scroll quer que estejamos
-    let velocity = 0    // segundos/frame — "inércia" capturada do último lerp
-    let lastScrollAt = 0
+    let animTime      = 0   // posição animada (separada de video.currentTime)
+    let targetTime    = 0   // onde o scroll quer que estejamos
+    let lastTarget    = 0   // targetTime anterior (para calcular delta real)
+    let velocity      = 0   // velocidade real do scroll (EWMA de deltas de targetTime)
+    let pendingDelta  = 0   // delta acumulado da inércia antes de fazer seek
+    let lastScrollAt  = 0
     let rafId = 0
     let running = true
 
     // Fases:
-    //  1. Scroll ativo  → lerp 15%/frame em direção ao alvo, salva velocity
-    //  2. Scroll parou  → continua com velocity decaindo (inércia/momentum)
-    //  3. Velocity ~zero → snap suave ao alvo exato (encerra sem micro-seeks)
-    const LERP       = 0.15   // 15%/frame durante scroll ativo
-    const FRICTION   = 0.88   // 88% de velocity por frame → ~15 frames de inércia
-    const SETTLE_MS  = 80     // ms sem evento de scroll → entra na fase de inércia
-    const EPSILON    = 0.005  // threshold de parada (< 1 frame @200fps)
+    //  1. Scroll ativo  → lerp 15%/frame em direção ao alvo
+    //  2. Scroll parou  → inércia: acumula delta, seek só quando >= 1 frame de vídeo
+    //  3. Velocity ~zero → snap único ao alvo exato
+    const LERP      = 0.15   // 15%/frame durante scroll ativo
+    const FRICTION  = 0.85   // 85%/frame → ~20 frames (≈330ms) de momentum
+    const EWMA      = 0.4    // peso do novo delta na média exponencial de velocity
+    const SETTLE_MS = 60     // ms sem scroll → início da fase de inércia
+    const MIN_SEEK  = 0.033  // só faz seek quando acumulou ≥ 1 frame (30fps)
+    const EPSILON   = 0.005  // threshold de parada
 
     function tick() {
       if (!running) return
@@ -60,27 +64,34 @@ export function ConstrucaoScrollVideo() {
       if (!settled) {
         // ── Fase 1: scroll ativo — lerp fluido ──
         const diff = targetTime - animTime
-        if (Math.abs(diff) < EPSILON) { velocity = 0; return }
-        const step = diff * LERP
-        velocity = step          // captura velocidade para a inércia
-        animTime += step
+        if (Math.abs(diff) < EPSILON) return
+        animTime += diff * LERP
+        animTime = Math.max(0, Math.min(v.duration - 0.033, animTime))
+        v.currentTime = animTime
 
       } else if (Math.abs(velocity) > EPSILON) {
-        // ── Fase 2: inércia — continua com atrito ──
-        animTime += velocity
-        velocity *= FRICTION     // decai suavemente até parar
+        // ── Fase 2: inércia ──
+        // Acumula o delta antes de seek para não fazer micro-seeks menores
+        // que 1 frame de vídeo (browser não consegue decodificar de forma suave)
+        pendingDelta += velocity
+        velocity *= FRICTION
 
-      } else if (Math.abs(targetTime - animTime) > EPSILON) {
-        // ── Fase 3: encerramento — snap final ao alvo exato ──
-        animTime = targetTime
-        velocity = 0
+        if (Math.abs(pendingDelta) >= MIN_SEEK) {
+          animTime += pendingDelta
+          animTime = Math.max(0, Math.min(v.duration - 0.033, animTime))
+          v.currentTime = animTime
+          pendingDelta = 0
+        }
 
       } else {
-        return // já parado no alvo, nada a fazer
+        // ── Fase 3: snap final ──
+        pendingDelta = 0
+        if (Math.abs(targetTime - animTime) > EPSILON) {
+          animTime = targetTime
+          velocity = 0
+          v.currentTime = animTime
+        }
       }
-
-      animTime = Math.max(0, Math.min(v.duration - 0.033, animTime))
-      v.currentTime = animTime
     }
 
     rafId = requestAnimationFrame(tick)
@@ -88,9 +99,17 @@ export function ConstrucaoScrollVideo() {
     const unsub = scrollYProgress.on('change', (latest) => {
       const v = videoRef.current
       if (!v || !v.duration || !isFinite(v.duration)) return
+
+      const newTarget = Math.max(0, Math.min(1, (latest - 0.1) / 0.8)) * (v.duration - 0.033)
+
+      // EWMA da velocidade real (delta de targetTime entre eventos de scroll)
+      // Evita que um único evento grande domine a inércia
+      const delta = newTarget - lastTarget
+      velocity = velocity * (1 - EWMA) + delta * EWMA
+
+      lastTarget  = newTarget
+      targetTime  = newTarget
       lastScrollAt = performance.now()
-      const mapped = Math.max(0, Math.min(1, (latest - 0.1) / 0.8))
-      targetTime = mapped * (v.duration - 0.033)
     })
 
     // Garante que o vídeo não tente reproduzir sozinho
