@@ -125,10 +125,11 @@ export function ConstrucaoScrollVideo() {
                 ref={videoRef}
                 muted
                 playsInline
-                preload="auto"
+                preload="metadata"
+                poster="/construct-video-poster.jpg"
                 className="w-full h-auto block"
               >
-                <source src="/construct-video-scrub.mp4" type="video/mp4" />
+                <source src="/construct-video-scrub-ios.mp4" type="video/mp4" />
               </video>
             </div>
           </div>

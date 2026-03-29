@@ -30,25 +30,26 @@ export function Navbar() {
           scrolled ? 'transform-none' : 'md:py-8'
         }`}
       >
-        <div className={`max-w-7xl mx-auto transition-all duration-500 ${
+        <div className={`transition-all duration-500 ${
           scrolled 
-            ? 'glass-navbar rounded-full px-6 shadow-2xl border border-white/20' 
-            : 'bg-transparent px-6 lg:px-12'
+            ? 'glass-navbar rounded-full px-6 shadow-2xl border border-white/20 w-[92%] mx-auto' 
+            : 'max-w-7xl mx-auto bg-transparent px-6 lg:px-12 w-full'
         }`}>
           <div className="flex items-center justify-between h-16 md:h-20">
             
             {/* Logo Group — Discrete Pill-Clipped Image (Force Native) */}
-            <Link href="/" className="relative flex items-center group -ml-1 md:-ml-2.5">
+            <Link href="/" className={`relative flex items-center group transition-all duration-500 ${scrolled ? '-ml-3.5 md:-ml-5' : '-ml-1 md:ml-0'}`}>
               <img 
-                src="/logo.png?v=9" 
+                src="/logo.png?v=12" 
                 alt="Queiroz Almeida" 
+                className={`transition-all duration-500 object-contain block ${
+                  scrolled 
+                    ? 'w-[120px] md:w-[150px]' 
+                    : 'w-[150px] md:w-[190px]'
+                }`}
                 style={{ 
-                  width: scrolled ? '150px' : '190px', 
                   height: 'auto', 
                   borderRadius: '100px', 
-                  objectFit: 'contain',
-                  display: 'block',
-                  transition: 'all 0.5s ease-in-out'
                 }} 
               />
             </Link>

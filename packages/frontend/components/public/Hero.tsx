@@ -89,7 +89,7 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1 }}
-            className="font-sans text-lg md:text-xl text-brand-silver/90 leading-relaxed mb-14 max-w-xl"
+            className="font-sans text-lg md:text-xl text-white/90 leading-relaxed mb-14 max-w-xl"
           >
             Flats de alto padrão em Porto de Galinhas e Maragogi.
             Onde a valorização imobiliária encontra o paraíso.
