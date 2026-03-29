@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { Reveal } from '@/components/public/RevealText'
 import { LeadCTAButton } from '@/components/public/LeadCTAButton'
+import { PdfViewer } from '@/components/public/PdfViewer'
 import type { Empreendimento } from '@/types'
 
 async function getEmpreendimento(slug: string): Promise<Empreendimento | null> {
@@ -389,6 +390,17 @@ export default async function EmpreendimentoPage({
                           <div className="absolute inset-0 bg-brand-navy/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         </div>
                       ))}
+                    </div>
+                  </div>
+                </Reveal>
+              )}
+              {/* Memorial Descritivo PDF */}
+              {e.pdf_url && (
+                <Reveal delay={0.18}>
+                  <div>
+                    <SectionTitle>Memorial Descritivo</SectionTitle>
+                    <div className="rounded-3xl overflow-hidden border border-slate-100 shadow-sm bg-white">
+                      <PdfViewer url={e.pdf_url} />
                     </div>
                   </div>
                 </Reveal>

@@ -38,6 +38,7 @@ export interface Empreendimento {
   whatsapp?: string
   fotos: string[]
   video_url?: string
+  pdf_url?: string
   is_lancamento: boolean
   created_at: string
   updated_at: string

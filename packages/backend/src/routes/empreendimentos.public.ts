@@ -40,6 +40,7 @@ const SELECT_PUBLIC = {
   whatsapp: true,
   fotos: true,
   video_url: true,
+  pdf_url: true,
   is_lancamento: true,
   created_at: true,
 }

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import slugify from 'slugify'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { requireRole } from '../middlewares/requireRole'
-import { uploadFoto, deleteFoto } from '../services/minio.service'
+import { uploadFoto, deleteFoto, uploadPdf, deletePdf } from '../services/minio.service'
 import { prisma } from '../lib/prisma'
 
 const ACCEPTED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -273,6 +273,40 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
       where: { id },
       data: { fotos: [...fotosAtual, ...novasUrls] },
     })
+    return reply.send(updated)
+  })
+
+  // POST /api/admin/empreendimentos/:id/pdf
+  app.post('/:id/pdf', { preHandler }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const existing = await prisma.empreendimento.findUnique({ where: { id } })
+    if (!existing) return reply.status(404).send({ message: 'Empreendimento não encontrado.' })
+
+    const part = await request.file()
+    if (!part) return reply.status(400).send({ message: 'Nenhum arquivo enviado.' })
+    if (part.mimetype !== 'application/pdf') {
+      return reply.status(400).send({ message: 'Somente arquivos PDF são aceitos.' })
+    }
+
+    if (existing.pdf_url) {
+      await deletePdf(existing.pdf_url).catch(() => {})
+    }
+
+    const buffer = await part.toBuffer()
+    const url = await uploadPdf(id, buffer)
+    const updated = await prisma.empreendimento.update({ where: { id }, data: { pdf_url: url } })
+    return reply.send(updated)
+  })
+
+  // DELETE /api/admin/empreendimentos/:id/pdf
+  app.delete('/:id/pdf', { preHandler }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const existing = await prisma.empreendimento.findUnique({ where: { id } })
+    if (!existing) return reply.status(404).send({ message: 'Empreendimento não encontrado.' })
+    if (existing.pdf_url) {
+      await deletePdf(existing.pdf_url).catch(() => {})
+    }
+    const updated = await prisma.empreendimento.update({ where: { id }, data: { pdf_url: null } })
     return reply.send(updated)
   })
 

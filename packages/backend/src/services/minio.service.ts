@@ -61,6 +61,26 @@ export async function uploadFoto(
   return `${PUBLIC_URL}/${BUCKET}/${objectName}`
 }
 
+export async function uploadPdf(
+  empreendimentoId: string,
+  buffer: Buffer,
+): Promise<string> {
+  await ensureBucket()
+  const minio = getClient()
+  const objectName = `${empreendimentoId}/memorial-${Date.now()}.pdf`
+  await minio.putObject(BUCKET, objectName, buffer, buffer.length, {
+    'Content-Type': 'application/pdf',
+  })
+  return `${PUBLIC_URL}/${BUCKET}/${objectName}`
+}
+
+export async function deletePdf(url: string): Promise<void> {
+  const minio = getClient()
+  const prefix = `${PUBLIC_URL}/${BUCKET}/`
+  const objectName = url.replace(prefix, '')
+  await minio.removeObject(BUCKET, objectName)
+}
+
 export async function deleteFoto(url: string): Promise<void> {
   const minio = getClient()
   // Extrai o objectName da URL pública

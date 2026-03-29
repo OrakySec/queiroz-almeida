@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useDropzone } from 'react-dropzone'
 import api from '@/lib/api'
 import { FotoUploader } from './FotoUploader'
-import { Save, Loader2, Send, RotateCcw, Upload, X, ImageIcon } from 'lucide-react'
+import { Save, Loader2, Send, RotateCcw, Upload, X, ImageIcon, FileText, Trash2 } from 'lucide-react'
 import { useAdmin } from '@/context/AdminContext'
 
 const emptyToUndef = (v: unknown) => (v === '' || v == null ? undefined : v)
@@ -108,6 +108,37 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
     } else {
       setVagasTipo('')
       setVagasMin(val)
+    }
+  }
+
+  // PDF (memorial descritivo)
+  const [pdfUrl, setPdfUrl] = useState<string | null>((initialData as any)?.pdf_url ?? null)
+  const [pdfUploading, setPdfUploading] = useState(false)
+
+  async function handlePdfUpload(file: File) {
+    if (!empId) return
+    setPdfUploading(true)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      const res = await api.post(`/api/admin/empreendimentos/${empId}/pdf`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      setPdfUrl(res.data.pdf_url ?? null)
+    } catch {
+      alert('Erro ao enviar PDF')
+    } finally {
+      setPdfUploading(false)
+    }
+  }
+
+  async function handlePdfDelete() {
+    if (!empId) return
+    try {
+      await api.delete(`/api/admin/empreendimentos/${empId}/pdf`)
+      setPdfUrl(null)
+    } catch {
+      alert('Erro ao remover PDF')
     }
   }
 
@@ -492,6 +523,53 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
                 </div>
               )}
             </div>
+          )}
+        </section>
+
+        {/* Memorial Descritivo (PDF) */}
+        <section className="bg-white rounded-2xl border border-brand-navy/5 shadow-sm p-6 lg:p-8">
+          <h2 className="font-semibold text-brand-navy mb-2 text-lg">Memorial Descritivo (PDF)</h2>
+          <p className="text-xs text-brand-navy/40 mb-5">
+            Envie o memorial descritivo ou book do empreendimento em PDF. Será exibido na página pública.
+          </p>
+
+          {!empId ? (
+            <p className="text-sm text-brand-navy/40 italic">
+              Salve o empreendimento primeiro para anexar o PDF.
+            </p>
+          ) : pdfUrl ? (
+            <div className="flex items-center gap-4 p-4 rounded-xl border border-brand-navy/10 bg-brand-navy/[0.02]">
+              <div className="w-10 h-10 rounded-xl bg-brand-marinho/10 flex items-center justify-center shrink-0">
+                <FileText size={18} className="text-brand-marinho" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-brand-navy truncate">PDF anexado</p>
+                <p className="text-xs text-brand-navy/40 truncate">{pdfUrl.split('/').pop()}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className={`flex items-center gap-2 px-4 py-2 rounded-full bg-brand-navy/5 text-brand-navy text-xs font-semibold cursor-pointer hover:bg-brand-navy/10 transition ${pdfUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                  {pdfUploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+                  Substituir
+                  <input type="file" accept="application/pdf" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f) }} />
+                </label>
+                <button type="button" onClick={handlePdfDelete} className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 text-red-500 text-xs font-semibold hover:bg-red-100 transition">
+                  <Trash2 size={13} />
+                  Remover
+                </button>
+              </div>
+            </div>
+          ) : (
+            <label className={`flex flex-col items-center gap-3 p-8 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${pdfUploading ? 'border-brand-marinho bg-cyan-50 opacity-70 pointer-events-none' : 'border-brand-navy/10 hover:border-brand-marinho hover:bg-brand-navy/[0.02]'}`}>
+              {pdfUploading ? (
+                <Loader2 size={24} className="text-brand-marinho animate-spin" />
+              ) : (
+                <FileText size={24} className="text-brand-navy/30" />
+              )}
+              <p className="text-sm text-brand-navy/40">
+                {pdfUploading ? 'Enviando PDF...' : 'Clique para selecionar o PDF'}
+              </p>
+              <input type="file" accept="application/pdf" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f) }} />
+            </label>
           )}
         </section>
 
