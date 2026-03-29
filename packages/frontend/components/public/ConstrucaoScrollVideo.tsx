@@ -33,20 +33,21 @@ export function ConstrucaoScrollVideo() {
 
     video.pause() // controle total via currentTime
 
-    let animTime = 0    // posição "animada" (separada de video.currentTime)
+    let animTime = 0    // posição animada (separada de video.currentTime)
     let targetTime = 0  // onde o scroll quer que estejamos
-    let lastScrollAt = 0 // timestamp do último evento de scroll
+    let velocity = 0    // segundos/frame — "inércia" capturada do último lerp
+    let lastScrollAt = 0
     let rafId = 0
     let running = true
 
-    // Lerp enquanto o scroll está ativo e o diff é grande.
-    // Snap (seek único) quando:
-    //   a) diff < SNAP_THRESHOLD  → não vale fazer micro-seeks de <4 frames
-    //   b) scroll parou há > SETTLE_MS → finaliza posição com um seek só
-    const LERP          = 0.15  // 15%/frame → segue rápido sem ser abrupto
-    const SNAP_THRESHOLD = 0.12 // <~4 frames a 30fps → snap direto
-    const SETTLE_MS     = 80    // ms sem scroll → snap para encerrar suavemente
-    const EPSILON       = 0.005 // já chegamos — nem seek
+    // Fases:
+    //  1. Scroll ativo  → lerp 15%/frame em direção ao alvo, salva velocity
+    //  2. Scroll parou  → continua com velocity decaindo (inércia/momentum)
+    //  3. Velocity ~zero → snap suave ao alvo exato (encerra sem micro-seeks)
+    const LERP       = 0.15   // 15%/frame durante scroll ativo
+    const FRICTION   = 0.88   // 88% de velocity por frame → ~15 frames de inércia
+    const SETTLE_MS  = 80     // ms sem evento de scroll → entra na fase de inércia
+    const EPSILON    = 0.005  // threshold de parada (< 1 frame @200fps)
 
     function tick() {
       if (!running) return
@@ -54,17 +55,28 @@ export function ConstrucaoScrollVideo() {
       const v = videoRef.current
       if (!v || !v.duration || !isFinite(v.duration)) return
 
-      const diff = targetTime - animTime
-      if (Math.abs(diff) < EPSILON) return // já no alvo, nada a fazer
-
       const settled = (performance.now() - lastScrollAt) > SETTLE_MS
 
-      if (settled || Math.abs(diff) < SNAP_THRESHOLD) {
-        // Snap: um único seek, elimina micro-seeks do lerp ao desacelerar
+      if (!settled) {
+        // ── Fase 1: scroll ativo — lerp fluido ──
+        const diff = targetTime - animTime
+        if (Math.abs(diff) < EPSILON) { velocity = 0; return }
+        const step = diff * LERP
+        velocity = step          // captura velocidade para a inércia
+        animTime += step
+
+      } else if (Math.abs(velocity) > EPSILON) {
+        // ── Fase 2: inércia — continua com atrito ──
+        animTime += velocity
+        velocity *= FRICTION     // decai suavemente até parar
+
+      } else if (Math.abs(targetTime - animTime) > EPSILON) {
+        // ── Fase 3: encerramento — snap final ao alvo exato ──
         animTime = targetTime
+        velocity = 0
+
       } else {
-        // Lerp: scroll ativo e diff grande → animação fluida
-        animTime += diff * LERP
+        return // já parado no alvo, nada a fazer
       }
 
       animTime = Math.max(0, Math.min(v.duration - 0.033, animTime))
