@@ -1,6 +1,6 @@
 'use client'
 import { useRef } from 'react'
-import { motion, useScroll, useTransform, useMotionValueEvent, useSpring } from 'framer-motion'
+import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
 import { ArrowRight, Building2, Hammer, CheckCircle2 } from 'lucide-react'
 import { useLeadModal } from '@/context/LeadModalContext'
 
@@ -14,41 +14,27 @@ export function ConstrucaoScrollVideo() {
   const { open: openLead } = useLeadModal()
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const lastTimeRef = useRef(0)
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   })
 
-  // Suavização (Inércia) — Cria aquele efeito de "massa" luxuosa
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 45,
-    damping: 35,
-    restDelta: 0.001
-  })
-
   // Scrub video — rolar pra baixo avança, rolar pra cima reverte
-  useMotionValueEvent(smoothProgress, 'change', (latest) => {
+  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
     const video = videoRef.current
     if (!video || !Number.isFinite(video.duration)) return
-    
     // Map scroll 0.1–0.9 to full video duration for a smooth in/out margin
     const mapped = Math.max(0, Math.min(1, (latest - 0.1) / 0.8))
-    const target = Math.min(mapped * video.duration, video.duration - 0.05)
-
-    // Throttling: Com o smoothProgress, podemos ter maior precisão (0.005s) sem travar
-    if (Math.abs(target - lastTimeRef.current) > 0.005) {
-      video.currentTime = target
-      lastTimeRef.current = target
-    }
+    const target = mapped * video.duration
+    video.currentTime = Math.min(target, video.duration - 0.05)
   })
 
   // Parallax/fade on the text column
-  const textOpacity = useTransform(smoothProgress, [0.05, 0.25], [0, 1])
+  const textOpacity = useTransform(scrollYProgress, [0.05, 0.25], [0, 1])
 
   // Progress bar fills as scroll advances
-  const barScale = useTransform(smoothProgress, [0.1, 0.88], [0, 1])
+  const barScale = useTransform(scrollYProgress, [0.1, 0.88], [0, 1])
 
   return (
     // 400vh outer container — user must scroll through it entirely
@@ -139,11 +125,10 @@ export function ConstrucaoScrollVideo() {
                 ref={videoRef}
                 muted
                 playsInline
-                preload="metadata"
-                poster="/construct-video-poster.jpg"
+                preload="auto"
                 className="w-full h-auto block"
               >
-                <source src="/construct-video-scrub-ios-turbo.mp4" type="video/mp4" />
+                <source src="/construct-video-scrub.mp4" type="video/mp4" />
               </video>
             </div>
           </div>
