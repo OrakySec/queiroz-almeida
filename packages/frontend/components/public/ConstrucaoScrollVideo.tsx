@@ -1,6 +1,6 @@
 'use client'
 import { useRef } from 'react'
-import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
+import { motion, useScroll, useTransform, useMotionValueEvent, useSpring } from 'framer-motion'
 import { ArrowRight, Building2, Hammer, CheckCircle2 } from 'lucide-react'
 import { useLeadModal } from '@/context/LeadModalContext'
 
@@ -21,8 +21,15 @@ export function ConstrucaoScrollVideo() {
     offset: ['start end', 'end start'],
   })
 
+  // Suavização (Inércia) — Cria aquele efeito de "massa" luxuosa
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 45,
+    damping: 35,
+    restDelta: 0.001
+  })
+
   // Scrub video — rolar pra baixo avança, rolar pra cima reverte
-  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
+  useMotionValueEvent(smoothProgress, 'change', (latest) => {
     const video = videoRef.current
     if (!video || !Number.isFinite(video.duration)) return
     
@@ -30,18 +37,18 @@ export function ConstrucaoScrollVideo() {
     const mapped = Math.max(0, Math.min(1, (latest - 0.1) / 0.8))
     const target = Math.min(mapped * video.duration, video.duration - 0.05)
 
-    // Throttling: Só atualiza se o tempo mudou pelo menos 0.015s (evita afogar o decoder do iPhone)
-    if (Math.abs(target - lastTimeRef.current) > 0.015) {
+    // Throttling: Com o smoothProgress, podemos ter maior precisão (0.005s) sem travar
+    if (Math.abs(target - lastTimeRef.current) > 0.005) {
       video.currentTime = target
       lastTimeRef.current = target
     }
   })
 
   // Parallax/fade on the text column
-  const textOpacity = useTransform(scrollYProgress, [0.05, 0.25], [0, 1])
+  const textOpacity = useTransform(smoothProgress, [0.05, 0.25], [0, 1])
 
   // Progress bar fills as scroll advances
-  const barScale = useTransform(scrollYProgress, [0.1, 0.88], [0, 1])
+  const barScale = useTransform(smoothProgress, [0.1, 0.88], [0, 1])
 
   return (
     // 400vh outer container — user must scroll through it entirely
