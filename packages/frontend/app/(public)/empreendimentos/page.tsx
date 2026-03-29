@@ -26,18 +26,19 @@ export default async function EmpreendimentosPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ── Hero ────────────────────────────────────────────────── */}
-      <section className="relative pt-44 pb-28 overflow-hidden">
+      {/* ── Hero (Banner Azul) ─────────────────────────────────── */}
+      <section className="bg-brand-navy pt-44 pb-28 relative overflow-hidden">
         {/* Background grid texture */}
-        <div className="absolute inset-0 bg-blueprint opacity-[0.012] pointer-events-none" />
-        {/* Ambient glow - more subtle on white */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-brand-marinho/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute inset-0 bg-blueprint opacity-[0.03] pointer-events-none" />
+        
+        {/* Ambient glow */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-marinho/10 blur-[120px] rounded-full pointer-events-none" />
  
         <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
           <Reveal>
             <div className="flex items-center gap-4 mb-8">
-              <div className="h-0.5 w-8 bg-brand-marinho/40" />
-              <span className="font-sans text-[10px] font-black uppercase tracking-[0.4em] text-brand-marinho/60">
+              <div className="h-0.5 w-8 bg-brand-marinho-glow/40" />
+              <span className="font-sans text-[10px] font-black uppercase tracking-[0.4em] text-brand-marinho-glow">
                 Portfólio Exclusivo
               </span>
             </div>
@@ -45,16 +46,16 @@ export default async function EmpreendimentosPage() {
  
           <Reveal delay={0.1}>
             <h1
-              className="font-serif font-bold text-brand-navy leading-[1.0] tracking-tight mb-8"
+              className="font-serif font-bold text-white leading-[1.0] tracking-tight mb-8"
               style={{ fontSize: 'clamp(3rem, 7vw, 6rem)' }}
             >
               Nossos{' '}
-              <em className="not-italic text-brand-marinho">empreendimentos.</em>
+              <em className="not-italic text-brand-marinho-glow">empreendimentos.</em>
             </h1>
           </Reveal>
  
           <Reveal delay={0.2}>
-            <p className="font-sans text-xl text-slate-500 max-w-xl leading-relaxed font-light">
+            <p className="font-sans text-xl text-white/60 max-w-xl leading-relaxed font-light">
               Flats de alto padrão em Porto de Galinhas e Maragogi — onde a valorização imobiliária encontra o paraíso.
             </p>
           </Reveal>
