@@ -118,7 +118,7 @@ export default async function EmpreendimentoPage({
       : null
 
   return (
-    <div className="min-h-screen bg-brand-dark">
+    <div className="min-h-screen bg-white">
 
       {/* ── Cinematic Hero ───────────────────────────────────────── */}
       <section className="relative min-h-[85vh] flex items-end overflow-hidden">
@@ -135,19 +135,19 @@ export default async function EmpreendimentoPage({
         )}
 
         {/* Multi-layer gradient veil */}
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/55 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/75 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-white via-brand-dark/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/60 via-transparent to-transparent" />
 
         {/* Blueprint texture */}
-        <div className="absolute inset-0 bg-blueprint opacity-[0.03] pointer-events-none" />
+        <div className="absolute inset-0 bg-blueprint opacity-[0.02] pointer-events-none" />
 
         {/* Back link */}
         <Link
           href="/empreendimentos"
-          className="absolute top-32 left-6 lg:left-12 z-20 flex items-center gap-2 text-white/50 hover:text-white transition-colors duration-300 group"
+          className="absolute top-32 left-6 lg:left-12 z-20 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 group"
         >
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em]">Portfólio</span>
+          <span className="font-sans text-[10px] font-black uppercase tracking-[0.25em]">Portfólio</span>
         </Link>
 
         {/* Hero content */}
@@ -208,11 +208,11 @@ export default async function EmpreendimentoPage({
           )}
 
           <Reveal delay={0.2}>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-white/50">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-white/80">
               <div className="flex items-center gap-2">
                 <MapPin size={13} className="text-brand-marinho-glow shrink-0" />
-                <span className="font-sans text-sm">
-                  {[e.bairro, e.cidade, e.estado].filter(Boolean).join(', ')}
+                <span className="font-sans text-sm font-medium tracking-wide">
+                  {[e.bairro, e.cidade, e.estado].filter(Boolean).join(' · ')}
                 </span>
               </div>
               {precoDisplay && (
@@ -233,12 +233,14 @@ export default async function EmpreendimentoPage({
           {/* ── Specs Strip ── */}
           {specs.length > 0 && (
             <Reveal>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-px bg-white/[0.05] border border-white/[0.05] rounded-2xl overflow-hidden mb-16 -mt-6 relative z-10">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 border border-slate-100 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl overflow-hidden mb-16 -mt-10 relative z-20">
                 {specs.map(({ icon: Icon, label, value }, i) => (
-                  <div key={i} className="bg-brand-dark px-5 py-6 flex flex-col gap-2">
-                    <Icon size={15} className="text-brand-marinho-glow" />
-                    <p className="font-serif font-bold text-white text-xl leading-none">{value}</p>
-                    <p className="font-sans text-[9px] font-bold uppercase tracking-[0.25em] text-white/30">{label}</p>
+                  <div key={i} className="px-5 py-7 flex flex-col items-center text-center gap-2 hover:bg-slate-50 transition-colors border-r border-slate-100 last:border-r-0">
+                    <div className="w-10 h-10 rounded-xl bg-brand-navy/5 flex items-center justify-center mb-1">
+                      <Icon size={16} className="text-brand-marinho" />
+                    </div>
+                    <p className="font-serif font-bold text-brand-navy text-xl leading-none">{value}</p>
+                    <p className="font-sans text-[9px] font-black uppercase tracking-[0.2em] text-brand-navy/30">{label}</p>
                   </div>
                 ))}
               </div>
@@ -254,20 +256,23 @@ export default async function EmpreendimentoPage({
               {/* Progress bar */}
               {e.progresso > 0 && (
                 <Reveal>
-                  <div>
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="font-sans text-[10px] font-black uppercase tracking-[0.25em] text-white/40">Evolução da Obra</span>
-                      <span className="font-sans text-[10px] font-black uppercase tracking-[0.25em] text-brand-marinho-glow">{e.progresso}%</span>
+                  <div className="bg-slate-50/50 p-8 rounded-3xl border border-slate-100">
+                    <div className="flex justify-between items-end mb-4">
+                      <div>
+                        <span className="font-sans text-[10px] font-black uppercase tracking-[0.25em] text-brand-navy/30 mb-1 block">Evolução da Obra</span>
+                        <h3 className="font-serif font-bold text-brand-navy text-2xl">Acompanhe a construção</h3>
+                      </div>
+                      <span className="font-serif font-bold text-brand-marinho text-3xl">{e.progresso}%</span>
                     </div>
-                    <div className="h-1 w-full bg-white/[0.07] rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden mb-3">
                       <div
-                        className="h-full bg-gradient-to-r from-brand-marinho to-brand-marinho-glow rounded-full transition-all duration-1000"
+                        className="h-full bg-brand-marinho rounded-full transition-all duration-1000"
                         style={{ width: `${e.progresso}%` }}
                       />
                     </div>
                     {e.data_entrega && (
-                      <p className="font-sans text-[10px] text-white/30 mt-2">
-                        Previsão de entrega: <span className="text-white/50 font-semibold">{formatDate(e.data_entrega)}</span>
+                      <p className="font-sans text-[10px] text-slate-400 font-medium uppercase tracking-widest">
+                        Previsão de entrega: <span className="text-brand-navy font-black">{formatDate(e.data_entrega)}</span>
                       </p>
                     )}
                   </div>
@@ -277,9 +282,9 @@ export default async function EmpreendimentoPage({
               {/* Description */}
               {e.descricao && (
                 <Reveal delay={0.05}>
-                  <div>
+                  <div className="py-2">
                     <SectionTitle>Sobre o empreendimento</SectionTitle>
-                    <p className="font-sans text-white/60 text-base leading-relaxed max-w-2xl">
+                    <p className="font-sans text-slate-600 text-lg leading-relaxed max-w-2xl font-light">
                       {e.descricao}
                     </p>
                   </div>
@@ -291,18 +296,18 @@ export default async function EmpreendimentoPage({
                 <Reveal delay={0.08}>
                   <div>
                     <SectionTitle>Ficha Técnica</SectionTitle>
-                    <div className="rounded-2xl border border-white/[0.07] overflow-hidden">
+                    <div className="rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
                       {ficha.map((row, i) => (
                         <div
                           key={i}
-                          className={`flex items-start justify-between gap-4 px-6 py-4 ${
-                            i % 2 === 0 ? 'bg-white/[0.02]' : 'bg-transparent'
-                          } ${i < ficha.length - 1 ? 'border-b border-white/[0.05]' : ''}`}
+                          className={`flex items-start justify-between gap-4 px-8 py-5 ${
+                            i % 2 === 0 ? 'bg-slate-50/50' : 'bg-white'
+                          } ${i < ficha.length - 1 ? 'border-b border-slate-100' : ''}`}
                         >
-                          <span className="font-sans text-[11px] font-bold uppercase tracking-widest text-white/30 shrink-0 pt-0.5 min-w-[120px]">
+                          <span className="font-sans text-[10px] font-black uppercase tracking-[0.2em] text-brand-navy/30 shrink-0 pt-0.5 min-w-[140px]">
                             {row.label}
                           </span>
-                          <span className="font-sans text-sm font-semibold text-white/80 text-right">
+                          <span className="font-sans text-sm font-bold text-brand-navy/70 text-right">
                             {row.value}
                           </span>
                         </div>
@@ -317,13 +322,13 @@ export default async function EmpreendimentoPage({
                 <Reveal delay={0.1}>
                   <div>
                     <SectionTitle>Amenidades & Diferenciais</SectionTitle>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3">
                       {e.amenidades.map(item => (
                         <span
                           key={item}
-                          className="flex items-center gap-1.5 font-sans text-[11px] font-semibold text-white/70 bg-white/[0.05] border border-white/[0.08] rounded-full px-4 py-2"
+                          className="flex items-center gap-2 font-sans text-[11px] font-bold uppercase tracking-widest text-brand-navy/60 bg-white border border-slate-100 shadow-sm rounded-full px-5 py-3"
                         >
-                          <CheckCircle2 size={11} className="text-brand-marinho-glow shrink-0" />
+                          <CheckCircle2 size={12} className="text-brand-marinho shrink-0" />
                           {item}
                         </span>
                       ))}
@@ -337,23 +342,26 @@ export default async function EmpreendimentoPage({
                 <Reveal delay={0.12}>
                   <div>
                     <SectionTitle>Localização</SectionTitle>
-                    <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="space-y-1">
+                    <div className="rounded-3xl border border-slate-100 bg-slate-50/50 p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                      <div className="space-y-2">
                         {e.endereco && (
-                          <p className="font-sans text-sm text-white/70 font-semibold">{e.endereco}</p>
+                          <p className="font-serif font-bold text-xl text-brand-navy leading-tight">{e.endereco}</p>
                         )}
-                        <p className="font-sans text-[11px] text-white/35 uppercase tracking-widest font-bold">
-                          {[e.bairro, e.cidade, e.estado].filter(Boolean).join(' · ')}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <MapPin size={12} className="text-brand-marinho" />
+                          <p className="font-sans text-[11px] text-slate-400 uppercase tracking-widest font-black">
+                            {[e.bairro, e.cidade, e.estado].filter(Boolean).join(' · ')}
+                          </p>
+                        </div>
                       </div>
                       <a
                         href={mapUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-brand-marinho-glow border border-brand-marinho-glow/30 rounded-full px-5 py-2.5 hover:bg-brand-marinho-glow/10 transition-colors duration-300 shrink-0"
+                        className="inline-flex items-center gap-2 font-sans text-[10px] font-black uppercase tracking-[0.2em] text-white bg-brand-navy rounded-full px-7 py-4 hover:bg-brand-marinho transition-all duration-300 shadow-lg shadow-brand-navy/10 shrink-0"
                       >
-                        <Navigation size={12} />
-                        Ver no mapa
+                        <Navigation size={13} />
+                        Mapa Detalhado
                       </a>
                     </div>
                   </div>
@@ -365,18 +373,19 @@ export default async function EmpreendimentoPage({
                 <Reveal delay={0.15}>
                   <div>
                     <SectionTitle>Galeria</SectionTitle>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {fotos.slice(1).map((foto, i) => (
                         <div
                           key={i}
-                          className="relative aspect-square rounded-2xl overflow-hidden border border-white/[0.06] group"
+                          className="relative aspect-square rounded-3xl overflow-hidden shadow-sm group border border-slate-100"
                         >
                           <Image
                             src={foto}
                             alt={`${e.nome} ${i + 2}`}
                             fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-700 brightness-90 group-hover:brightness-100"
+                            className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
                           />
+                          <div className="absolute inset-0 bg-brand-navy/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         </div>
                       ))}
                     </div>
@@ -391,28 +400,28 @@ export default async function EmpreendimentoPage({
                 <div className="sticky top-28 space-y-4">
 
                   {/* Price + CTA Card */}
-                  <div className="rounded-[2rem] border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-8 overflow-hidden relative">
+                  <div className="rounded-[2.5rem] bg-brand-navy p-10 overflow-hidden relative shadow-2xl shadow-brand-navy/20">
                     {/* Glow */}
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-brand-marinho-glow/10 blur-[60px] rounded-full pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-brand-marinho-glow/10 blur-[80px] rounded-full pointer-events-none" />
                     <div className="relative z-10">
-
+ 
                       {/* Price */}
                       {precoDisplay ? (
-                        <div className="mb-6 pb-6 border-b border-white/[0.07]">
-                          <p className="font-sans text-[9px] font-black uppercase tracking-[0.25em] text-white/30 mb-1">
+                        <div className="mb-8 pb-8 border-b border-white/10">
+                          <p className="font-sans text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2">
                             A partir de
                           </p>
-                          <p className="font-serif font-bold text-white leading-none" style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)' }}>
+                          <p className="font-serif font-bold text-white leading-none" style={{ fontSize: 'clamp(2rem, 3vw, 2.5rem)' }}>
                             {precoMin}
                           </p>
                           {precoMax && precoMax !== precoMin && (
-                            <p className="font-sans text-xs text-white/35 mt-1">até {precoMax}</p>
+                            <p className="font-sans text-[10px] font-bold text-brand-marinho-glow uppercase tracking-widest mt-2">{precoMax}</p>
                           )}
                         </div>
                       ) : null}
-
+ 
                       {/* Quick info */}
-                      <div className="space-y-3 mb-6">
+                      <div className="space-y-4 mb-10">
                         {faixa(e.quartos_min, e.quartos_max) && (
                           <SidebarInfo icon={BedDouble} label="Quartos" value={faixa(e.quartos_min, e.quartos_max)!} />
                         )}
@@ -425,25 +434,19 @@ export default async function EmpreendimentoPage({
                         {e.data_entrega && (
                           <SidebarInfo icon={Calendar} label="Entrega" value={formatDate(e.data_entrega)!} />
                         )}
-                        {e.unidades_disponiveis != null && (
-                          <SidebarInfo icon={Hash} label="Unidades disponíveis" value={String(e.unidades_disponiveis)} />
-                        )}
                       </div>
-
-                      {/* Divider */}
-                      <div className="h-px bg-white/[0.07] mb-6" />
-
-                      <div className="flex items-center gap-2 mb-3">
-                        <CheckCircle2 size={14} className="text-brand-marinho-glow" />
-                        <span className="font-sans text-[9px] font-black uppercase tracking-[0.25em] text-brand-marinho-glow">
-                          Assessoria Gratuita
+ 
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-1.5 h-1.5 rounded-full bg-brand-marinho-glow animate-pulse" />
+                        <span className="font-sans text-[10px] font-black uppercase tracking-[0.25em] text-brand-marinho-glow">
+                          Atendimento Personalizado
                         </span>
                       </div>
-                      <h3 className="font-serif font-bold text-white text-xl leading-snug mb-3">
-                        Tenho interesse neste empreendimento
+                      <h3 className="font-serif font-bold text-white text-2xl leading-tight mb-4">
+                        Interessado neste imóvel?
                       </h3>
-                      <p className="font-sans text-xs text-white/40 mb-6 leading-relaxed">
-                        Fale com um especialista e receba todas as informações sobre unidades e formas de pagamento.
+                      <p className="font-sans text-xs text-white/50 mb-8 leading-relaxed font-light">
+                        Deixe seus dados e um de nossos especialistas entrará em contato para apresentar todas as condições.
                       </p>
                       <LeadCTAButton interesse={e.nome} />
                     </div>
@@ -452,10 +455,10 @@ export default async function EmpreendimentoPage({
                   {/* Back to portfolio */}
                   <Link
                     href="/empreendimentos"
-                    className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl border border-white/[0.06] text-white/30 hover:text-white hover:border-white/20 transition-all duration-300 group"
+                    className="flex items-center justify-center gap-3 w-full py-5 rounded-3xl border border-slate-100 text-slate-400 hover:text-brand-navy hover:border-slate-300 hover:bg-slate-50 transition-all duration-300 group"
                   >
                     <ArrowLeft size={13} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em]">Ver portfólio completo</span>
+                    <span className="font-sans text-[10px] font-black uppercase tracking-[0.25em]">Ver portfólio completo</span>
                   </Link>
                 </div>
               </Reveal>
@@ -472,11 +475,12 @@ export default async function EmpreendimentoPage({
 
 function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <div className="flex items-center gap-3 mb-6">
-      <div className="w-1.5 h-1.5 rounded-full bg-brand-marinho-glow shrink-0" />
-      <h2 className="font-sans text-[10px] font-black uppercase tracking-[0.3em] text-brand-marinho-glow">
+    <div className="flex items-center gap-4 mb-8">
+      <div className="h-0.5 w-8 bg-brand-marinho/30" />
+      <h2 className="font-serif font-bold text-brand-navy text-2xl tracking-tight">
         {children}
       </h2>
+      <div className="h-px flex-1 bg-slate-100" />
     </div>
   )
 }
@@ -491,14 +495,16 @@ function SidebarInfo({
   value: string
 }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <div className="flex items-center gap-2 min-w-0">
-        <Icon size={12} className="text-brand-marinho-glow shrink-0" />
-        <span className="font-sans text-[10px] font-bold uppercase tracking-widest text-white/30 truncate">
+    <div className="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/5">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
+          <Icon size={13} className="text-brand-marinho-glow" />
+        </div>
+        <span className="font-sans text-[10px] font-black uppercase tracking-widest text-white/30 truncate">
           {label}
         </span>
       </div>
-      <span className="font-sans text-xs font-bold text-white/70 shrink-0">{value}</span>
+      <span className="font-sans text-sm font-bold text-white shrink-0">{value}</span>
     </div>
   )
 }
