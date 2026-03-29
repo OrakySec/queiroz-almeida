@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, ArrowUpRight, Maximize2, BedDouble, Car } from 'lucide-react'
+import { MapPin, ArrowUpRight, Maximize2, BedDouble, Car, Bath, ShowerHead } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { Empreendimento } from '@/types'
 
@@ -26,19 +26,34 @@ function faixa(min?: number, max?: number, suffix = '') {
 
 export function EmpreendimentoCard({ empreendimento: e }: Props) {
   const foto = e.fotos?.[0]
-  const label = e.is_lancamento ? 'Lançamento' : 'Em Obra'
 
-  const localizacao = [e.bairro, e.cidade, e.estado].filter(Boolean).join(', ')
-  const quartos = faixa(e.quartos_min, e.quartos_max)
-  const vagas = faixa(e.vagas_min, e.vagas_max)
-  const area = faixa(e.area_min, e.area_max, ' m²')
-  const precoMin = formatPreco(e.preco_min)
-  const precoMax = formatPreco(e.preco_max)
-  const preco = precoMin
-    ? precoMax && precoMax !== precoMin
-      ? `${precoMin} – ${precoMax}`
-      : precoMin
+  // Status: Concluído > Lançamento > Em Obra
+  const label = e.progresso >= 100 ? 'Concluído' : e.is_lancamento ? 'Lançamento' : 'Em Obra'
+  const labelStyle = e.progresso >= 100
+    ? 'bg-emerald-500/15 border-emerald-400/40 text-emerald-400'
+    : e.is_lancamento
+      ? 'bg-brand-marinho-glow/15 border-brand-marinho-glow/40 text-brand-marinho-glow'
+      : 'bg-white/10 border-white/20 text-white'
+
+  const localizacao = [e.cidade, e.estado].filter(Boolean).join(' · ')
+  const area      = faixa(e.area_min, e.area_max, ' m²')
+  const quartos   = faixa(e.quartos_min, e.quartos_max)
+  const suites    = faixa(e.suites_min, e.suites_max)
+  const banheiros = faixa(e.banheiros_min, e.banheiros_max)
+  const vagas     = faixa(e.vagas_min, e.vagas_max)
+  const precoMin  = formatPreco(e.preco_min)
+  const precoMax  = formatPreco(e.preco_max)
+  const preco     = precoMin
+    ? precoMax && precoMax !== precoMin ? `${precoMin} – ${precoMax}` : precoMin
     : null
+
+  const specs = [
+    { icon: Maximize2,  label: 'Área',      value: area },
+    { icon: BedDouble,  label: 'Quartos',   value: quartos },
+    { icon: Bath,       label: 'Suítes',    value: suites },
+    { icon: ShowerHead, label: 'Banheiros', value: banheiros },
+    { icon: Car,        label: 'Vagas',     value: vagas },
+  ].filter(s => s.value)
 
   return (
     <motion.article
@@ -66,11 +81,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
 
           {/* Badges — top left */}
           <div className="absolute top-5 left-5 flex items-center gap-2">
-            <span className={`font-sans text-[8px] font-black uppercase tracking-[0.3em] px-4 py-2 rounded-full backdrop-blur-md border shadow-lg ${
-              e.is_lancamento
-                ? 'bg-brand-marinho-glow/15 border-brand-marinho-glow/40 text-brand-marinho-glow'
-                : 'bg-white/10 border-white/20 text-white'
-            }`}>
+            <span className={`font-sans text-[8px] font-black uppercase tracking-[0.3em] px-4 py-2 rounded-full backdrop-blur-md border shadow-lg ${labelStyle}`}>
               {label}
             </span>
             {e.tipo_imovel && (
@@ -135,34 +146,26 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
           {/* Divider */}
           <div className="h-px w-full bg-white/[0.06] mb-5" />
 
-          {/* Specs grid */}
-          <div className="grid grid-cols-3 gap-3 mb-5">
-            {quartos && (
-              <div className="flex flex-col gap-1">
-                <BedDouble size={12} className="text-brand-marinho-glow" />
-                <span className="font-sans text-xs font-bold text-white leading-none">{quartos}</span>
-                <span className="font-sans text-[8px] uppercase tracking-widest text-white/35">
-                  {Number(e.quartos_max ?? e.quartos_min) > 1 ? 'Quartos' : 'Quarto'}
-                </span>
-              </div>
-            )}
-            {vagas && (
-              <div className="flex flex-col gap-1">
-                <Car size={12} className="text-brand-marinho-glow" />
-                <span className="font-sans text-xs font-bold text-white leading-none">{vagas}</span>
-                <span className="font-sans text-[8px] uppercase tracking-widest text-white/35">
-                  {Number(e.vagas_max ?? e.vagas_min) > 1 ? 'Vagas' : 'Vaga'}
-                </span>
-              </div>
-            )}
-            {area && (
-              <div className="flex flex-col gap-1">
-                <Maximize2 size={12} className="text-brand-marinho-glow" />
-                <span className="font-sans text-xs font-bold text-white leading-none">{area}</span>
-                <span className="font-sans text-[8px] uppercase tracking-widest text-white/35">Área</span>
-              </div>
-            )}
-          </div>
+          {/* Specs grid — 2 colunas */}
+          {specs.length > 0 && (
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
+              {specs.map(({ icon: Icon, label: specLabel, value }) => (
+                <div key={specLabel} className="flex items-center gap-2.5">
+                  <div className="w-6 h-6 rounded-lg bg-white/[0.05] flex items-center justify-center shrink-0">
+                    <Icon size={11} className="text-brand-marinho-glow" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-sans text-[8px] uppercase tracking-widest text-white/30 leading-none mb-0.5">
+                      {specLabel}
+                    </p>
+                    <p className="font-sans text-xs font-bold text-white leading-none truncate">
+                      {value}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Price + progress row */}
           <div className="flex items-end justify-between">
