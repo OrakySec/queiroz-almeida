@@ -94,11 +94,6 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
 
           {/* Padrão badge — top right */}
           <div className="absolute top-5 right-5 flex items-center gap-2">
-            {e.padrao && (
-              <span className="font-sans text-[7px] font-black uppercase tracking-[0.25em] px-3 py-1.5 rounded-full backdrop-blur-md border border-brand-marinho-glow/30 bg-brand-marinho-glow/10 text-brand-marinho-glow">
-                {e.padrao}
-              </span>
-            )}
             <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110">
               <ArrowUpRight size={16} className="text-white" />
             </div>
