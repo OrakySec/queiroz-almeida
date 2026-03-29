@@ -26,31 +26,31 @@ export function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-8 py-4 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-4 ${
           scrolled ? 'transform-none' : 'md:py-8'
         }`}
       >
         <div className={`max-w-7xl mx-auto transition-all duration-500 ${
           scrolled 
             ? 'glass-navbar rounded-full px-6 shadow-2xl border border-white/20' 
-            : 'bg-transparent px-0'
+            : 'bg-transparent px-6 lg:px-12'
         }`}>
           <div className="flex items-center justify-between h-16 md:h-20">
             
-            {/* Logo Group */}
-            <Link href="/" className="relative flex items-center group">
-              <div className={`transition-all duration-500 overflow-hidden rounded-xl bg-transparent ${
-                scrolled ? 'w-10 h-10 md:w-14 md:h-14' : 'w-20 h-20 md:w-28 md:h-28'
-              }`}>
-                <Image 
-                  src="/logo.png" 
-                  alt="Queiroz Almeida" 
-                  width={200} 
-                  height={200}
-                  priority
-                  className="object-contain w-full h-full" 
-                />
-              </div>
+            {/* Logo Group — Discrete Pill-Clipped Image (Force Native) */}
+            <Link href="/" className="relative flex items-center group -ml-1 md:-ml-2.5">
+              <img 
+                src="/logo.png?v=9" 
+                alt="Queiroz Almeida" 
+                style={{ 
+                  width: scrolled ? '150px' : '190px', 
+                  height: 'auto', 
+                  borderRadius: '100px', 
+                  objectFit: 'contain',
+                  display: 'block',
+                  transition: 'all 0.5s ease-in-out'
+                }} 
+              />
             </Link>
 
             {/* Desktop Nav */}

@@ -80,7 +80,7 @@ function TestimonialCard({ d, index }: { d: typeof depoimentos[0], index: number
         </div>
 
         {/* Text */}
-        <p className={`font-sans text-white/70 leading-relaxed mb-6 md:mb-8 italic flex-grow 
+        <p className={`font-sans text-white/90 leading-relaxed mb-6 md:mb-8 italic flex-grow 
           ${d.destaque ? 'text-base md:text-xl' : 'text-sm md:text-base'}
         `}>
           "{d.texto}"
@@ -103,7 +103,7 @@ function TestimonialCard({ d, index }: { d: typeof depoimentos[0], index: number
           </div>
           <div>
             <h4 className="font-serif font-bold text-white text-base md:text-lg leading-tight">{d.nome}</h4>
-            <span className="font-sans text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-brand-marinho-glow/60">{d.cidade}</span>
+            <span className="font-sans text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-brand-marinho-glow/85">{d.cidade}</span>
           </div>
         </div>
       </div>
@@ -146,7 +146,7 @@ export function Depoimentos() {
                       />
                     ))}
                   </div>
-                  <span className="font-sans text-[9px] md:text-[10px] font-bold text-white/80 uppercase tracking-widest leading-none">
+                  <span className="font-sans text-[9px] md:text-[10px] font-bold text-white uppercase tracking-widest leading-none">
                     4.9 Trust Score
                   </span>
                 </div>
@@ -207,7 +207,7 @@ export function Depoimentos() {
                 <div className="absolute -inset-3 bg-brand-marinho-glow/30 blur-xl rounded-full -z-10" />
               </div>
             </div>
-            <p className="font-sans text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white/30 text-center md:text-right">
+            <p className="font-sans text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white/60 text-center md:text-right">
               Investidores Atendidos
             </p>
           </motion.div>

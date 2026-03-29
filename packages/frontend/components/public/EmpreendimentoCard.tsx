@@ -69,7 +69,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
           {/* Location */}
           <div className="flex items-center gap-2 mb-3">
             <MapPin size={10} className="text-brand-marinho-glow shrink-0" />
-            <span className="font-sans text-[9px] font-bold uppercase tracking-[0.25em] text-white/40">
+            <span className="font-sans text-[9px] font-bold uppercase tracking-[0.25em] text-white/70">
               {e.cidade}{e.estado ? `, ${e.estado}` : ''}
             </span>
           </div>
@@ -87,16 +87,16 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
           <div className="flex flex-wrap items-center gap-4">
             {e.area_min && (
               <div className="flex items-center gap-2">
-                <Maximize2 size={11} className="text-white/30" />
-                <span className="font-sans text-[10px] font-bold text-white/50 uppercase tracking-widest">
+                <Maximize2 size={11} className="text-white/60" />
+                <span className="font-sans text-[10px] font-bold text-white/80 uppercase tracking-widest">
                   {e.area_min}{e.area_max && e.area_max !== e.area_min ? `–${e.area_max}` : ''} m²
                 </span>
               </div>
             )}
             {e.tipologia && (
               <div className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-white/20" />
-                <span className="font-sans text-[10px] font-bold text-white/50 uppercase tracking-widest">
+                <div className="w-1 h-1 rounded-full bg-white/40" />
+                <span className="font-sans text-[10px] font-bold text-white/80 uppercase tracking-widest">
                   {e.tipologia}
                 </span>
               </div>

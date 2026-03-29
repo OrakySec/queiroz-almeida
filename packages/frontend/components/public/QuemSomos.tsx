@@ -89,7 +89,7 @@ function TimelineItem({ marco, index }: TimelineItemProps) {
           <h4 className={`font-serif font-bold text-xl md:text-2xl mb-3 md:mb-5 relative z-10 transition-colors duration-500 ${isInView ? 'text-brand-marinho' : 'text-brand-navy'}`}>
             {marco.titulo}
           </h4>
-          <p className="font-sans text-brand-navy/50 leading-relaxed relative z-10 text-xs md:text-base">
+          <p className="font-sans text-brand-navy/75 leading-relaxed relative z-10 text-xs md:text-base">
             {marco.descricao}
           </p>
           
@@ -169,10 +169,10 @@ export function QuemSomos() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="flex flex-col gap-6 lg:pt-8"
           >
-            <p className="font-sans text-lg text-brand-navy/60 leading-relaxed">
+            <p className="font-sans text-lg text-brand-navy/85 leading-relaxed">
               A <strong className="text-brand-navy font-semibold">Queiroz Almeida Construtora e Incorporadora</strong> é reconhecida no mercado do litoral nordestino pela excelência na construção de flats de investimento de altíssimo padrão.
             </p>
-            <p className="font-sans text-base text-brand-navy/40 leading-relaxed">
+            <p className="font-sans text-base text-brand-navy/65 leading-relaxed">
               Fundada em 2016, a empresa atua no Litoral Sul Pernambucano (Porto de Galinhas) e no Litoral Norte Alagoano (Maragogi), entregando ativos imobiliários que combinam qualidade construtiva, localização privilegiada e alto potencial de valorização.
             </p>
           </motion.div>
@@ -201,7 +201,7 @@ export function QuemSomos() {
               <div className="pt-10">
                 <Shield size={32} className="text-brand-marinho-glow mb-8" />
                 <h3 className="font-serif font-bold text-white text-3xl mb-4">Anos de Mercado</h3>
-                <p className="font-sans text-brand-silver/50 leading-relaxed max-w-sm">
+                <p className="font-sans text-brand-silver/75 leading-relaxed max-w-sm">
                   Uma década de solidez e reputação inabalável no litoral nordestino.
                 </p>
               </div>
@@ -222,7 +222,7 @@ export function QuemSomos() {
              <div className="relative z-10">
                <TrendingUp size={40} className="text-brand-marinho-glow mb-10 group-hover:scale-110 transition-transform" />
                <h3 className="font-serif font-bold text-brand-navy text-3xl mb-4">Potencial de Renda</h3>
-               <p className="font-sans text-brand-navy/60 leading-relaxed">
+               <p className="font-sans text-brand-navy/85 leading-relaxed">
                  Flats em Porto de Galinhas e Maragogi — os destinos com maior valorização imobiliária do Brasil.
                </p>
              </div>
@@ -280,7 +280,7 @@ export function QuemSomos() {
               <MapPin size={32} className="text-brand-marinho-glow mb-12" />
               <div>
                 <h3 className="font-serif font-bold text-white text-3xl mb-3">Litoral Único</h3>
-                <p className="font-sans text-brand-silver/50 text-sm leading-relaxed max-w-xs">
+                <p className="font-sans text-brand-silver/75 text-sm leading-relaxed max-w-xs">
                   Pernambuco e Alagoas: uma atuação focada onde o mar é a maior riqueza da marca.
                 </p>
               </div>
@@ -303,10 +303,10 @@ export function QuemSomos() {
               {/* Milestones Container with Dedicated Scroll Sensor */}
               <div ref={timelineRef} className="relative">
                 {/* Vertical Progress Bar — Precision Linked */}
-                <div className="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-brand-navy/5 -translate-x-1/2 md:block" />
+                <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-brand-navy/5 -translate-x-1/2" />
                 <motion.div 
                   style={{ scaleY: smoothTimelineProgress }}
-                  className="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-brand-marinho-glow -translate-x-1/2 md:block origin-top z-10" 
+                  className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-brand-marinho-glow -translate-x-1/2 origin-top z-10" 
                 />
 
                 <div className="space-y-48 relative">

@@ -81,14 +81,14 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
                   className="absolute bottom-8 left-8 right-8 bg-white/10 backdrop-blur-3xl border border-white/20 rounded-3xl px-8 py-6 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.2)]"
                 >
                   <div>
-                    <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 mb-1.5">Metragem</p>
+                    <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-white/75 mb-1.5">Metragem</p>
                     <p className="font-serif text-2xl font-bold text-white">
                       {e.area_min}{e.area_max && e.area_max !== e.area_min ? `–${e.area_max}` : ''} m²
                     </p>
                   </div>
                   <div className="h-10 w-px bg-white/20" />
                   <div>
-                    <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 mb-1.5">Tipologia</p>
+                    <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-white/75 mb-1.5">Tipologia</p>
                     <p className="font-serif text-2xl font-bold text-white">{e.tipologia || 'Studio'}</p>
                   </div>
                   <div className="flex flex-col items-center gap-1">
@@ -119,7 +119,7 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
                   {e.nome}
                 </h2>
 
-                <div className="flex items-center gap-3 text-brand-navy/60">
+                <div className="flex items-center gap-3 text-brand-navy/85">
                   <div className="w-2 h-2 rounded-full bg-brand-marinho-glow animate-pulse" />
                   <span className="font-sans text-xs font-bold uppercase tracking-[0.2em]">{e.cidade}{e.estado ? `, ${e.estado}` : ''}</span>
                 </div>

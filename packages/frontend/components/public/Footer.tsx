@@ -20,28 +20,38 @@ export function Footer() {
 
           {/* Brand Info (5/12) */}
           <div className="md:col-span-5">
-            <div className="mb-0">
-              <div className="w-24 h-24 md:w-32 md:h-32 mb-8 overflow-hidden rounded-xl">
-                <Image 
-                  src="/logo.png" 
-                  alt="Queiroz Almeida" 
-                  width={200} 
-                  height={200}
-                  className="object-contain w-full h-full" 
-                />
-              </div>
+            <div className="mb-8">
+              <img 
+                src="/logo.png?v=7" 
+                alt="Queiroz Almeida" 
+                style={{ 
+                  width: '180px', 
+                  height: 'auto', 
+                  borderRadius: '100px', 
+                  objectFit: 'contain',
+                  display: 'block',
+                  transition: 'all 0.5s ease-in-out'
+                }} 
+              />
             </div>
-            <p className="font-sans text-sm text-brand-silver/40 leading-relaxed mb-10 max-w-sm">
+            <p className="font-sans text-sm text-brand-silver/75 leading-relaxed mb-10 max-w-sm">
               Referência em incorporação de alto padrão no litoral nordestino. 
               Criamos ativos imobiliários de elite para investidores que buscam 
               rentabilidade e exclusividade.
             </p>
             <div className="flex gap-6">
-              {[Instagram, Facebook, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:border-brand-marinho-glow hover:text-brand-marinho-glow transition-all">
-                  <Icon size={18} />
-                </a>
-              ))}
+              <a href="https://www.instagram.com/queirozalmeidaconstrutora/" target="_blank" rel="noopener noreferrer" 
+                className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:border-brand-marinho-glow hover:text-brand-marinho-glow transition-all"
+                aria-label="Instagram"
+              >
+                <Instagram size={18} />
+              </a>
+              <a href="mailto:contato@queirozalmeidaconstrutora.com.br" 
+                className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:border-brand-marinho-glow hover:text-brand-marinho-glow transition-all"
+                aria-label="Email"
+              >
+                <Mail size={18} />
+              </a>
             </div>
           </div>
 
@@ -53,7 +63,7 @@ export function Footer() {
             <ul className="space-y-4">
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="flex items-center gap-2 group font-sans text-xs font-semibold text-brand-silver/40 hover:text-white transition-all">
+                  <Link href={link.href} className="flex items-center gap-2 group font-sans text-xs font-semibold text-brand-silver/75 hover:text-white transition-all">
                     <span className="w-0 h-px bg-brand-marinho-glow group-hover:w-4 transition-all" />
                     {link.label}
                   </Link>
@@ -70,14 +80,14 @@ export function Footer() {
             <ul className="space-y-6">
               <li>
                 <a href="mailto:contato@queirozalmeidaconstrutora.com.br"
-                  className="flex flex-col gap-1 text-brand-silver/40 hover:text-white transition-colors group">
-                  <span className="font-sans text-[9px] uppercase tracking-widest text-brand-silver/20 group-hover:text-brand-marinho-glow">E-mail</span>
+                  className="flex flex-col gap-1 text-brand-silver/75 hover:text-white transition-colors group">
+                  <span className="font-sans text-[9px] uppercase tracking-widest text-brand-silver/50 group-hover:text-brand-marinho-glow">E-mail</span>
                   <span className="font-sans text-sm font-medium">contato@queirozalmeidaconstrutora.com.br</span>
                 </a>
               </li>
               <li>
-                <a href="tel:+5581999999999" className="flex flex-col gap-1 text-brand-silver/40 hover:text-white transition-colors group">
-                  <span className="font-sans text-[9px] uppercase tracking-widest text-brand-silver/20 group-hover:text-brand-marinho-glow">Atendimento</span>
+                <a href="tel:+5581999999999" className="flex flex-col gap-1 text-brand-silver/75 hover:text-white transition-colors group">
+                  <span className="font-sans text-[9px] uppercase tracking-widest text-brand-silver/50 group-hover:text-brand-marinho-glow">Atendimento</span>
                   <span className="font-sans text-sm font-medium">(81) 99999-9999</span>
                 </a>
               </li>
@@ -95,11 +105,11 @@ export function Footer() {
         {/* Footer Bottom */}
         <div className="pt-12 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-8">
-            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-brand-silver/20">© 2024 Queiroz Almeida</span>
-            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-brand-silver/20">CNPJ: 00.000.000/0001-00</span>
+            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-brand-silver/50">© 2024 Queiroz Almeida</span>
+            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-brand-silver/50">CNPJ: 00.000.000/0001-00</span>
           </div>
           <div className="flex items-center gap-6">
-             <span className="font-sans text-[9px] text-brand-silver/10 uppercase tracking-widest">Powered by Premium Design</span>
+             <span className="font-sans text-[9px] text-brand-silver/30 uppercase tracking-widest">Powered by Premium Design</span>
           </div>
         </div>
       </div>

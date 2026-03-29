@@ -57,14 +57,14 @@ export function Hero() {
           >
             <div className="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-4 py-2">
               <MapPin size={12} className="text-brand-marinho-glow" />
-              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-white/70">
+              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-white/90">
                 Porto de Galinhas, PE
               </span>
             </div>
             <div className="w-1 h-1 rounded-full bg-brand-marinho-glow/40" />
             <div className="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-4 py-2">
               <MapPin size={12} className="text-brand-marinho-glow" />
-              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-white/70">
+              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-white/90">
                 Maragogi, AL
               </span>
             </div>
@@ -89,7 +89,7 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1 }}
-            className="font-sans text-lg md:text-xl text-brand-silver/60 leading-relaxed mb-14 max-w-xl"
+            className="font-sans text-lg md:text-xl text-brand-silver/90 leading-relaxed mb-14 max-w-xl"
           >
             Flats de alto padrão em Porto de Galinhas e Maragogi.
             Onde a valorização imobiliária encontra o paraíso.
@@ -114,7 +114,7 @@ export function Hero() {
             </button>
 
             {/* Secondary — Ghost Pill */}
-            <button className="flex items-center gap-4 group text-white/60 hover:text-white transition-colors">
+            <button className="flex items-center gap-4 group text-white/85 hover:text-white transition-colors">
               <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center transition-all group-hover:border-brand-marinho-glow group-hover:scale-110 group-hover:bg-brand-marinho-glow/10">
                 <Play size={14} className="fill-white translate-x-0.5" />
               </div>
@@ -135,27 +135,27 @@ export function Hero() {
           <div className="flex flex-wrap items-center justify-center gap-x-8 md:gap-x-12 gap-y-4 text-center">
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-brand-marinho-glow animate-pulse" />
-              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-brand-silver/50">
+              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-brand-silver/75">
                 Fundada em 2016
               </span>
             </div>
             
             <div className="hidden md:block h-3 w-px bg-white/10" />
             
-            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-brand-silver/50">
+            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-brand-silver/75">
               9+ anos no litoral nordestino
             </span>
 
             <div className="hidden md:block h-3 w-px bg-white/10" />
 
-            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-brand-silver/50">
+            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-brand-silver/75">
               3 empreendimentos ativos
             </span>
 
             <div className="hidden md:block h-3 w-px bg-white/10" />
 
             <div className="flex items-center gap-3">
-              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-brand-silver/50">
+              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-brand-silver/75">
                 100% foco no litoral
               </span>
               <div className="w-1.5 h-1.5 rounded-full bg-brand-marinho-glow/40" />

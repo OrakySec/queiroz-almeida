@@ -46,16 +46,17 @@ export function MobileMenu({ isOpen, onClose }: Props) {
           <div className="absolute inset-0 bg-blueprint opacity-[0.05] pointer-events-none" />
 
           {/* Header */}
-          <div className="relative z-10 flex items-center justify-between px-8 h-24 border-b border-white/5">
-            <div className="w-16 h-16 overflow-hidden rounded-xl">
-              <Image 
-                src="/logo.png" 
-                alt="Queiroz Almeida" 
-                width={64} 
-                height={64}
-                className="object-contain w-full h-full" 
-              />
-            </div>
+          <div className="relative z-10 flex items-center justify-between px-8 h-24">
+            <Image 
+              src="/logo.png?v=7" 
+              alt="Queiroz Almeida" 
+              width={120} 
+              height={60}
+              style={{ 
+                borderRadius: '100px', 
+                objectFit: 'contain'
+              }} 
+            />
             <button
               onClick={onClose}
               className="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 text-white hover:bg-brand-marinho transition-all"
