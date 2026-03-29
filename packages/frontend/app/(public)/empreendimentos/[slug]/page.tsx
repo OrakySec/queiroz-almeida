@@ -1,11 +1,11 @@
-import type { ReactNode, ComponentType } from 'react'
+import type { ReactNode } from 'react'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
   MapPin, Maximize2, BedDouble, Car, TrendingUp, ArrowLeft, CheckCircle2,
-  Bath, Building2, Calendar, Navigation, Hash,
+  Bath, Building2, Calendar, Navigation, Hash, type LucideIcon,
 } from 'lucide-react'
 import { Reveal } from '@/components/public/RevealText'
 import { LeadCTAButton } from '@/components/public/LeadCTAButton'
@@ -486,7 +486,7 @@ function SidebarInfo({
   label,
   value,
 }: {
-  icon: ComponentType<{ size?: number; className?: string }>
+  icon: LucideIcon
   label: string
   value: string
 }) {
