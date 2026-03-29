@@ -394,17 +394,6 @@ export default async function EmpreendimentoPage({
                   </div>
                 </Reveal>
               )}
-              {/* Memorial Descritivo PDF */}
-              {e.pdf_url && (
-                <Reveal delay={0.18}>
-                  <div>
-                    <SectionTitle>Memorial Descritivo</SectionTitle>
-                    <div className="rounded-3xl overflow-hidden border border-slate-100 shadow-sm bg-white">
-                      <PdfViewer url={e.pdf_url} />
-                    </div>
-                  </div>
-                </Reveal>
-              )}
             </div>
 
             {/* ── Sidebar ── */}
@@ -480,6 +469,20 @@ export default async function EmpreendimentoPage({
           </div>
         </div>
       </section>
+
+      {/* ── Memorial Descritivo ── largura total ─────────────────── */}
+      {e.pdf_url && (
+        <section className="pb-32">
+          <div className="max-w-7xl mx-auto px-6 lg:px-16">
+            <Reveal>
+              <SectionTitle>Memorial Descritivo</SectionTitle>
+              <div className="rounded-3xl overflow-hidden border border-slate-100 shadow-sm bg-white">
+                <PdfViewer url={e.pdf_url} />
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
