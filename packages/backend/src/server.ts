@@ -22,7 +22,7 @@ if (!process.env.MINIO_PUBLIC_URL) {
   console.warn('WARN: MINIO_PUBLIC_URL não definida — URLs de fotos podem estar incorretas em produção.')
 }
 
-const app = Fastify({ logger: true })
+const app = Fastify({ logger: true, bodyLimit: 50 * 1024 * 1024 }) // 50 MB para suportar uploads de PDF e fotos
 
 async function bootstrap() {
   // Plugins
