@@ -31,27 +31,49 @@ export function ConstrucaoScrollVideo() {
     const video = videoRef.current
     if (!video) return
 
-    video.pause() // controle total via currentTime
-
-    let animTime      = 0   // posição animada (separada de video.currentTime)
-    let targetTime    = 0   // onde o scroll quer que estejamos
-    let lastTarget    = 0   // targetTime anterior (para calcular delta real)
-    let velocity      = 0   // velocidade real do scroll (EWMA de deltas de targetTime)
-    let pendingDelta  = 0   // delta acumulado da inércia antes de fazer seek
-    let lastScrollAt  = 0
+    let animTime     = 0
+    let targetTime   = 0
+    let lastTarget   = 0
+    let velocity     = 0
+    let pendingDelta = 0
+    let lastScrollAt = 0
     let rafId = 0
     let running = true
 
-    // Fases:
-    //  1. Scroll ativo  → lerp 15%/frame em direção ao alvo
-    //  2. Scroll parou  → inércia: acumula delta, seek só quando >= 1 frame de vídeo
-    //  3. Velocity ~zero → snap único ao alvo exato
     const LERP      = 0.15   // 15%/frame durante scroll ativo
-    const FRICTION  = 0.85   // 85%/frame → ~20 frames (≈330ms) de momentum
-    const EWMA      = 0.4    // peso do novo delta na média exponencial de velocity
-    const SETTLE_MS = 60     // ms sem scroll → início da fase de inércia
-    const MIN_SEEK  = 0.033  // só faz seek quando acumulou ≥ 1 frame (30fps)
-    const EPSILON   = 0.005  // threshold de parada
+    const FRICTION  = 0.85   // momentum ~20 frames (330ms)
+    const EWMA      = 0.4    // suavização da velocity real
+    const SETTLE_MS = 60     // ms sem scroll → fase de inércia
+    const MIN_SEEK  = 0.066  // seek só quando acumulou ≥ 2 frames (30fps) — alivia mobile
+    const EPSILON   = 0.005
+
+    // Usa fastSeek() onde disponível (Firefox/Chrome Android): menos preciso
+    // mas muito mais rápido que currentTime em mobile
+    function seekTo(el: HTMLVideoElement, t: number) {
+      const v = el as any
+      if (typeof v.fastSeek === 'function') v.fastSeek(t)
+      else el.currentTime = t
+    }
+
+    // ── iOS warm-up ──────────────────────────────────────────────────────
+    // iOS Safari ignora preload="auto" e não decodifica NENHUM frame até que
+    // o vídeo tenha sido play()'ed ao menos uma vez. Fazemos um play() silencioso
+    // no loadedmetadata e pausamos imediatamente — o decoder fica "aquecido"
+    // e currentTime scrubbing passa a funcionar normalmente.
+    function warmUp() {
+      const v = videoRef.current
+      if (!v) return
+      const p = v.play()
+      if (p) p.then(() => {
+        const cur = videoRef.current
+        if (cur) { cur.pause(); cur.currentTime = 0 }
+      }).catch(() => {})
+    }
+    video.addEventListener('loadedmetadata', warmUp, { once: true })
+
+    // Mantém o vídeo sempre pausado (scrubbing manual via currentTime)
+    function onPlay() { videoRef.current?.pause() }
+    video.addEventListener('play', onPlay)
 
     function tick() {
       if (!running) return
@@ -62,24 +84,21 @@ export function ConstrucaoScrollVideo() {
       const settled = (performance.now() - lastScrollAt) > SETTLE_MS
 
       if (!settled) {
-        // ── Fase 1: scroll ativo — lerp fluido ──
+        // ── Fase 1: scroll ativo — lerp ──
         const diff = targetTime - animTime
         if (Math.abs(diff) < EPSILON) return
         animTime += diff * LERP
         animTime = Math.max(0, Math.min(v.duration - 0.033, animTime))
-        v.currentTime = animTime
+        seekTo(v, animTime)
 
       } else if (Math.abs(velocity) > EPSILON) {
-        // ── Fase 2: inércia ──
-        // Acumula o delta antes de seek para não fazer micro-seeks menores
-        // que 1 frame de vídeo (browser não consegue decodificar de forma suave)
+        // ── Fase 2: inércia — batching de seeks ──
         pendingDelta += velocity
         velocity *= FRICTION
-
         if (Math.abs(pendingDelta) >= MIN_SEEK) {
           animTime += pendingDelta
           animTime = Math.max(0, Math.min(v.duration - 0.033, animTime))
-          v.currentTime = animTime
+          seekTo(v, animTime)
           pendingDelta = 0
         }
 
@@ -89,7 +108,7 @@ export function ConstrucaoScrollVideo() {
         if (Math.abs(targetTime - animTime) > EPSILON) {
           animTime = targetTime
           velocity = 0
-          v.currentTime = animTime
+          seekTo(v, animTime)
         }
       }
     }
@@ -99,22 +118,13 @@ export function ConstrucaoScrollVideo() {
     const unsub = scrollYProgress.on('change', (latest) => {
       const v = videoRef.current
       if (!v || !v.duration || !isFinite(v.duration)) return
-
       const newTarget = Math.max(0, Math.min(1, (latest - 0.1) / 0.8)) * (v.duration - 0.033)
-
-      // EWMA da velocidade real (delta de targetTime entre eventos de scroll)
-      // Evita que um único evento grande domine a inércia
       const delta = newTarget - lastTarget
       velocity = velocity * (1 - EWMA) + delta * EWMA
-
-      lastTarget  = newTarget
-      targetTime  = newTarget
+      lastTarget   = newTarget
+      targetTime   = newTarget
       lastScrollAt = performance.now()
     })
-
-    // Garante que o vídeo não tente reproduzir sozinho
-    function onPlay() { videoRef.current?.pause() }
-    video.addEventListener('play', onPlay)
 
     return () => {
       running = false
@@ -219,6 +229,7 @@ export function ConstrucaoScrollVideo() {
                 ref={videoRef}
                 muted
                 playsInline
+                autoPlay
                 preload="auto"
                 disableRemotePlayback
                 className="w-full h-auto block"
