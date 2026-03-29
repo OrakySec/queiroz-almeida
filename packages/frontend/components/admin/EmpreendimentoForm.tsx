@@ -10,8 +10,9 @@ import { FotoUploader } from './FotoUploader'
 import { Save, Loader2, Send, RotateCcw, Upload, X, ImageIcon } from 'lucide-react'
 import { useAdmin } from '@/context/AdminContext'
 
-const optNum = z.coerce.number().positive().optional().or(z.literal(''))
-const optInt = z.coerce.number().int().min(0).optional().or(z.literal(''))
+const emptyToUndef = (v: unknown) => (v === '' || v == null ? undefined : v)
+const optNum = z.preprocess(emptyToUndef, z.coerce.number().positive().optional())
+const optInt = z.preprocess(emptyToUndef, z.coerce.number().int().min(0).optional())
 
 const schema = z.object({
   nome: z.string().min(3, 'Nome obrigatório'),
@@ -33,16 +34,16 @@ const schema = z.object({
   banheirosMax: optInt,
   numTorres: optInt,
   numAndares: optInt,
-  latitude: z.coerce.number().optional().or(z.literal('')),
-  longitude: z.coerce.number().optional().or(z.literal('')),
+  latitude: z.preprocess(emptyToUndef, z.coerce.number().optional()),
+  longitude: z.preprocess(emptyToUndef, z.coerce.number().optional()),
   amenidades: z.array(z.string()).optional(),
   areaMin: optNum,
   areaMax: optNum,
   precoMin: optNum,
   precoMax: optNum,
-  totalUnidades: z.coerce.number().int().positive().optional().or(z.literal('')),
-  unidadesDisponiveis: z.coerce.number().int().min(0).optional().or(z.literal('')),
-  percentualObra: z.coerce.number().min(0).max(100).optional().or(z.literal('')),
+  totalUnidades: z.preprocess(emptyToUndef, z.coerce.number().int().positive().optional()),
+  unidadesDisponiveis: z.preprocess(emptyToUndef, z.coerce.number().int().min(0).optional()),
+  percentualObra: z.preprocess(emptyToUndef, z.coerce.number().min(0).max(100).optional()),
   dataEntrega: z.string().optional(),
   destaque: z.boolean().optional(),
   videoUrl: z.string().url('URL inválida').optional().or(z.literal('')),

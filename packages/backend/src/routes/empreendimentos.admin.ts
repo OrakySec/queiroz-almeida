@@ -8,8 +8,9 @@ import { prisma } from '../lib/prisma'
 
 const ACCEPTED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp']
 
-const num = z.coerce.number().optional().or(z.literal(''))
-const numInt = z.coerce.number().int().optional().or(z.literal(''))
+const emptyToUndef = (v: unknown) => (v === '' || v == null ? undefined : v)
+const num = z.preprocess(emptyToUndef, z.coerce.number().optional())
+const numInt = z.preprocess(emptyToUndef, z.coerce.number().int().optional())
 
 const empreendimentoSchema = z.object({
   nome: z.string().min(1),
