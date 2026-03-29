@@ -1,6 +1,6 @@
 'use client'
-import { useRef } from 'react'
-import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
+import { useRef, useEffect } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, Building2, Hammer, CheckCircle2 } from 'lucide-react'
 import { useLeadModal } from '@/context/LeadModalContext'
 
@@ -20,15 +20,59 @@ export function ConstrucaoScrollVideo() {
     offset: ['start end', 'end start'],
   })
 
-  // Scrub video — rolar pra baixo avança, rolar pra cima reverte
-  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
+  // ── Smooth video scrubbing: RAF loop + exponential lerp ────────
+  // Problema original: setar video.currentTime direto em cada evento de scroll
+  // faz o browser decodificar um keyframe por evento → trava, especialmente iOS.
+  //
+  // Solução: mantemos `animTime` como nosso estado interno e usamos um loop
+  // requestAnimationFrame que suaviza (lerp 12%/frame) em direção a `targetTime`.
+  // O browser processa seeks em ritmo sustentável ao invés de "pular" a cada pixel.
+  useEffect(() => {
     const video = videoRef.current
-    if (!video || !Number.isFinite(video.duration)) return
-    // Map scroll 0.1–0.9 to full video duration for a smooth in/out margin
-    const mapped = Math.max(0, Math.min(1, (latest - 0.1) / 0.8))
-    const target = mapped * video.duration
-    video.currentTime = Math.min(target, video.duration - 0.05)
-  })
+    if (!video) return
+
+    video.pause() // controle total via currentTime
+
+    let animTime = 0   // posição "animada" (separada de video.currentTime)
+    let targetTime = 0 // onde o scroll quer que estejamos
+    let rafId = 0
+    let running = true
+
+    const LERP = 0.12    // 12%/frame → suave mas responsivo
+    const EPSILON = 0.004 // para de iterar quando estamos a menos de ~1 frame
+
+    function tick() {
+      if (!running) return
+      rafId = requestAnimationFrame(tick)
+      const v = videoRef.current
+      if (!v || !v.duration || !isFinite(v.duration)) return
+      const diff = targetTime - animTime
+      if (Math.abs(diff) < EPSILON) return
+      animTime += diff * LERP
+      animTime = Math.max(0, Math.min(v.duration - 0.033, animTime))
+      v.currentTime = animTime
+    }
+
+    rafId = requestAnimationFrame(tick)
+
+    const unsub = scrollYProgress.on('change', (latest) => {
+      const v = videoRef.current
+      if (!v || !v.duration || !isFinite(v.duration)) return
+      const mapped = Math.max(0, Math.min(1, (latest - 0.1) / 0.8))
+      targetTime = mapped * (v.duration - 0.033)
+    })
+
+    // Garante que o vídeo não tente reproduzir sozinho
+    function onPlay() { videoRef.current?.pause() }
+    video.addEventListener('play', onPlay)
+
+    return () => {
+      running = false
+      cancelAnimationFrame(rafId)
+      unsub()
+      video.removeEventListener('play', onPlay)
+    }
+  }, [scrollYProgress])
 
   // Parallax/fade on the text column
   const textOpacity = useTransform(scrollYProgress, [0.05, 0.25], [0, 1])
@@ -75,7 +119,7 @@ export function ConstrucaoScrollVideo() {
 
             {/* Construction Steps — More compact on mobile */}
             <div className="hidden sm:flex flex-col gap-4 mb-10 w-full">
-              {etapas.map(({ icon: Icon, label }, i) => (
+              {etapas.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-4">
                   <div className="w-8 h-8 rounded-full border border-brand-marinho/20 bg-brand-marinho/5 flex items-center justify-center shrink-0">
                     <Icon size={14} className="text-brand-marinho" />
@@ -126,6 +170,7 @@ export function ConstrucaoScrollVideo() {
                 muted
                 playsInline
                 preload="auto"
+                disableRemotePlayback
                 className="w-full h-auto block"
               >
                 <source src="/construct-video-scrub.mp4" type="video/mp4" />
