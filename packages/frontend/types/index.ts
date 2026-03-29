@@ -33,6 +33,7 @@ export interface Empreendimento {
   preco_max?: number
   total_unidades?: number
   unidades_disponiveis?: number
+  data_inicio?: string
   data_entrega?: string
   whatsapp?: string
   fotos: string[]

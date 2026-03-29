@@ -48,16 +48,26 @@ function ObraCard({ e }: { e: Empreendimento }) {
             style={{ width: `${e.progresso}%` }}
           />
         </div>
-        <div className="mt-4 flex gap-2">
-          <div className="flex-1 bg-brand-gelo rounded-lg p-3 text-center">
-            <p className="font-sans text-xs text-brand-texto/60 mb-0.5">Início</p>
-            <p className="font-sans font-semibold text-sm text-brand-azul">2024</p>
+        {(e.data_inicio || e.data_entrega) && (
+          <div className="mt-4 flex gap-2">
+            {e.data_inicio && (
+              <div className="flex-1 bg-brand-gelo rounded-lg p-3 text-center">
+                <p className="font-sans text-xs text-brand-texto/60 mb-0.5">Início</p>
+                <p className="font-sans font-semibold text-sm text-brand-azul">
+                  {new Date(e.data_inicio).getFullYear()}
+                </p>
+              </div>
+            )}
+            {e.data_entrega && (
+              <div className="flex-1 bg-brand-gelo rounded-lg p-3 text-center">
+                <p className="font-sans text-xs text-brand-texto/60 mb-0.5">Previsão</p>
+                <p className="font-sans font-semibold text-sm text-brand-azul">
+                  {new Date(e.data_entrega).getFullYear()}
+                </p>
+              </div>
+            )}
           </div>
-          <div className="flex-1 bg-brand-gelo rounded-lg p-3 text-center">
-            <p className="font-sans text-xs text-brand-texto/60 mb-0.5">Previsão</p>
-            <p className="font-sans font-semibold text-sm text-brand-azul">2026</p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   )

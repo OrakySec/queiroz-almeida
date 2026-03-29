@@ -43,6 +43,7 @@ function apiToForm(d: any) {
     totalUnidades: d.total_unidades ?? '',
     unidadesDisponiveis: d.unidades_disponiveis ?? '',
     percentualObra: d.progresso ?? 0,
+    dataInicio: d.data_inicio ? String(d.data_inicio).slice(0, 10) : '',
     dataEntrega: d.data_entrega ? String(d.data_entrega).slice(0, 10) : '',
     videoUrl: d.video_url ?? '',
     whatsapp: d.whatsapp ?? '',

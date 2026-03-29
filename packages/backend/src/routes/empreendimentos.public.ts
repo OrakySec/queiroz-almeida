@@ -35,6 +35,7 @@ const SELECT_PUBLIC = {
   preco_max: true,
   total_unidades: true,
   unidades_disponiveis: true,
+  data_inicio: true,
   data_entrega: true,
   whatsapp: true,
   fotos: true,

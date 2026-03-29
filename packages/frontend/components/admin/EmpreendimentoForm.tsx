@@ -44,6 +44,7 @@ const schema = z.object({
   totalUnidades: z.preprocess(emptyToUndef, z.coerce.number().int().positive().optional()),
   unidadesDisponiveis: z.preprocess(emptyToUndef, z.coerce.number().int().min(0).optional()),
   percentualObra: z.preprocess(emptyToUndef, z.coerce.number().min(0).max(100).optional()),
+  dataInicio: z.string().optional(),
   dataEntrega: z.string().optional(),
   destaque: z.boolean().optional(),
   videoUrl: z.string().url('URL inválida').optional().or(z.literal('')),
@@ -320,6 +321,9 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
             </Field>
             <Field label="Evolução da Obra (%)" error={errors.percentualObra?.message}>
               <input {...register('percentualObra')} type="number" min={0} max={100} className={input()} placeholder="65" />
+            </Field>
+            <Field label="Início da Obra" error={errors.dataInicio?.message}>
+              <input {...register('dataInicio')} type="date" className={input()} />
             </Field>
             <Field label="Data de Entrega" error={errors.dataEntrega?.message}>
               <input {...register('dataEntrega')} type="date" className={input()} />

@@ -52,6 +52,7 @@ model Empreendimento {
   preco_max             Decimal?
   total_unidades        Int?
   unidades_disponiveis  Int?
+  data_inicio           DateTime?
   data_entrega          DateTime?
   bairro                String?
   endereco              String?
