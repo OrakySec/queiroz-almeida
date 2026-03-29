@@ -81,7 +81,7 @@ export default async function EmpreendimentosPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
               {empreendimentos.map((e, i) => (
                 <Reveal key={e.id} delay={0.07 * i}>
                   <EmpreendimentoCard empreendimento={e} />
