@@ -1,11 +1,11 @@
+import type { ReactNode, ComponentType } from 'react'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
   MapPin, Maximize2, BedDouble, Car, TrendingUp, ArrowLeft, CheckCircle2,
-  Bath, Building2, Star, Calendar, Home, Layers, Navigation, DoorOpen,
-  Hash,
+  Bath, Building2, Calendar, Navigation, Hash,
 } from 'lucide-react'
 import { Reveal } from '@/components/public/RevealText'
 import { LeadCTAButton } from '@/components/public/LeadCTAButton'
@@ -470,7 +470,7 @@ export default async function EmpreendimentoPage({
 
 /* ── Helpers ─────────────────────────────────────────────────── */
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function SectionTitle({ children }: { children: ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-6">
       <div className="w-1.5 h-1.5 rounded-full bg-brand-marinho-glow shrink-0" />
@@ -486,7 +486,7 @@ function SidebarInfo({
   label,
   value,
 }: {
-  icon: React.ComponentType<{ size?: number; className?: string }>
+  icon: ComponentType<{ size?: number; className?: string }>
   label: string
   value: string
 }) {
