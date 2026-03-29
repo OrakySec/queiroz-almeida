@@ -219,7 +219,7 @@ export function ConstrucaoScrollVideo() {
 
           {/* ── Right Column: Scroll-Synced Video ─────────────────── */}
           <div className="w-full md:flex-1 relative">
-            <div className="relative overflow-hidden w-full h-auto rounded-2xl md:rounded-0 border border-brand-navy/5 md:border-none">
+            <div className="relative overflow-hidden w-full h-auto border-none">
               <video
                 ref={videoRef}
                 muted
