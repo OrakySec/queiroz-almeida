@@ -171,31 +171,44 @@ function EmpreendimentosContent() {
                           <Pencil size={14} />
                         </Link>
 
+                        {canApprove && (emp.status === 'AGUARDANDO_APROVACAO' || emp.status === 'RASCUNHO') && (
+                          <button
+                            onClick={() => handleStatus(emp.id, 'PUBLICADO')}
+                            disabled={!!actionLoading}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-emerald-50 text-emerald-500 transition"
+                            title="Publicar"
+                          >
+                            {actionLoading === emp.id + 'PUBLICADO'
+                              ? <Loader2 size={14} className="animate-spin" />
+                              : <CheckCircle size={14} />
+                            }
+                          </button>
+                        )}
                         {canApprove && emp.status === 'AGUARDANDO_APROVACAO' && (
-                          <>
-                            <button
-                              onClick={() => handleStatus(emp.id, 'PUBLICADO')}
-                              disabled={!!actionLoading}
-                              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-emerald-50 text-emerald-500 transition"
-                              title="Aprovar"
-                            >
-                              {actionLoading === emp.id + 'PUBLICADO'
-                                ? <Loader2 size={14} className="animate-spin" />
-                                : <CheckCircle size={14} />
-                              }
-                            </button>
-                            <button
-                              onClick={() => handleStatus(emp.id, 'REJEITADO')}
-                              disabled={!!actionLoading}
-                              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 text-red-400 transition"
-                              title="Rejeitar"
-                            >
-                              {actionLoading === emp.id + 'REJEITADO'
-                                ? <Loader2 size={14} className="animate-spin" />
-                                : <XCircle size={14} />
-                              }
-                            </button>
-                          </>
+                          <button
+                            onClick={() => handleStatus(emp.id, 'REJEITADO')}
+                            disabled={!!actionLoading}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 text-red-400 transition"
+                            title="Rejeitar"
+                          >
+                            {actionLoading === emp.id + 'REJEITADO'
+                              ? <Loader2 size={14} className="animate-spin" />
+                              : <XCircle size={14} />
+                            }
+                          </button>
+                        )}
+                        {canApprove && emp.status === 'PUBLICADO' && (
+                          <button
+                            onClick={() => handleStatus(emp.id, 'RASCUNHO')}
+                            disabled={!!actionLoading}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-amber-50 text-amber-400 transition"
+                            title="Despublicar"
+                          >
+                            {actionLoading === emp.id + 'RASCUNHO'
+                              ? <Loader2 size={14} className="animate-spin" />
+                              : <XCircle size={14} />
+                            }
+                          </button>
                         )}
 
                         {canDelete && (
