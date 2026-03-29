@@ -14,6 +14,7 @@ export function ConstrucaoScrollVideo() {
   const { open: openLead } = useLeadModal()
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const lastTimeRef = useRef(0)
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -24,10 +25,16 @@ export function ConstrucaoScrollVideo() {
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
     const video = videoRef.current
     if (!video || !Number.isFinite(video.duration)) return
+    
     // Map scroll 0.1–0.9 to full video duration for a smooth in/out margin
     const mapped = Math.max(0, Math.min(1, (latest - 0.1) / 0.8))
-    const target = mapped * video.duration
-    video.currentTime = Math.min(target, video.duration - 0.05)
+    const target = Math.min(mapped * video.duration, video.duration - 0.05)
+
+    // Throttling: Só atualiza se o tempo mudou pelo menos 0.015s (evita afogar o decoder do iPhone)
+    if (Math.abs(target - lastTimeRef.current) > 0.015) {
+      video.currentTime = target
+      lastTimeRef.current = target
+    }
   })
 
   // Parallax/fade on the text column
@@ -129,7 +136,7 @@ export function ConstrucaoScrollVideo() {
                 poster="/construct-video-poster.jpg"
                 className="w-full h-auto block"
               >
-                <source src="/construct-video-scrub-ios.mp4" type="video/mp4" />
+                <source src="/construct-video-scrub-ios-turbo.mp4" type="video/mp4" />
               </video>
             </div>
           </div>
