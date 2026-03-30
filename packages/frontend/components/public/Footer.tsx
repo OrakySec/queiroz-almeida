@@ -134,8 +134,9 @@ export function Footer() {
               CRECI: 00.000-J
             </span>
           </div>
-          <div className="flex items-center gap-4 opacity-30 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
-             <span className="font-serif italic text-xs text-brand-silver/60">Made with Excellence.</span>
+          <div className="flex items-center gap-3 opacity-30 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
+             <span className="font-serif italic text-[10px] text-brand-silver/60">Desenvolvido por</span>
+             <img src="/assinatura.png" alt="Assinatura" className="h-6 w-auto object-contain" />
           </div>
         </div>
       </div>
