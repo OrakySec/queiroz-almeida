@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Instagram, Mail, Phone, ArrowUpRight, MapPin, Linkedin } from 'lucide-react'
+import { Instagram, Mail, ArrowUpRight, MapPin, MessageCircle } from 'lucide-react'
 
 const navLinks = [
   { label: 'Início', href: '/' },
@@ -55,19 +55,13 @@ export function Footer() {
                 >
                   <Mail size={20} />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" 
-                  className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:bg-brand-marinho-glow hover:text-brand-navy hover:border-brand-marinho-glow hover:-translate-y-1 transition-all duration-500 shadow-xl"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin size={20} />
-                </a>
               </div>
               
               <a href="https://wa.me/5581999999999" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-3 w-fit bg-white/5 border border-white/10 px-6 py-3 rounded-2xl group hover:bg-brand-marinho-glow hover:border-brand-marinho-glow transition-all duration-500 shadow-xl"
               >
                 <div className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-brand-navy/20 group-hover:border-transparent transition-all">
-                  <Phone size={14} className="text-brand-marinho-glow group-hover:text-brand-navy" />
+                  <MessageCircle size={16} className="text-brand-marinho-glow group-hover:text-brand-navy" />
                 </div>
                 <span className="font-sans text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-brand-navy">WhatsApp</span>
               </a>
