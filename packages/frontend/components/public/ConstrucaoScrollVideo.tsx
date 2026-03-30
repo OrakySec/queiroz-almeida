@@ -1,150 +1,146 @@
 'use client'
-import { useRef, useEffect } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef, useEffect, useState } from 'react'
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion'
 import { ArrowRight, Building2, Hammer, CheckCircle2 } from 'lucide-react'
 import { useLeadModal } from '@/context/LeadModalContext'
 
+// ── Ajuste conforme o total de frames exportados do vídeo ─────────────
+const FRAME_COUNT = 120
+
 const etapas = [
-  { icon: Hammer, label: 'Estrutura' },
-  { icon: Building2, label: 'Construção' },
-  { icon: CheckCircle2, label: 'Entrega' },
+  { icon: Hammer,       label: 'Estrutura'   },
+  { icon: Building2,    label: 'Construção'  },
+  { icon: CheckCircle2, label: 'Entrega'     },
 ]
 
 export function ConstrucaoScrollVideo() {
   const { open: openLead } = useLeadModal()
-  const containerRef = useRef<HTMLDivElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
 
+  const containerRef = useRef<HTMLDivElement>(null)
+  const canvasRef    = useRef<HTMLCanvasElement>(null)
+  const framesRef    = useRef<HTMLImageElement[]>([])
+  const lastIndexRef = useRef(-1)
+
+  const [loadProgress, setLoadProgress] = useState(0)
+  const [loaded, setLoaded]             = useState(false)
+
+  // ── 1) Pré-carrega todos os frames ──────────────────────────────────
+  useEffect(() => {
+    let done = 0
+    const imgs: HTMLImageElement[] = new Array(FRAME_COUNT)
+
+    for (let i = 0; i < FRAME_COUNT; i++) {
+      const img = new Image()
+      const finish = () => {
+        done++
+        setLoadProgress(Math.round((done / FRAME_COUNT) * 100))
+        if (done === FRAME_COUNT) {
+          framesRef.current = imgs
+          setLoaded(true)
+        }
+      }
+      img.onload  = finish
+      img.onerror = finish
+      img.src = `/sequence/frame_${i}.webp`
+      imgs[i] = img
+    }
+  }, [])
+
+  // ── 2) Redimensiona canvas quando o container muda de tamanho ───────
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    function resize() {
+      if (!canvas) return
+      canvas.width  = canvas.offsetWidth
+      canvas.height = canvas.offsetHeight
+    }
+
+    resize()
+    const ro = new ResizeObserver(resize)
+    ro.observe(canvas)
+    return () => ro.disconnect()
+  }, [])
+
+  // ── 3) Scroll progress + spring suave ───────────────────────────────
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   })
 
-  // ── Smooth video scrubbing: RAF loop + exponential lerp ────────
-  // Problema original: setar video.currentTime direto em cada evento de scroll
-  // faz o browser decodificar um keyframe por evento → trava, especialmente iOS.
-  //
-  // Solução: mantemos `animTime` como nosso estado interno e usamos um loop
-  // requestAnimationFrame que suaviza (lerp 12%/frame) em direção a `targetTime`.
-  // O browser processa seeks em ritmo sustentável ao invés de "pular" a cada pixel.
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  })
+
+  // ── 4) Desenha o frame correto no canvas ─────────────────────────────
   useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
+    if (!loaded) return
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
-    let targetTime   = 0
-    let velocity     = 0   // inércia para desktop (mobile usa momentum nativo)
-    let lastTarget   = 0
-    let lastScrollAt = 0
-    let lastSeekAt   = 0
-    let rafId        = 0
-    let running      = true
+    function draw(index: number) {
+      const img = framesRef.current[index]
+      if (!img?.complete || !img.naturalWidth) return
 
-    // Seek direto ao alvo (sem lerp) → sem passos decrescentes ao desacelerar.
-    // Mobile (iOS/Android) já tem momentum nativo no scroll, então o
-    // scrollYProgress continua disparando eventos após o dedo levantar —
-    // a "inércia" no mobile é grátis. No desktop adicionamos velocity manual.
-    const FRICTION  = 0.82   // decaimento da inércia (desktop)
-    const EWMA      = 0.35   // suavização da velocity
-    const SETTLE_MS = 80     // ms sem scroll → fase de inércia
-    const SEEK_MS   = 33     // máx 30 seeks/segundo (imperceptível, ≈ 1 frame RAF)
-    const MIN_SEEK  = 0.033  // ignora seeks < 1 frame de vídeo (30fps)
-    const EPSILON   = 0.004
+      const cw = canvas!.width
+      const ch = canvas!.height
+      const scale = Math.min(cw / img.naturalWidth, ch / img.naturalHeight)
+      const dw = img.naturalWidth  * scale
+      const dh = img.naturalHeight * scale
+      const dx = (cw - dw) / 2
+      const dy = (ch - dh) / 2
 
-    function seekTo(el: HTMLVideoElement, t: number) {
-      const v = el as any
-      if (typeof v.fastSeek === 'function') v.fastSeek(t)
-      else el.currentTime = t
+      ctx!.clearRect(0, 0, cw, ch)
+      ctx!.drawImage(img, dx, dy, dw, dh)
     }
 
-    // ── iOS warm-up ──────────────────────────────────────────────────────
-    // iOS Safari não decodifica frames sem um play() prévio.
-    function warmUp() {
-      const v = videoRef.current
-      if (!v) return
-      v.play()
-        .then(() => { const c = videoRef.current; if (c) { c.pause(); c.currentTime = 0 } })
-        .catch(() => {})
-    }
-    video.addEventListener('loadedmetadata', warmUp, { once: true })
-    function onPlay() { videoRef.current?.pause() }
-    video.addEventListener('play', onPlay)
+    // Desenha o frame inicial
+    draw(0)
 
-    function tick() {
-      if (!running) return
-      rafId = requestAnimationFrame(tick)
-      const v = videoRef.current
-      if (!v || !v.duration || !isFinite(v.duration)) return
+    const unsub = smoothProgress.on('change', (v) => {
+      // Mapeia 10%–90% do scroll para 0–1
+      const mapped = Math.max(0, Math.min(1, (v - 0.1) / 0.8))
+      const index  = Math.min(Math.floor(mapped * FRAME_COUNT), FRAME_COUNT - 1)
 
-      const now     = performance.now()
-      const settled = (now - lastScrollAt) > SETTLE_MS
-
-      let seekTarget: number
-
-      if (!settled) {
-        // ── Scroll ativo: seek DIRETO ao alvo ──────────────────────────
-        // Sem lerp → sem passos decrescentes → sem micro-stutters.
-        // O browser interpola internamente entre frames; nós apenas dizemos
-        // onde o vídeo deve estar agora.
-        seekTarget = targetTime
-
-      } else if (Math.abs(velocity) > EPSILON) {
-        // ── Inércia (desktop): aplica velocity com atrito ────────────
-        targetTime += velocity
-        targetTime  = Math.max(0, Math.min(v.duration - 0.033, targetTime))
-        velocity   *= FRICTION
-        seekTarget  = targetTime
-
-      } else {
-        return // parado no alvo
-      }
-
-      seekTarget = Math.max(0, Math.min(v.duration - 0.033, seekTarget))
-
-      // Throttle: no máximo 30 seeks/segundo + mínimo 1 frame de movimento
-      const moved = Math.abs(seekTarget - v.currentTime)
-      if (moved >= MIN_SEEK && (now - lastSeekAt) >= SEEK_MS) {
-        seekTo(v, seekTarget)
-        lastSeekAt = now
-      }
-    }
-
-    rafId = requestAnimationFrame(tick)
-
-    const unsub = scrollYProgress.on('change', (latest) => {
-      const v = videoRef.current
-      if (!v || !v.duration || !isFinite(v.duration)) return
-      const newTarget = Math.max(0, Math.min(1, (latest - 0.1) / 0.8)) * (v.duration - 0.033)
-      const delta  = newTarget - lastTarget
-      velocity     = velocity * (1 - EWMA) + delta * EWMA
-      lastTarget   = newTarget
-      targetTime   = newTarget
-      lastScrollAt = performance.now()
+      // Evita redesenhar o mesmo frame
+      if (index === lastIndexRef.current) return
+      lastIndexRef.current = index
+      draw(index)
     })
 
-    return () => {
-      running = false
-      cancelAnimationFrame(rafId)
-      unsub()
-      video.removeEventListener('play', onPlay)
-    }
-  }, [scrollYProgress])
+    return () => unsub()
+  }, [smoothProgress, loaded])
 
-  // Parallax/fade on the text column
+  // ── Transforms para texto e barra (sem mudança) ──────────────────────
   const textOpacity = useTransform(scrollYProgress, [0.05, 0.25], [0, 1])
-
-  // Progress bar fills as scroll advances
-  const barScale = useTransform(scrollYProgress, [0.1, 0.88], [0, 1])
+  const barScale    = useTransform(scrollYProgress, [0.1, 0.88],  [0, 1])
 
   return (
-    // 400vh outer container — user must scroll through it entirely
     <div ref={containerRef} className="relative h-[400vh] bg-white">
 
-      {/* Sticky inner frame — stays fixed while user scrolls */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center">
+
+        {/* ── Loading overlay ──────────────────────────────────────── */}
+        {!loaded && (
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white gap-6">
+            <div className="w-6 h-6 border-2 border-brand-marinho border-t-transparent rounded-full animate-spin" />
+            <div className="w-48 h-0.5 bg-brand-navy/10 relative overflow-hidden rounded-full">
+              <div
+                className="absolute inset-y-0 left-0 bg-brand-marinho transition-all duration-150 rounded-full"
+                style={{ width: `${loadProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row items-center gap-8 md:gap-16 pt-24 md:pt-32">
 
-          {/* ── Left Column: Text ─────────────────────────────────── */}
+          {/* ── Coluna esquerda: Texto (sem alteração) ────────────── */}
           <motion.div
             style={{ opacity: textOpacity }}
             className="w-full md:w-[45%] shrink-0 flex flex-col items-start"
@@ -172,7 +168,7 @@ export function ConstrucaoScrollVideo() {
               Acompanhe a evolução do empreendimento em tempo real. Cada etapa é executada com rigor técnico e acabamento de alto padrão.
             </p>
 
-            {/* Construction Steps — More compact on mobile */}
+            {/* Construction Steps */}
             <div className="hidden sm:flex flex-col gap-4 mb-10 w-full">
               {etapas.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-4">
@@ -217,21 +213,13 @@ export function ConstrucaoScrollVideo() {
             </button>
           </motion.div>
 
-          {/* ── Right Column: Scroll-Synced Video ─────────────────── */}
+          {/* ── Coluna direita: Canvas ────────────────────────────── */}
           <div className="w-full md:flex-1 relative">
-            <div className="relative overflow-hidden w-full h-auto border-none">
-              <video
-                ref={videoRef}
-                muted
-                playsInline
-                autoPlay
-                preload="auto"
-                disableRemotePlayback
-                className="w-full h-auto block"
-              >
-                <source src="/construct-video-scrub.mp4" type="video/mp4" />
-              </video>
-            </div>
+            <canvas
+              ref={canvasRef}
+              className="w-full block"
+              style={{ aspectRatio: '16/9' }}
+            />
           </div>
 
         </div>
