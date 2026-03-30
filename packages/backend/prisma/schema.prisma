@@ -88,12 +88,15 @@ model Empreendimento {
 }
 
 model Lead {
-  id         String   @id @default(uuid())
-  nome       String
-  email      String
-  whatsapp   String
-  interesse  String?
-  origem     String?
-  lido       Boolean  @default(false)
-  created_at DateTime @default(now())
+  id             String   @id @default(uuid())
+  nome           String
+  email          String
+  whatsapp       String
+  interesse      String?
+  origem         String?
+  tipo_usuario   String?  // "CLIENTE" | "CORRETOR"
+  tipo_corretor  String?  // "AUTONOMO" | "IMOBILIARIA"
+  imobiliaria    String?
+  lido           Boolean  @default(false)
+  created_at     DateTime @default(now())
 }

@@ -11,15 +11,12 @@ const schema = z.object({
   whatsapp: z.string().min(14, 'Informe um WhatsApp válido'),
   email: z.string().email('Informe um e-mail válido'),
   interesse: z.string().optional(),
+  tipo_usuario: z.enum(['CLIENTE', 'CORRETOR']).optional(),
+  tipo_corretor: z.enum(['AUTONOMO', 'IMOBILIARIA']).optional(),
+  imobiliaria: z.string().optional(),
 })
 
 type FormData = z.infer<typeof schema>
-
-const empreendimentos = [
-  'Porto Lagoa Residence',
-  'Porto Mau Loa',
-  'Caminho do Mar',
-]
 
 interface Props {
   interesseInicial?: string
@@ -40,7 +37,9 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
     defaultValues: { interesse: interesseInicial || '' },
   })
 
-  const whatsapp = watch('whatsapp')
+  const whatsapp     = watch('whatsapp')
+  const tipoUsuario  = watch('tipo_usuario')
+  const tipoCorretor = watch('tipo_corretor')
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -107,8 +106,76 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
         </div>
       </div>
 
+      {/* Tipo de usuário */}
+      <div>
+        <label className={labelClass}>Você é</label>
+        <div className="grid grid-cols-2 gap-3">
+          {([
+            { value: 'CLIENTE',  label: 'Cliente' },
+            { value: 'CORRETOR', label: 'Corretor' },
+          ] as const).map(opt => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => {
+                setValue('tipo_usuario', opt.value)
+                setValue('tipo_corretor', undefined)
+                setValue('imobiliaria', '')
+              }}
+              className={`py-4 rounded-2xl border font-sans text-sm font-semibold transition-all duration-200 ${
+                tipoUsuario === opt.value
+                  ? 'bg-brand-navy text-white border-brand-navy shadow-lg'
+                  : 'bg-brand-navy/[0.03] border-brand-navy/5 text-brand-navy/60 hover:border-brand-marinho/30 hover:text-brand-navy'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {/* Submit — Luxury Pill */}
+      {/* Se corretor: autônomo ou imobiliária */}
+      {tipoUsuario === 'CORRETOR' && (
+        <div>
+          <label className={labelClass}>Tipo de Corretor</label>
+          <div className="grid grid-cols-2 gap-3">
+            {([
+              { value: 'AUTONOMO',    label: 'Autônomo' },
+              { value: 'IMOBILIARIA', label: 'De Imobiliária' },
+            ] as const).map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  setValue('tipo_corretor', opt.value)
+                  setValue('imobiliaria', '')
+                }}
+                className={`py-4 rounded-2xl border font-sans text-sm font-semibold transition-all duration-200 ${
+                  tipoCorretor === opt.value
+                    ? 'bg-brand-navy text-white border-brand-navy shadow-lg'
+                    : 'bg-brand-navy/[0.03] border-brand-navy/5 text-brand-navy/60 hover:border-brand-marinho/30 hover:text-brand-navy'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Se imobiliária: qual */}
+      {tipoUsuario === 'CORRETOR' && tipoCorretor === 'IMOBILIARIA' && (
+        <div className="group/input">
+          <label className={labelClass}>Nome da Imobiliária</label>
+          <input
+            {...register('imobiliaria')}
+            placeholder="Ex: Imobiliária Central"
+            className={inputClass}
+          />
+        </div>
+      )}
+
+      {/* Submit */}
       <div className="pt-4">
         <button
           type="submit"

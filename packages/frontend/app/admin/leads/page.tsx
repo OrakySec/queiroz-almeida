@@ -12,6 +12,9 @@ interface Lead {
   whatsapp: string
   interesse: string | null
   origem: string | null
+  tipo_usuario: 'CLIENTE' | 'CORRETOR' | null
+  tipo_corretor: 'AUTONOMO' | 'IMOBILIARIA' | null
+  imobiliaria: string | null
   lido: boolean
   created_at: string
 }
@@ -152,6 +155,19 @@ export default function LeadsPage() {
                         <p className="text-xs text-brand-navy/40">{lead.email}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
+                        {lead.tipo_usuario && (
+                          <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                            lead.tipo_usuario === 'CORRETOR'
+                              ? 'text-amber-700 bg-amber-50 border-amber-200'
+                              : 'text-brand-navy/50 bg-brand-navy/5 border-brand-navy/10'
+                          }`}>
+                            {lead.tipo_usuario === 'CORRETOR'
+                              ? lead.tipo_corretor === 'IMOBILIARIA'
+                                ? `Corretor · ${lead.imobiliaria || 'Imobiliária'}`
+                                : 'Corretor Autônomo'
+                              : 'Cliente'}
+                          </span>
+                        )}
                         {lead.interesse && (
                           <span className="text-[10px] font-black uppercase tracking-wider text-brand-marinho bg-cyan-50 border border-brand-marinho/20 px-2 py-0.5 rounded-full">
                             {lead.interesse}

@@ -11,6 +11,9 @@ const leadSchema = z.object({
   whatsapp: z.string().min(10),
   interesse: z.string().optional(),
   origem: z.string().optional(),
+  tipo_usuario: z.enum(['CLIENTE', 'CORRETOR']).optional(),
+  tipo_corretor: z.enum(['AUTONOMO', 'IMOBILIARIA']).optional(),
+  imobiliaria: z.string().optional(),
 })
 
 export async function leadsRoutes(app: FastifyInstance) {
