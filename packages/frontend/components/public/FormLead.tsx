@@ -107,24 +107,6 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
         </div>
       </div>
 
-      {/* Interesse */}
-      <div className="group/input">
-        <label className={labelClass}>Empreendimento de Interesse</label>
-        <div className="relative">
-          <select
-            {...register('interesse')}
-            className={`${inputClass} cursor-pointer appearance-none`}
-          >
-            <option value="">Selecione o empreendimento</option>
-            {empreendimentos.map((e) => (
-              <option key={e} value={e}>{e}</option>
-            ))}
-          </select>
-          <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-brand-navy/20">
-            <ArrowRight size={16} className="rotate-90" />
-          </div>
-        </div>
-      </div>
 
       {/* Submit — Luxury Pill */}
       <div className="pt-4">
@@ -137,7 +119,7 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
             <Loader2 size={18} className="animate-spin" />
           ) : (
             <>
-              Solicitar Dossier <ArrowRight size={16} />
+              Falar com Especialista <ArrowRight size={16} />
             </>
           )}
         </button>
