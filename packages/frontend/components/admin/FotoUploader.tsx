@@ -50,8 +50,18 @@ export function FotoUploader({ empreendimentoId, fotos, onChange }: Props) {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
+    onDropRejected: (rejections) => {
+      const msgs = rejections.map(r => {
+        const name = r.file.name
+        const reason = r.errors.some(e => e.code === 'file-too-large')
+          ? 'arquivo muito grande (máx 30 MB)'
+          : r.errors.map(e => e.message).join(', ')
+        return `${name}: ${reason}`
+      })
+      alert('Arquivo(s) recusado(s):\n' + msgs.join('\n'))
+    },
     accept: { 'image/jpeg': [], 'image/png': [], 'image/webp': [] },
-    maxSize: 10 * 1024 * 1024,
+    maxSize: 30 * 1024 * 1024,
     disabled: uploading || fotos.length >= 20,
   })
 
@@ -79,7 +89,7 @@ export function FotoUploader({ empreendimentoId, fotos, onChange }: Props) {
               {isDragActive ? 'Solte as fotos aqui' : 'Arraste fotos ou clique para selecionar'}
             </p>
             <p className="font-sans text-xs text-brand-texto/30">
-              JPG, PNG, WebP · Máx 10 MB · {fotos.length}/20 fotos
+              JPG, PNG, WebP · Máx 30 MB · {fotos.length}/20 fotos
             </p>
           </div>
         )}
