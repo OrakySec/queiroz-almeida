@@ -29,10 +29,10 @@ export default function LeadsPage() {
     setLoading(true)
     try {
       const params = new URLSearchParams()
-      if (search) params.set('search', search)
+      if (search) params.set('q', search)
       if (lido !== '') params.set('lido', lido)
       const res = await api.get(`/api/admin/leads?${params}`)
-      setLeads(res.data.data ?? res.data)
+      setLeads(res.data.leads ?? [])
     } catch {
       // ignore
     } finally {
