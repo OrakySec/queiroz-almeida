@@ -221,14 +221,15 @@ export function ConstrucaoScrollVideo() {
     function tick() {
       if (!running) return
       rafId = requestAnimationFrame(tick)
-      if (!video.duration || !isFinite(video.duration)) return
+      const v = videoRef.current
+      if (!v || !v.duration || !isFinite(v.duration)) return
 
       const diff = targetTime - currentTime
       if (Math.abs(diff) < 0.001) return
 
       currentTime += diff * 0.12
-      if (typeof (video as any).fastSeek === 'function') (video as any).fastSeek(currentTime)
-      else video.currentTime = currentTime
+      if (typeof (v as any).fastSeek === 'function') (v as any).fastSeek(currentTime)
+      else v.currentTime = currentTime
     }
 
     rafId = requestAnimationFrame(tick)
