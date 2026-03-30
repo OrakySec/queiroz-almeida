@@ -2,6 +2,7 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, Play, MapPin } from 'lucide-react'
+import Link from 'next/link'
 import { useLeadModal } from '@/context/LeadModalContext'
 
 const locations = [
@@ -114,12 +115,15 @@ export function Hero() {
             </button>
 
             {/* Secondary — Ghost Pill */}
-            <button className="flex items-center gap-4 group text-white/85 hover:text-white transition-colors">
+            <Link 
+              href="/empreendimentos" 
+              className="flex items-center gap-4 group text-white/85 hover:text-white transition-colors"
+            >
               <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center transition-all group-hover:border-brand-marinho-glow group-hover:scale-110 group-hover:bg-brand-marinho-glow/10">
                 <Play size={14} className="fill-white translate-x-0.5" />
               </div>
-              <span className="font-sans text-[10px] font-bold uppercase tracking-widest">Ver o Projeto</span>
-            </button>
+              <span className="font-sans text-[10px] font-bold uppercase tracking-widest">Ver projetos</span>
+            </Link>
           </motion.div>
         </div>
       </motion.div>
