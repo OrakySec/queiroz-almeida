@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, Maximize2, BedDouble, Car, ArrowRight, TrendingUp } from 'lucide-react'
+import { MapPin, Maximize2, BedDouble, Car, ArrowRight, TrendingUp, Bath, ShowerHead } from 'lucide-react'
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { useLeadModal } from '@/context/LeadModalContext'
@@ -28,9 +28,41 @@ function ProgressBar({ progresso }: { progresso: number }) {
   )
 }
 
+function formatPreco(valor?: number | string | null) {
+  const n = Number(valor)
+  if (!n) return null
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    maximumFractionDigits: 0,
+  }).format(n)
+}
+
+function faixa(min?: number, max?: number, suffix = '') {
+  if (min == null && max == null) return null
+  if (min != null && max != null && min !== max) return `${min}–${max}${suffix}`
+  return `${min ?? max}${suffix}`
+}
+
 export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimento }) {
   const { open: openLead } = useLeadModal()
   const foto = e.fotos?.[0]
+
+  const area      = faixa(e.area_min, e.area_max, ' m²')
+  const quartos   = faixa(e.quartos_min, e.quartos_max)
+  const suites    = faixa(e.suites_min, e.suites_max)
+  const banheiros = faixa(e.banheiros_min, e.banheiros_max)
+  const vagas     = e.vagas_tipo === 'ROTATIVA' ? 'Rotativa' : faixa(e.vagas_min, e.vagas_max)
+  const preco     = formatPreco(e.preco_min)
+
+  const specs = [
+    { icon: Maximize2,  label: 'Área',      value: area },
+    { icon: BedDouble,  label: 'Quartos',   value: quartos },
+    { icon: Bath,       label: 'Suítes',    value: suites },
+    { icon: ShowerHead, label: 'Banheiros', value: banheiros },
+    { icon: Car,        label: 'Vagas',     value: vagas },
+    { icon: TrendingUp, label: 'Unidades',  value: e.total_unidades?.toString() },
+  ].filter(s => s.value)
 
   return (
     <section className="bg-gradient-to-b from-white via-white to-slate-50/50 py-24 lg:py-40 overflow-hidden relative">
@@ -72,31 +104,6 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
                 ✦ Lançamento
               </motion.div>
 
-              {/* Investment highlight at bottom */}
-              {e.area_min && (
-                <motion.div
-                  initial={{ y: 30, opacity: 0 }}
-                  whileInView={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 1, type: "spring" }}
-                  className="absolute bottom-8 left-8 right-8 bg-white/10 backdrop-blur-3xl border border-white/20 rounded-3xl px-8 py-6 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.2)]"
-                >
-                  <div>
-                    <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-white/75 mb-1.5">Metragem</p>
-                    <p className="font-serif text-2xl font-bold text-white">
-                      {e.area_min}{e.area_max && e.area_max !== e.area_min ? `–${e.area_max}` : ''} m²
-                    </p>
-                  </div>
-                  <div className="h-10 w-px bg-white/20" />
-                  <div>
-                    <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-white/75 mb-1.5">Tipologia</p>
-                    <p className="font-serif text-2xl font-bold text-white">{e.tipologia || 'Studio'}</p>
-                  </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <TrendingUp size={18} className="text-brand-marinho-glow" />
-                    <span className="font-sans text-[8px] font-bold uppercase tracking-[0.2em] text-brand-marinho-glow">Alto Retorno</span>
-                  </div>
-                </motion.div>
-              )}
             </motion.div>
           </div>
 
@@ -125,13 +132,16 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
                 </div>
               </div>
 
+              {/* Descrição breve */}
+              {e.descricao_breve && (
+                <p className="font-sans text-lg text-brand-navy/60 leading-relaxed font-light -mt-4">
+                  {e.descricao_breve}
+                </p>
+              )}
+
               {/* Specs — Rounded Pills with staggered spring */}
               <div className="flex flex-wrap gap-3">
-                {[
-                  { icon: Maximize2, label: 'Área', value: e.area_min ? `${e.area_min}${e.area_max && e.area_max !== e.area_min ? `–${e.area_max}` : ''} m²` : null },
-                  { icon: BedDouble, label: 'Tipologia', value: e.tipologia },
-                  { icon: Car, label: 'Unidades', value: e.total_unidades?.toString() },
-                ].filter(s => s.value).map((spec, i) => (
+                {specs.map((spec, i) => (
                   <motion.div 
                     key={i}
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -140,12 +150,20 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
                     className="flex items-center gap-3 bg-brand-navy/[0.04] border border-brand-navy/5 rounded-full px-6 py-4 hover:bg-brand-marinho group cursor-default transition-all duration-500 hover:shadow-xl hover:-translate-y-1"
                   >
                     <spec.icon size={16} className="text-brand-marinho group-hover:text-brand-marinho-glow transition-colors" />
-                    <span className="font-sans text-xs font-black text-brand-navy group-hover:text-white transition-colors uppercase tracking-widest">
+                    <span className="font-sans text-xs font-black text-brand-navy group-hover:text-white transition-colors uppercase tracking-widest text-[10px]">
                       {spec.value}
                     </span>
                   </motion.div>
                 ))}
               </div>
+
+              {/* Preço se houver */}
+              {preco && (
+                <div className="flex flex-col gap-1 -mt-4">
+                  <span className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-brand-marinho/40">Unidades a partir de</span>
+                  <p className="font-serif text-4xl font-bold text-brand-navy">{preco}</p>
+                </div>
+              )}
 
               {/* Progress */}
               <div className="bg-brand-navy/[0.02] border border-brand-navy/5 rounded-[2.5rem] p-8 hover:bg-white hover:shadow-2xl transition-all duration-700">

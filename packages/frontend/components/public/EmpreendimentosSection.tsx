@@ -60,7 +60,12 @@ export function EmpreendimentosSection({ empreendimentos }: Props) {
         <div className="overflow-visible relative" ref={emblaRef}>
           <div className="flex gap-10 pl-1 pb-12">
             {empreendimentos.map((e, i) => (
-              <Reveal key={e.id} delay={0.05 * i} direction="up">
+              <Reveal 
+                key={e.id} 
+                delay={0.05 * i} 
+                direction="up"
+                className="min-w-0 flex-[0_0_85%] md:flex-[0_0_calc(50%-20px)] lg:flex-[0_0_calc(33.3333%-27px)]"
+              >
                 <EmpreendimentoCard empreendimento={e} />
               </Reveal>
             ))}
