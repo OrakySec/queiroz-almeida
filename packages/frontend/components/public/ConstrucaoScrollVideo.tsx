@@ -113,9 +113,9 @@ export function ConstrucaoScrollVideo() {
 
   return (
     <div ref={containerRef} className="relative h-[400vh] bg-white">
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center">
+      <div className="sticky top-0 h-screen w-full flex items-center">
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row items-center gap-8 md:gap-16 pt-24 md:pt-32">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row items-center gap-4 md:gap-12 pt-16 md:pt-24">
 
           {/* ── Coluna esquerda: Texto ────────────────────────────── */}
           <motion.div
@@ -129,7 +129,7 @@ export function ConstrucaoScrollVideo() {
             </div>
 
             <h2
-              className="font-serif font-bold text-brand-navy leading-[1.1] md:leading-[1.05] tracking-tight mb-4 md:mb-6"
+              className="font-serif font-bold text-brand-navy leading-[1.1] md:leading-[1.05] tracking-tight mb-3 md:mb-4"
               style={{ fontSize: 'clamp(1.5rem, 6vw, 3.5rem)' }}
             >
               Cada detalhe{' '}
@@ -138,11 +138,11 @@ export function ConstrucaoScrollVideo() {
               </em>
             </h2>
 
-            <p className="font-sans text-sm md:text-base text-brand-navy/85 leading-relaxed mb-6 md:mb-10 max-w-md">
+            <p className="font-sans text-sm md:text-base text-brand-navy/85 leading-relaxed mb-4 md:mb-6 max-w-md">
               Acompanhe a evolução do empreendimento em tempo real. Cada etapa é executada com rigor técnico e acabamento de alto padrão.
             </p>
 
-            <div className="hidden sm:flex flex-col gap-4 mb-10 w-full">
+            <div className="hidden sm:flex flex-col gap-4 mb-6 w-full">
               {etapas.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-4">
                   <div className="w-8 h-8 rounded-full border border-brand-marinho/20 bg-brand-marinho/5 flex items-center justify-center shrink-0">
@@ -158,7 +158,7 @@ export function ConstrucaoScrollVideo() {
               ))}
             </div>
 
-            <div className="w-full mb-6 md:mb-8">
+            <div className="w-full mb-4 md:mb-6">
               <div className="flex justify-between mb-2">
                 <span className="font-sans text-[8px] md:text-[9px] font-black uppercase tracking-widest text-brand-navy/55">
                   Progresso da Obra
