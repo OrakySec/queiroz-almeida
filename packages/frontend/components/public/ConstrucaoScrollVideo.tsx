@@ -5,7 +5,7 @@ import { ArrowRight, Building2, Hammer, CheckCircle2 } from 'lucide-react'
 import { useLeadModal } from '@/context/LeadModalContext'
 
 // ── Ajuste conforme o total de frames exportados do vídeo ─────────────
-const FRAME_COUNT = 120
+const FRAME_COUNT = 151
 // Se mais da metade dos frames falhar ao carregar → usa vídeo como fallback
 const FALLBACK_THRESHOLD = Math.floor(FRAME_COUNT * 0.5)
 
@@ -89,7 +89,7 @@ export function ConstrucaoScrollVideo() {
         if (completed === FRAME_COUNT) finalize(htmlImgs)
       }
 
-      img.src = `/sequence/frame_${i}.webp`
+      img.src = `/sequence/frame_${i}.jpg`
       htmlImgs[i] = img
     }
   }, [])
