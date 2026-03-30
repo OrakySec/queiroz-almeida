@@ -122,7 +122,7 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
       const form = new FormData()
       form.append('file', file)
       const res = await api.post(`/api/admin/empreendimentos/${empId}/pdf`, form, {
-        headers: { 'Content-Type': undefined },
+        headers: { 'Content-Type': 'multipart/form-data' },
       })
       setPdfUrl(res.data.pdf_url ?? null)
     } catch {
