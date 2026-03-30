@@ -24,7 +24,7 @@ export function FotoUploader({ empreendimentoId, fotos, onChange }: Props) {
       const res = await api.post(
         `/api/admin/empreendimentos/${empreendimentoId}/fotos`,
         form,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        { headers: { 'Content-Type': undefined } }
       )
       onChange(res.data.fotos as string[])
     } catch {

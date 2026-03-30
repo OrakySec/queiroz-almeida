@@ -31,7 +31,7 @@ export default function LeadsPage() {
       const params = new URLSearchParams()
       if (search) params.set('search', search)
       if (lido !== '') params.set('lido', lido)
-      const res = await api.get(`/api/leads?${params}`)
+      const res = await api.get(`/api/admin/leads?${params}`)
       setLeads(res.data.data ?? res.data)
     } catch {
       // ignore
@@ -45,7 +45,7 @@ export default function LeadsPage() {
   async function toggleLido(lead: Lead) {
     setMarking(lead.id)
     try {
-      await api.patch(`/api/leads/${lead.id}`, { lido: !lead.lido })
+      await api.patch(`/api/admin/leads/${lead.id}/lido`, { lido: !lead.lido })
       setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, lido: !l.lido } : l))
     } finally {
       setMarking(null)

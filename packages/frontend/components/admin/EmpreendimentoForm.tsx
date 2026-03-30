@@ -122,7 +122,7 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
       const form = new FormData()
       form.append('file', file)
       const res = await api.post(`/api/admin/empreendimentos/${empId}/pdf`, form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': undefined },
       })
       setPdfUrl(res.data.pdf_url ?? null)
     } catch {
@@ -236,6 +236,7 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
       } else {
         await api.put(`/api/admin/empreendimentos/${empId}`, payload)
       }
+      await fetch('/api/revalidate', { method: 'POST' }).catch(() => {})
     } catch (err: any) {
       alert(err?.response?.data?.message ?? 'Erro ao salvar')
     } finally {
@@ -257,6 +258,7 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
       }
       await uploadPendingFiles(id!)
       await api.patch(`/api/admin/empreendimentos/${id}/status`, { status: targetStatus })
+      await fetch('/api/revalidate', { method: 'POST' }).catch(() => {})
       router.push('/admin/empreendimentos')
     } catch (err: any) {
       alert(err?.response?.data?.message ?? 'Erro ao publicar')

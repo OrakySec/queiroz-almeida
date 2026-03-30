@@ -48,6 +48,7 @@ function apiToForm(d: any) {
     videoUrl: d.video_url ?? '',
     whatsapp: d.whatsapp ?? '',
     destaque: d.is_lancamento ?? false,
+    pdf_url: d.pdf_url ?? null,
   }
 }
 
