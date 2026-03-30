@@ -122,7 +122,7 @@ export function Footer() {
         </div>
 
         {/* Footer Bottom */}
-        <div className="pt-12 flex flex-col md:flex-row items-center justify-between gap-10">
+        <div className="pt-12 flex flex-col-reverse md:flex-row items-center justify-between gap-10">
           <div className="flex flex-wrap items-center gap-x-10 gap-y-4 justify-center md:justify-start">
             <span className="font-sans text-[10px] font-black uppercase tracking-[0.2em] text-brand-silver/25">
               © 2024 Queiroz Almeida
@@ -134,9 +134,9 @@ export function Footer() {
               CRECI: 00.000-J
             </span>
           </div>
-          <div className="flex items-center gap-3 opacity-30 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
-             <span className="font-serif italic text-[10px] text-brand-silver/60">Desenvolvido por</span>
-             <img src="/assinatura.png" alt="Assinatura" className="h-6 w-auto object-contain" />
+          <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
+             <span className="font-serif italic text-xs md:text-sm text-brand-silver/90">Desenvolvido por</span>
+             <img src="/assinatura.png" alt="Assinatura" className="h-10 md:h-12 w-auto object-contain" />
           </div>
         </div>
       </div>
