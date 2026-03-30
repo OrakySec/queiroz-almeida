@@ -176,11 +176,6 @@ export default function LeadsPage() {
                           {lead.whatsapp}
                         </a>
                       )}
-                      {lead.origem && (
-                        <span className="text-[10px] text-brand-navy/30 truncate max-w-[200px]" title={lead.origem}>
-                          {lead.origem}
-                        </span>
-                      )}
                     </div>
                   </div>
 
