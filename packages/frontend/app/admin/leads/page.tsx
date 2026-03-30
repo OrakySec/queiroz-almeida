@@ -1,7 +1,7 @@
 'use client'
 export const dynamic = 'force-dynamic'
 import { useEffect, useState, useCallback } from 'react'
-import { Search, Mail, MailOpen, Loader2, Phone, ChevronDown, ChevronUp } from 'lucide-react'
+import { Search, Mail, MailOpen, Loader2, Phone, Trash2 } from 'lucide-react'
 import api from '@/lib/api'
 import { whatsAppLink } from '@/lib/utils'
 
@@ -9,12 +9,11 @@ interface Lead {
   id: string
   nome: string
   email: string
-  telefone: string | null
+  whatsapp: string
   interesse: string | null
-  mensagem: string | null
+  origem: string | null
   lido: boolean
-  createdAt: string
-  empreendimento?: { nome: string } | null
+  created_at: string
 }
 
 export default function LeadsPage() {
@@ -22,8 +21,8 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [lido, setLido] = useState<'' | 'true' | 'false'>('')
-  const [expanded, setExpanded] = useState<string | null>(null)
   const [marking, setMarking] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -50,6 +49,25 @@ export default function LeadsPage() {
     } finally {
       setMarking(null)
     }
+  }
+
+  async function deleteLead(lead: Lead) {
+    if (!confirm(`Excluir lead de ${lead.nome}? Esta ação não pode ser desfeita.`)) return
+    setDeleting(lead.id)
+    try {
+      await api.delete(`/api/admin/leads/${lead.id}`)
+      setLeads(prev => prev.filter(l => l.id !== lead.id))
+    } catch {
+      alert('Erro ao excluir lead.')
+    } finally {
+      setDeleting(null)
+    }
+  }
+
+  function formatDate(raw: string) {
+    const d = new Date(raw)
+    if (isNaN(d.getTime())) return '—'
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
   }
 
   const naoLidos = leads.filter(l => !l.lido).length
@@ -109,6 +127,7 @@ export default function LeadsPage() {
             {leads.map(lead => (
               <div key={lead.id} className={`transition-colors ${!lead.lido ? 'bg-cyan-50/40' : 'hover:bg-brand-navy/[0.02]'}`}>
                 <div className="px-5 py-4 flex items-start gap-4">
+
                   {/* Read indicator */}
                   <button
                     onClick={() => toggleLido(lead)}
@@ -125,7 +144,7 @@ export default function LeadsPage() {
                   </button>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                       <div>
                         <p className={`font-semibold text-brand-navy ${!lead.lido ? 'font-bold' : ''}`}>
                           {lead.nome}
@@ -138,48 +157,46 @@ export default function LeadsPage() {
                             {lead.interesse}
                           </span>
                         )}
-                        {lead.empreendimento && (
-                          <span className="text-[10px] font-bold text-brand-navy/40 bg-brand-navy/5 px-2 py-0.5 rounded-full">
-                            {lead.empreendimento.nome}
-                          </span>
-                        )}
                         <span className="text-[10px] text-brand-navy/30">
-                          {new Date(lead.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          {formatDate(lead.created_at)}
                         </span>
                       </div>
                     </div>
 
-                    {/* Actions row */}
-                    <div className="flex items-center gap-3 mt-2">
-                      {lead.telefone && (
+                    {/* Phone + origem */}
+                    <div className="flex items-center gap-3 mt-2 flex-wrap">
+                      {lead.whatsapp && (
                         <a
-                          href={whatsAppLink(lead.telefone, `Olá ${lead.nome}, vi seu interesse em nossos empreendimentos!`)}
+                          href={whatsAppLink(lead.whatsapp, `Olá ${lead.nome}, vi seu interesse em nossos empreendimentos!`)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold hover:underline"
                         >
                           <Phone size={12} />
-                          {lead.telefone}
+                          {lead.whatsapp}
                         </a>
                       )}
-                      {lead.mensagem && (
-                        <button
-                          onClick={() => setExpanded(expanded === lead.id ? null : lead.id)}
-                          className="flex items-center gap-1 text-xs text-brand-navy/40 hover:text-brand-navy transition"
-                        >
-                          {expanded === lead.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                          {expanded === lead.id ? 'Ocultar mensagem' : 'Ver mensagem'}
-                        </button>
+                      {lead.origem && (
+                        <span className="text-[10px] text-brand-navy/30 truncate max-w-[200px]" title={lead.origem}>
+                          {lead.origem}
+                        </span>
                       )}
                     </div>
-
-                    {/* Expanded message */}
-                    {expanded === lead.id && lead.mensagem && (
-                      <div className="mt-3 p-3 bg-brand-navy/5 rounded-xl text-sm text-brand-navy/70 leading-relaxed">
-                        {lead.mensagem}
-                      </div>
-                    )}
                   </div>
+
+                  {/* Delete */}
+                  <button
+                    onClick={() => deleteLead(lead)}
+                    disabled={deleting === lead.id}
+                    className="mt-0.5 shrink-0 text-brand-navy/20 hover:text-red-400 transition"
+                    title="Excluir lead"
+                  >
+                    {deleting === lead.id
+                      ? <Loader2 size={15} className="animate-spin" />
+                      : <Trash2 size={15} />
+                    }
+                  </button>
+
                 </div>
               </div>
             ))}

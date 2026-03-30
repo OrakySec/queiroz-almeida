@@ -61,4 +61,15 @@ export async function leadsRoutes(app: FastifyInstance) {
       return reply.send(updated)
     }
   )
+
+  // DELETE /api/admin/leads/:id
+  app.delete(
+    '/api/admin/leads/:id',
+    { preHandler: [verifyJWT, requireRole('GERENTE', 'ADMIN')] },
+    async (request, reply) => {
+      const { id } = request.params as { id: string }
+      await prisma.lead.delete({ where: { id } })
+      return reply.status(204).send()
+    }
+  )
 }
