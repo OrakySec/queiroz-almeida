@@ -178,10 +178,10 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
                   Receber Dossier Completo
                 </button>
                 <Link
-                  href="/evolucao-da-obra"
+                  href="/empreendimentos"
                   className="flex-1 flex items-center justify-center gap-4 border-2 border-brand-navy/10 text-brand-navy font-sans text-[11px] font-black uppercase tracking-[0.3em] py-5 rounded-full hover:bg-brand-navy hover:text-white transition-all group overflow-hidden relative"
                 >
-                  <span className="relative z-10">Ver Evolução</span>
+                  <span className="relative z-10">Ver Catálogo</span>
                   <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform relative z-10" />
                   <div className="absolute inset-0 bg-brand-navy translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 </Link>

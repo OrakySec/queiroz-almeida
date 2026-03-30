@@ -12,7 +12,6 @@ const links = [
   { label: 'Início', href: '/' },
   { label: 'Quem Somos', href: '/#quem-somos' },
   { label: 'Empreendimentos', href: '/empreendimentos' },
-  { label: 'Evolução da Obra', href: '/evolucao-da-obra' },
 ]
 
 export function Navbar() {
