@@ -1,13 +1,19 @@
 'use client'
 import { useRef, useEffect, useState } from 'react'
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, Building2, Hammer, CheckCircle2 } from 'lucide-react'
 import { useLeadModal } from '@/context/LeadModalContext'
 
 // ── Ajuste conforme o total de frames exportados do vídeo ─────────────
 const FRAME_COUNT = 120
-// Quantos frames precisam falhar para usar o fallback de vídeo
+// Se mais da metade dos frames falhar ao carregar → usa vídeo como fallback
 const FALLBACK_THRESHOLD = Math.floor(FRAME_COUNT * 0.5)
+
+// Fator de lerp: quão rápido o frame atual persegue o frame alvo
+// Desktop: 0.08 → inércia longa e suave
+// Mobile:  0.16 → mais ágil (OS já dá inércia via momentum nativo)
+const LERP_DESKTOP = 0.08
+const LERP_MOBILE  = 0.16
 
 const etapas = [
   { icon: Hammer,       label: 'Estrutura'   },
@@ -21,45 +27,70 @@ export function ConstrucaoScrollVideo() {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef    = useRef<HTMLCanvasElement>(null)
   const videoRef     = useRef<HTMLVideoElement>(null)
-  const framesRef    = useRef<HTMLImageElement[]>([])
-  const lastIndexRef = useRef(-1)
+
+  // Desktop: ImageBitmap[] (GPU) | Mobile: HTMLImageElement[] (RAM)
+  const framesRef   = useRef<(ImageBitmap | HTMLImageElement)[]>([])
+  const isMobileRef = useRef(false)
 
   const [loadProgress, setLoadProgress] = useState(0)
   const [loaded, setLoaded]             = useState(false)
   const [useFallback, setUseFallback]   = useState(false)
 
-  // ── 1) Pré-carrega todos os frames ──────────────────────────────────
+  // ── 1) Pré-carrega frames ────────────────────────────────────────────
   useEffect(() => {
-    let done   = 0
-    let errors = 0
-    const imgs: HTMLImageElement[] = new Array(FRAME_COUNT)
+    // pointer: coarse = tela touch (celular/tablet)
+    isMobileRef.current = window.matchMedia('(pointer: coarse)').matches
+
+    let completed = 0
+    let errors    = 0
+    const htmlImgs: HTMLImageElement[] = new Array(FRAME_COUNT)
+
+    async function finalize(imgs: HTMLImageElement[]) {
+      if (isMobileRef.current) {
+        // Mobile: mantém HTMLImageElement para economizar memória GPU
+        framesRef.current = imgs
+      } else {
+        // Desktop: converte para ImageBitmap (decodificado na GPU)
+        // drawImage() vira um blit direto, sem custo de decodificação
+        try {
+          framesRef.current = await Promise.all(
+            imgs.map(img =>
+              img.complete && img.naturalWidth
+                ? createImageBitmap(img)
+                : Promise.resolve(img),
+            ),
+          )
+        } catch {
+          framesRef.current = imgs // fallback silencioso para HTMLImageElement
+        }
+      }
+      setLoaded(true)
+    }
 
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image()
+
       img.onload = () => {
-        done++
-        setLoadProgress(Math.round((done / FRAME_COUNT) * 100))
-        if (done + errors === FRAME_COUNT) {
-          framesRef.current = imgs
-          setLoaded(true)
-        }
+        completed++
+        setLoadProgress(Math.round((completed / FRAME_COUNT) * 100))
+        if (completed === FRAME_COUNT) finalize(htmlImgs)
       }
+
       img.onerror = () => {
         errors++
-        done++
+        completed++
+        // Se a maioria falhou, os frames não existem → usa vídeo
         if (errors >= FALLBACK_THRESHOLD) {
-          // Frames não existem — usa vídeo
           setUseFallback(true)
           setLoaded(true)
           return
         }
-        if (done === FRAME_COUNT) {
-          framesRef.current = imgs
-          setLoaded(true)
-        }
+        setLoadProgress(Math.round((completed / FRAME_COUNT) * 100))
+        if (completed === FRAME_COUNT) finalize(htmlImgs)
       }
+
       img.src = `/sequence/frame_${i}.webp`
-      imgs[i] = img
+      htmlImgs[i] = img
     }
   }, [])
 
@@ -80,60 +111,95 @@ export function ConstrucaoScrollVideo() {
     return () => ro.disconnect()
   }, [])
 
-  // ── 3) Scroll progress + spring suave ───────────────────────────────
+  // ── 3) Scroll progress ───────────────────────────────────────────────
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   })
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  })
-
-  // ── 4) Desenha o frame correto no canvas ─────────────────────────────
+  // ── 4) RAF loop com lerp — canvas ────────────────────────────────────
+  //
+  // A cada tick (60fps, sincronizado com o monitor):
+  //   currentProgress += (targetProgress - currentProgress) × LERP
+  //   → currentProgress se aproxima do alvo com desaceleração natural
+  //   → quando o scroll para, currentProgress continua se movendo
+  //     até estabilizar = INÉRCIA
+  //
+  // Desktop (LERP 0.08): animação "pesada", inércia longa
+  // Mobile  (LERP 0.16): animação ágil, inércia curta (OS já dá momentum)
   useEffect(() => {
-    if (!loaded) return
+    if (!loaded || useFallback) return
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    function draw(index: number) {
-      const img = framesRef.current[index]
-      if (!img?.complete || !img.naturalWidth) return
+    const LERP = isMobileRef.current ? LERP_MOBILE : LERP_DESKTOP
 
+    let currentProgress = 0
+    let targetProgress  = 0
+    let lastDrawnIndex  = -1
+    let rafId           = 0
+    let running         = true
+
+    function draw(index: number) {
+      const frame = framesRef.current[index]
+      if (!frame) return
+
+      const isImg = frame instanceof HTMLImageElement
+      if (isImg && (!frame.complete || !frame.naturalWidth)) return
+
+      const fw = isImg ? frame.naturalWidth  : (frame as ImageBitmap).width
+      const fh = isImg ? frame.naturalHeight : (frame as ImageBitmap).height
       const cw = canvas!.width
       const ch = canvas!.height
-      const scale = Math.min(cw / img.naturalWidth, ch / img.naturalHeight)
-      const dw = img.naturalWidth  * scale
-      const dh = img.naturalHeight * scale
-      const dx = (cw - dw) / 2
-      const dy = (ch - dh) / 2
+
+      const scale = Math.min(cw / fw, ch / fh)
+      const dw    = fw * scale
+      const dh    = fh * scale
+      const dx    = (cw - dw) / 2
+      const dy    = (ch - dh) / 2
 
       ctx!.clearRect(0, 0, cw, ch)
-      ctx!.drawImage(img, dx, dy, dw, dh)
+      ctx!.drawImage(frame as CanvasImageSource, dx, dy, dw, dh)
     }
 
-    // Desenha o frame inicial
+    function tick() {
+      if (!running) return
+      rafId = requestAnimationFrame(tick)
+
+      const diff = targetProgress - currentProgress
+      // Para quando já está próximo o suficiente (< 0.02% do range)
+      if (Math.abs(diff) < 0.0002) return
+
+      currentProgress += diff * LERP
+
+      const index = Math.min(
+        Math.floor(currentProgress * FRAME_COUNT),
+        FRAME_COUNT - 1,
+      )
+
+      if (index !== lastDrawnIndex) {
+        lastDrawnIndex = index
+        draw(index)
+      }
+    }
+
     draw(0)
+    rafId = requestAnimationFrame(tick)
 
-    const unsub = smoothProgress.on('change', (v) => {
-      // Mapeia 10%–90% do scroll para 0–1
-      const mapped = Math.max(0, Math.min(1, (v - 0.1) / 0.8))
-      const index  = Math.min(Math.floor(mapped * FRAME_COUNT), FRAME_COUNT - 1)
-
-      // Evita redesenhar o mesmo frame
-      if (index === lastIndexRef.current) return
-      lastIndexRef.current = index
-      draw(index)
+    const unsub = scrollYProgress.on('change', v => {
+      targetProgress = Math.max(0, Math.min(1, (v - 0.1) / 0.8))
     })
 
-    return () => unsub()
-  }, [smoothProgress, loaded, useFallback])
+    return () => {
+      running = false
+      cancelAnimationFrame(rafId)
+      unsub()
+    }
+  }, [loaded, useFallback, scrollYProgress])
 
-  // ── 5) Fallback: seek no vídeo quando frames não existem ─────────────
+  // ── 5) Fallback: seek no vídeo (também com RAF + lerp) ───────────────
   useEffect(() => {
     if (!useFallback) return
     const video = videoRef.current
@@ -147,21 +213,41 @@ export function ConstrucaoScrollVideo() {
     const onPlay = () => video.pause()
     video.addEventListener('play', onPlay)
 
-    const unsub = smoothProgress.on('change', (v) => {
+    let currentTime = 0
+    let targetTime  = 0
+    let rafId       = 0
+    let running     = true
+
+    function tick() {
+      if (!running) return
+      rafId = requestAnimationFrame(tick)
+      if (!video.duration || !isFinite(video.duration)) return
+
+      const diff = targetTime - currentTime
+      if (Math.abs(diff) < 0.001) return
+
+      currentTime += diff * 0.12
+      if (typeof (video as any).fastSeek === 'function') (video as any).fastSeek(currentTime)
+      else video.currentTime = currentTime
+    }
+
+    rafId = requestAnimationFrame(tick)
+
+    const unsub = scrollYProgress.on('change', v => {
       if (!video.duration || !isFinite(video.duration)) return
       const mapped = Math.max(0, Math.min(1, (v - 0.1) / 0.8))
-      const t = mapped * (video.duration - 0.033)
-      if (typeof (video as any).fastSeek === 'function') (video as any).fastSeek(t)
-      else video.currentTime = t
+      targetTime = mapped * (video.duration - 0.033)
     })
 
     return () => {
+      running = false
+      cancelAnimationFrame(rafId)
       unsub()
       video.removeEventListener('play', onPlay)
     }
-  }, [smoothProgress, useFallback])
+  }, [useFallback, scrollYProgress])
 
-  // ── Transforms para texto e barra (sem mudança) ──────────────────────
+  // ── Transforms para texto e barra ────────────────────────────────────
   const textOpacity = useTransform(scrollYProgress, [0.05, 0.25], [0, 1])
   const barScale    = useTransform(scrollYProgress, [0.1, 0.88],  [0, 1])
 
@@ -185,7 +271,7 @@ export function ConstrucaoScrollVideo() {
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row items-center gap-8 md:gap-16 pt-24 md:pt-32">
 
-          {/* ── Coluna esquerda: Texto (sem alteração) ────────────── */}
+          {/* ── Coluna esquerda: Texto ────────────────────────────── */}
           <motion.div
             style={{ opacity: textOpacity }}
             className="w-full md:w-[45%] shrink-0 flex flex-col items-start"
@@ -230,7 +316,7 @@ export function ConstrucaoScrollVideo() {
               ))}
             </div>
 
-            {/* Progress bar — synced with scroll */}
+            {/* Progress bar — synced com scroll */}
             <div className="w-full mb-6 md:mb-8">
               <div className="flex justify-between mb-2">
                 <span className="font-sans text-[8px] md:text-[9px] font-black uppercase tracking-widest text-brand-navy/55">
