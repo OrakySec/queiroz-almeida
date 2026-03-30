@@ -130,9 +130,6 @@ export function Footer() {
             <span className="font-sans text-[10px] font-black uppercase tracking-[0.2em] text-brand-silver/25">
               CNPJ: 00.000.000/0001-00
             </span>
-            <span className="font-sans text-[10px] font-black uppercase tracking-[0.2em] text-brand-silver/25">
-              CRECI: 00.000-J
-            </span>
           </div>
           <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
              <span className="font-serif italic text-xs md:text-sm text-brand-silver/90">Desenvolvido por</span>
