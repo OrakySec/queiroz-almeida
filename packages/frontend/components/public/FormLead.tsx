@@ -79,19 +79,19 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
     )
   }
 
-  const inputClass = "w-full bg-brand-navy/[0.03] border border-brand-navy/5 rounded-2xl px-5 py-4 font-sans text-sm text-brand-navy placeholder:text-brand-navy/20 focus:outline-none focus:ring-2 focus:ring-brand-marinho/20 focus:border-brand-marinho focus:bg-white transition-all duration-300"
-  const labelClass = "block font-sans text-[10px] font-black uppercase tracking-[0.3em] text-brand-navy/40 mb-3 ml-1"
+  const inputClass = "w-full bg-brand-navy/[0.03] border border-brand-navy/5 rounded-xl px-4 py-3 font-sans text-sm text-brand-navy placeholder:text-brand-navy/20 focus:outline-none focus:ring-2 focus:ring-brand-marinho/20 focus:border-brand-marinho focus:bg-white transition-all duration-300"
+  const labelClass = "block font-sans text-[10px] font-black uppercase tracking-[0.3em] text-brand-navy/40 mb-2 ml-1"
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Nome */}
       <div className="group/input">
         <label className={labelClass}>Nome Completo</label>
         <input {...register('nome')} placeholder="Ex: João Silva" className={inputClass} />
-        {errors.nome && <p className="mt-2 text-[10px] font-bold text-red-500 uppercase tracking-widest leading-none">{errors.nome.message}</p>}
+        {errors.nome && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase tracking-widest leading-none">{errors.nome.message}</p>}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* WhatsApp */}
         <div className="group/input">
           <label className={labelClass}>WhatsApp</label>
@@ -102,14 +102,14 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
             maxLength={15}
             className={inputClass}
           />
-          {errors.whatsapp && <p className="mt-2 text-[10px] font-bold text-red-500 uppercase tracking-widest leading-none">{errors.whatsapp.message}</p>}
+          {errors.whatsapp && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase tracking-widest leading-none">{errors.whatsapp.message}</p>}
         </div>
 
         {/* E-mail */}
         <div className="group/input">
           <label className={labelClass}>E-mail</label>
           <input {...register('email')} type="email" placeholder="seu@email.com" className={inputClass} />
-          {errors.email && <p className="mt-2 text-[10px] font-bold text-red-500 uppercase tracking-widest leading-none">{errors.email.message}</p>}
+          {errors.email && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase tracking-widest leading-none">{errors.email.message}</p>}
         </div>
       </div>
 
@@ -129,7 +129,7 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
                 setValue('tipo_corretor', undefined)
                 setValue('imobiliaria', '')
               }}
-              className={`py-4 rounded-2xl border font-sans text-sm font-semibold transition-all duration-200 ${
+              className={`py-3 rounded-xl border font-sans text-sm font-semibold transition-all duration-200 ${
                 tipoUsuario === opt.value
                   ? 'bg-brand-navy text-white border-brand-navy shadow-lg'
                   : 'bg-brand-navy/[0.03] border-brand-navy/5 text-brand-navy/60 hover:border-brand-marinho/30 hover:text-brand-navy'
@@ -158,7 +158,7 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
                   setValue('tipo_corretor', opt.value, { shouldValidate: true })
                   setValue('imobiliaria', '')
                 }}
-                className={`py-4 rounded-2xl border font-sans text-sm font-semibold transition-all duration-200 ${
+                className={`py-3 rounded-xl border font-sans text-sm font-semibold transition-all duration-200 ${
                   tipoCorretor === opt.value
                     ? 'bg-brand-navy text-white border-brand-navy shadow-lg'
                     : 'bg-brand-navy/[0.03] border-brand-navy/5 text-brand-navy/60 hover:border-brand-marinho/30 hover:text-brand-navy'
