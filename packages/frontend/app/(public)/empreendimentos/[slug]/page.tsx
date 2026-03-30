@@ -129,6 +129,7 @@ export default async function EmpreendimentoPage({
             src={fotoPrincipal}
             alt={e.nome}
             fill
+            sizes="100vw"
             className="object-cover brightness-[0.45]"
             priority
           />
@@ -385,6 +386,7 @@ export default async function EmpreendimentoPage({
                             src={foto}
                             alt={`${e.nome} ${i + 2}`}
                             fill
+                            sizes="(max-width: 768px) 50vw, 33vw"
                             className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
                           />
                           <div className="absolute inset-0 bg-brand-navy/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

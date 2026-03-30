@@ -6,6 +6,7 @@ const nextConfig = {
     return config
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       // dev local
       { protocol: 'http', hostname: 'localhost', port: '9000', pathname: '/**' },

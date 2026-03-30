@@ -71,6 +71,7 @@ export function EmpreendimentoCard({ empreendimento: e }: Props) {
           {foto ? (
             <Image
               src={foto} alt={e.nome} fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="object-cover group-hover:scale-105 transition-transform duration-[1.4s] ease-[0.22,1,0.36,1] brightness-90 group-hover:brightness-100"
             />
           ) : (
