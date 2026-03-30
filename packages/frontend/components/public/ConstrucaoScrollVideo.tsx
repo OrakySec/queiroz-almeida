@@ -6,6 +6,8 @@ import { useLeadModal } from '@/context/LeadModalContext'
 
 // ── Ajuste conforme o total de frames exportados do vídeo ─────────────
 const FRAME_COUNT = 120
+// Quantos frames precisam falhar para usar o fallback de vídeo
+const FALLBACK_THRESHOLD = Math.floor(FRAME_COUNT * 0.5)
 
 const etapas = [
   { icon: Hammer,       label: 'Estrutura'   },
@@ -18,29 +20,44 @@ export function ConstrucaoScrollVideo() {
 
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef    = useRef<HTMLCanvasElement>(null)
+  const videoRef     = useRef<HTMLVideoElement>(null)
   const framesRef    = useRef<HTMLImageElement[]>([])
   const lastIndexRef = useRef(-1)
 
   const [loadProgress, setLoadProgress] = useState(0)
   const [loaded, setLoaded]             = useState(false)
+  const [useFallback, setUseFallback]   = useState(false)
 
   // ── 1) Pré-carrega todos os frames ──────────────────────────────────
   useEffect(() => {
-    let done = 0
+    let done   = 0
+    let errors = 0
     const imgs: HTMLImageElement[] = new Array(FRAME_COUNT)
 
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image()
-      const finish = () => {
+      img.onload = () => {
         done++
         setLoadProgress(Math.round((done / FRAME_COUNT) * 100))
+        if (done + errors === FRAME_COUNT) {
+          framesRef.current = imgs
+          setLoaded(true)
+        }
+      }
+      img.onerror = () => {
+        errors++
+        done++
+        if (errors >= FALLBACK_THRESHOLD) {
+          // Frames não existem — usa vídeo
+          setUseFallback(true)
+          setLoaded(true)
+          return
+        }
         if (done === FRAME_COUNT) {
           framesRef.current = imgs
           setLoaded(true)
         }
       }
-      img.onload  = finish
-      img.onerror = finish
       img.src = `/sequence/frame_${i}.webp`
       imgs[i] = img
     }
@@ -114,7 +131,35 @@ export function ConstrucaoScrollVideo() {
     })
 
     return () => unsub()
-  }, [smoothProgress, loaded])
+  }, [smoothProgress, loaded, useFallback])
+
+  // ── 5) Fallback: seek no vídeo quando frames não existem ─────────────
+  useEffect(() => {
+    if (!useFallback) return
+    const video = videoRef.current
+    if (!video) return
+
+    // Warm-up iOS
+    const warmUp = () => {
+      video.play().then(() => { video.pause(); video.currentTime = 0 }).catch(() => {})
+    }
+    video.addEventListener('loadedmetadata', warmUp, { once: true })
+    const onPlay = () => video.pause()
+    video.addEventListener('play', onPlay)
+
+    const unsub = smoothProgress.on('change', (v) => {
+      if (!video.duration || !isFinite(video.duration)) return
+      const mapped = Math.max(0, Math.min(1, (v - 0.1) / 0.8))
+      const t = mapped * (video.duration - 0.033)
+      if (typeof (video as any).fastSeek === 'function') (video as any).fastSeek(t)
+      else video.currentTime = t
+    })
+
+    return () => {
+      unsub()
+      video.removeEventListener('play', onPlay)
+    }
+  }, [smoothProgress, useFallback])
 
   // ── Transforms para texto e barra (sem mudança) ──────────────────────
   const textOpacity = useTransform(scrollYProgress, [0.05, 0.25], [0, 1])
@@ -213,13 +258,27 @@ export function ConstrucaoScrollVideo() {
             </button>
           </motion.div>
 
-          {/* ── Coluna direita: Canvas ────────────────────────────── */}
+          {/* ── Coluna direita: Canvas ou Vídeo (fallback) ───────── */}
           <div className="w-full md:flex-1 relative">
-            <canvas
-              ref={canvasRef}
-              className="w-full block"
-              style={{ aspectRatio: '16/9' }}
-            />
+            {useFallback ? (
+              <video
+                ref={videoRef}
+                muted
+                playsInline
+                autoPlay
+                preload="auto"
+                disableRemotePlayback
+                className="w-full h-auto block"
+              >
+                <source src="/construct-video-scrub.mp4" type="video/mp4" />
+              </video>
+            ) : (
+              <canvas
+                ref={canvasRef}
+                className="w-full block"
+                style={{ aspectRatio: '16/9' }}
+              />
+            )}
           </div>
 
         </div>
