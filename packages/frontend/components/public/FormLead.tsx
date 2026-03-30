@@ -11,9 +11,16 @@ const schema = z.object({
   whatsapp: z.string().min(14, 'Informe um WhatsApp válido'),
   email: z.string().email('Informe um e-mail válido'),
   interesse: z.string().optional(),
-  tipo_usuario: z.enum(['CLIENTE', 'CORRETOR']).optional(),
+  tipo_usuario: z.enum(['CLIENTE', 'CORRETOR'], { required_error: 'Selecione o tipo de usuário' }),
   tipo_corretor: z.enum(['AUTONOMO', 'IMOBILIARIA']).optional(),
   imobiliaria: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.tipo_usuario === 'CORRETOR' && !data.tipo_corretor) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Selecione o tipo de corretor', path: ['tipo_corretor'] })
+  }
+  if (data.tipo_usuario === 'CORRETOR' && data.tipo_corretor === 'IMOBILIARIA' && !data.imobiliaria?.trim()) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Informe o nome da imobiliária', path: ['imobiliaria'] })
+  }
 })
 
 type FormData = z.infer<typeof schema>
@@ -118,7 +125,7 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
               key={opt.value}
               type="button"
               onClick={() => {
-                setValue('tipo_usuario', opt.value)
+                setValue('tipo_usuario', opt.value, { shouldValidate: true })
                 setValue('tipo_corretor', undefined)
                 setValue('imobiliaria', '')
               }}
@@ -132,6 +139,7 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
             </button>
           ))}
         </div>
+        {errors.tipo_usuario && <p className="mt-2 text-[10px] font-bold text-red-500 uppercase tracking-widest leading-none">{errors.tipo_usuario.message}</p>}
       </div>
 
       {/* Se corretor: autônomo ou imobiliária */}
@@ -147,7 +155,7 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
                 key={opt.value}
                 type="button"
                 onClick={() => {
-                  setValue('tipo_corretor', opt.value)
+                  setValue('tipo_corretor', opt.value, { shouldValidate: true })
                   setValue('imobiliaria', '')
                 }}
                 className={`py-4 rounded-2xl border font-sans text-sm font-semibold transition-all duration-200 ${
@@ -160,6 +168,7 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
               </button>
             ))}
           </div>
+          {errors.tipo_corretor && <p className="mt-2 text-[10px] font-bold text-red-500 uppercase tracking-widest leading-none">{errors.tipo_corretor.message}</p>}
         </div>
       )}
 
@@ -172,6 +181,7 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
             placeholder="Ex: Imobiliária Central"
             className={inputClass}
           />
+          {errors.imobiliaria && <p className="mt-2 text-[10px] font-bold text-red-500 uppercase tracking-widest leading-none">{errors.imobiliaria.message}</p>}
         </div>
       )}
 
