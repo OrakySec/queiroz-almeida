@@ -61,7 +61,6 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
     { icon: Bath,       label: 'Suítes',    value: suites },
     { icon: ShowerHead, label: 'Banheiros', value: banheiros },
     { icon: Car,        label: 'Vagas',     value: vagas },
-    { icon: TrendingUp, label: 'Unidades',  value: e.total_unidades?.toString() },
   ].filter(s => s.value)
 
   return (
