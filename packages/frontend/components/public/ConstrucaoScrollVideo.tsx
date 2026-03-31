@@ -24,10 +24,18 @@ export function ConstrucaoScrollVideo() {
     const video = videoRef.current
     if (!video) return
 
-    let targetTime = 0
-    let lastSeekAt = 0
-    let rafId = 0
-    let running = true
+    let targetTime   = 0
+    let velocity     = 0   // inércia: velocidade atual do targetTime
+    let lastTarget   = 0   // target anterior (para calcular delta)
+    let lastScrollAt = 0   // quando foi o último evento de scroll
+    let lastSeekAt   = 0
+    let rafId        = 0
+    let running      = true
+
+    const FRICTION   = 0.85  // decaimento da inércia (0=para imediato, 1=nunca para)
+    const EWMA       = 0.30  // suavização da velocidade
+    const SETTLE_MS  = 80    // ms sem scroll antes de ativar a inércia
+    const EPSILON    = 0.0002 // velocidade mínima para continuar movendo
 
     // iOS warm-up: desbloqueia o decoder antes do usuário scrollar
     const warmUp = () => {
@@ -39,14 +47,22 @@ export function ConstrucaoScrollVideo() {
     const onPlay = () => { videoRef.current?.pause() }
     video.addEventListener('play', onPlay)
 
-    // RAF loop: move currentTime 18% em direção ao target a cada frame
-    // → transições suaves entre frames mesmo no scroll lento do celular
     function tick() {
       if (!running) return
       rafId = requestAnimationFrame(tick)
       const v = videoRef.current
       if (!v || !isFinite(v.duration)) return
-      const now  = performance.now()
+
+      const now     = performance.now()
+      const settled = (now - lastScrollAt) > SETTLE_MS
+
+      // Inércia: após parar o scroll, continua movendo com fricção
+      if (settled && Math.abs(velocity) > EPSILON) {
+        targetTime = Math.max(0, Math.min(v.duration - 0.05, targetTime + velocity))
+        velocity  *= FRICTION
+      }
+
+      // Lerp: move currentTime suavemente em direção ao targetTime
       const diff = targetTime - v.currentTime
       if (Math.abs(diff) > 0.001 && (now - lastSeekAt) >= 33) {
         v.currentTime += diff * 0.18
@@ -58,7 +74,12 @@ export function ConstrucaoScrollVideo() {
     const unsub = scrollYProgress.on('change', (latest) => {
       const v = videoRef.current
       if (!v || !isFinite(v.duration)) return
-      targetTime = Math.max(0, Math.min(1, (latest - 0.1) / 0.8)) * (v.duration - 0.05)
+      const newTarget = Math.max(0, Math.min(1, (latest - 0.1) / 0.8)) * (v.duration - 0.05)
+      // EWMA: suaviza a velocidade para evitar spikes bruscos
+      velocity     = velocity * (1 - EWMA) + (newTarget - lastTarget) * EWMA
+      lastTarget   = newTarget
+      targetTime   = newTarget
+      lastScrollAt = performance.now()
     })
 
     return () => {
