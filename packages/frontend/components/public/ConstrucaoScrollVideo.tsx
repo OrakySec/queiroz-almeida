@@ -25,6 +25,7 @@ export function ConstrucaoScrollVideo() {
     if (!video) return
 
     let targetTime = 0
+    let lastSeekAt = 0
     let rafId = 0
     let running = true
 
@@ -45,9 +46,11 @@ export function ConstrucaoScrollVideo() {
       rafId = requestAnimationFrame(tick)
       const v = videoRef.current
       if (!v || !isFinite(v.duration)) return
+      const now  = performance.now()
       const diff = targetTime - v.currentTime
-      if (Math.abs(diff) > 0.001) {
+      if (Math.abs(diff) > 0.001 && (now - lastSeekAt) >= 33) {
         v.currentTime += diff * 0.18
+        lastSeekAt = now
       }
     }
     rafId = requestAnimationFrame(tick)
