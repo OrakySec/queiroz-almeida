@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useEffect } from 'react'
-import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, Building2, Hammer, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -19,28 +19,52 @@ export function ConstrucaoScrollVideo() {
     offset: ['start end', 'end start'],
   })
 
-  // iOS warm-up: desbloqueia o decoder antes do usuário scrollar
+  // Lerp scrub: suaviza a transição entre frames (especialmente no celular)
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
+
+    let targetTime = 0
+    let rafId = 0
+    let running = true
+
+    // iOS warm-up: desbloqueia o decoder antes do usuário scrollar
     const warmUp = () => {
       video.play()
         .then(() => { video.pause(); video.currentTime = 0 })
         .catch(() => {})
     }
     video.addEventListener('loadedmetadata', warmUp, { once: true })
-    const onPlay = () => { video.pause() }
+    const onPlay = () => { videoRef.current?.pause() }
     video.addEventListener('play', onPlay)
-    return () => { video.removeEventListener('play', onPlay) }
-  }, [])
 
-  // Seek direto — funciona perfeitamente com vídeo encodado com -g 1 (todo frame é keyframe)
-  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    const video = videoRef.current
-    if (!video || !Number.isFinite(video.duration)) return
-    const mapped = Math.max(0, Math.min(1, (latest - 0.1) / 0.8))
-    video.currentTime = Math.min(mapped * video.duration, video.duration - 0.05)
-  })
+    // RAF loop: move currentTime 18% em direção ao target a cada frame
+    // → transições suaves entre frames mesmo no scroll lento do celular
+    function tick() {
+      if (!running) return
+      rafId = requestAnimationFrame(tick)
+      const v = videoRef.current
+      if (!v || !isFinite(v.duration)) return
+      const diff = targetTime - v.currentTime
+      if (Math.abs(diff) > 0.001) {
+        v.currentTime += diff * 0.18
+      }
+    }
+    rafId = requestAnimationFrame(tick)
+
+    const unsub = scrollYProgress.on('change', (latest) => {
+      const v = videoRef.current
+      if (!v || !isFinite(v.duration)) return
+      targetTime = Math.max(0, Math.min(1, (latest - 0.1) / 0.8)) * (v.duration - 0.05)
+    })
+
+    return () => {
+      running = false
+      cancelAnimationFrame(rafId)
+      unsub()
+      video.removeEventListener('play', onPlay)
+    }
+  }, [scrollYProgress])
 
   const textOpacity = useTransform(scrollYProgress, [0.05, 0.25], [0, 1])
   const barScale    = useTransform(scrollYProgress, [0.1, 0.88],  [0, 1])
