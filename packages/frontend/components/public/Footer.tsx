@@ -114,10 +114,18 @@ export function Footer() {
               CNPJ: 00.000.000/0001-00
             </span>
           </div>
-          <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
-             <span className="font-serif italic text-xs md:text-sm text-brand-silver/90">Desenvolvido por</span>
-             <img src="/assinatura.png" alt="Assinatura" className="h-10 md:h-12 w-auto object-contain" />
-          </div>
+          <a 
+            href="https://www.instagram.com/oykaromarques.ia/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 group relative overflow-hidden px-4 py-2 rounded-xl transition-all duration-500"
+          >
+            {/* Efeito de Brilho (Shine) no Hover */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none" />
+            
+            <span className="font-serif italic text-xs md:text-sm text-brand-silver/90">Desenvolvido por</span>
+            <img src="/assinatura.png" alt="Assinatura" className="h-10 md:h-12 w-auto object-contain" />
+          </a>
         </div>
       </div>
     </footer>
