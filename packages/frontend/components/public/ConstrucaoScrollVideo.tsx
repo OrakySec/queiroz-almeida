@@ -32,9 +32,9 @@ export function ConstrucaoScrollVideo() {
     let rafId        = 0
     let running      = true
 
-    const FRICTION   = 0.85  // decaimento da inércia (0=para imediato, 1=nunca para)
+    const FRICTION   = 0.60  // decaimento da inércia (0=para imediato, 1=nunca para)
     const EWMA       = 0.30  // suavização da velocidade
-    const SETTLE_MS  = 80    // ms sem scroll antes de ativar a inércia
+    const SETTLE_MS  = 60    // ms sem scroll antes de ativar a inércia
     const EPSILON    = 0.0002 // velocidade mínima para continuar movendo
 
     // iOS warm-up: desbloqueia o decoder antes do usuário scrollar
