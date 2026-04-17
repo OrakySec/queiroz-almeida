@@ -27,7 +27,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        serif: ['var(--font-garamond)', 'Georgia', 'serif'],
+        serif: ['var(--font-playfair)', 'Georgia', 'serif'],
         sans:  ['var(--font-outfit)', 'Inter', 'system-ui', 'sans-serif'],
       },
       animation: {

@@ -5,7 +5,7 @@ import { Shield, TrendingUp, Award, MapPin } from 'lucide-react'
 
 const marcos = [
   {
-    ano: '2016',
+    ano: '2026',
     titulo: 'Fundação',
     descricao: 'Nasce a Queiroz Almeida em Pernambuco, com foco exclusivo no litoral.',
   },
@@ -160,6 +160,20 @@ export function QuemSomos() {
                 gerações.
               </motion.h2>
             </div>
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="mt-10 relative rounded-[2rem] overflow-hidden aspect-[21/9] bg-brand-navy/5 border border-brand-navy/10 flex items-center justify-center group"
+            >
+              <div className="absolute inset-0 bg-slate-100 flex flex-col items-center justify-center gap-3">
+                 <span className="font-sans text-[10px] font-black uppercase tracking-[0.2em] text-brand-navy/30">Espaço para Foto da Equipe</span>
+                 <p className="font-sans text-[9px] text-brand-navy/30 border border-brand-navy/10 px-3 py-1 rounded-full">public/foto-equipe.jpg</p>
+              </div>
+              <img src="/foto-equipe.jpg" alt="Equipe Queiroz Almeida" className="absolute top-0 left-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-500" onLoad={(e) => { e.currentTarget.style.opacity = '1'; }} />
+            </motion.div>
           </div>
 
           <motion.div
@@ -173,14 +187,14 @@ export function QuemSomos() {
               A <strong className="text-brand-navy font-semibold">Queiroz Almeida Construtora e Incorporadora</strong> é reconhecida no mercado do litoral nordestino pela excelência na construção de flats de investimento de altíssimo padrão.
             </p>
             <p className="font-sans text-base text-brand-navy/65 leading-relaxed">
-              Fundada em 2016, a empresa atua no Litoral Sul Pernambucano (Porto de Galinhas) e no Litoral Norte Alagoano (Maragogi), entregando ativos imobiliários que combinam qualidade construtiva, localização privilegiada e alto potencial de valorização.
+              A empresa foi fundada em 2026 e possui diversas experiências no mercado de construção. Mas hoje atua fortemente no litoral, desenvolvendo e construindo projetos compactos, com localizações estratégicas voltadas para investidores que buscam valorização e rentabilidade.
             </p>
           </motion.div>
         </div>
 
         {/* Diferenciais — Architectural Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-32">
-          {/* Card 1: 10+ Years (Large) */}
+          {/* Card 1: Experiência (Large) */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -189,20 +203,20 @@ export function QuemSomos() {
           >
             <div className="absolute inset-0 bg-blueprint opacity-[0.05] group-hover:opacity-[0.1] transition-opacity duration-700" />
             
-            {/* Parallax Number */}
+            {/* Parallax QA */}
             <motion.span 
               style={{ y: smoothParallaxY }}
-              className="font-sans text-[7rem] md:text-[11rem] font-black text-brand-marinho-glow/15 absolute top-0 right-10 leading-none pointer-events-none italic"
+              className="font-serif text-[9rem] md:text-[13rem] font-bold text-brand-marinho-glow/10 absolute top-0 right-10 leading-none pointer-events-none italic"
             >
-              10+
+              QA
             </motion.span>
 
             <div className="relative z-10">
               <div className="pt-10">
                 <Shield size={32} className="text-brand-marinho-glow mb-8" />
-                <h3 className="font-serif font-bold text-white text-3xl mb-4">Anos de Mercado</h3>
+                <h3 className="font-serif font-bold text-white text-3xl mb-4">Experiência de Mercado</h3>
                 <p className="font-sans text-brand-silver/75 leading-relaxed max-w-sm">
-                  Uma década de solidez e reputação inabalável no litoral nordestino.
+                  Diversas experiências em construção, desenvolvendo projetos inovadores com solidez e reputação inabalável no litoral.
                 </p>
               </div>
             </div>

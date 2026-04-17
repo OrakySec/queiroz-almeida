@@ -29,7 +29,7 @@ export function Footer() {
               <img 
                 src="/logo.png?v=7" 
                 alt="Queiroz Almeida" 
-                className="w-44 md:w-52 h-auto rounded-full bg-white/5 backdrop-blur-sm p-1 border border-white/10"
+                className="w-44 md:w-52 h-auto mix-blend-plus-lighter"
               />
             </Link>
             <div className="space-y-6">
@@ -111,7 +111,7 @@ export function Footer() {
               © 2024 Queiroz Almeida
             </span>
             <span className="font-sans text-[10px] font-black uppercase tracking-[0.2em] text-brand-silver/25">
-              CNPJ: 00.000.000/0001-00
+              CNPJ: 25.009.690/0001-70
             </span>
           </div>
           <a 

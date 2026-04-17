@@ -177,7 +177,7 @@ export default async function EmpreendimentoPage({
               {/* Padrão badge */}
               {e.padrao && (
                 <span className="font-sans text-[8px] font-black uppercase tracking-[0.25em] px-3 py-2 rounded-full backdrop-blur-md border border-brand-marinho-glow/30 bg-brand-marinho-glow/10 text-brand-marinho-glow">
-                  {e.padrao}
+                  {e.padrao === 'ALTO' || e.padrao === 'Alto' ? 'ALTO PADRÃO' : e.padrao}
                 </span>
               )}
 
@@ -324,7 +324,7 @@ export default async function EmpreendimentoPage({
               {e.amenidades && e.amenidades.length > 0 && (
                 <Reveal delay={0.1}>
                   <div>
-                    <SectionTitle>Amenidades & Diferenciais</SectionTitle>
+                    <SectionTitle>Áreas Comuns</SectionTitle>
                     <div className="flex flex-wrap gap-3">
                       {e.amenidades.map(item => (
                         <span
@@ -345,57 +345,45 @@ export default async function EmpreendimentoPage({
                 <Reveal delay={0.12}>
                   <div>
                     <SectionTitle>Localização</SectionTitle>
-                    <div className="rounded-3xl border border-slate-100 bg-slate-50/50 p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                      <div className="space-y-2">
-                        {e.endereco && (
-                          <p className="font-serif font-bold text-xl text-brand-navy leading-tight">{e.endereco}</p>
-                        )}
-                        <div className="flex items-center gap-2">
-                          <MapPin size={12} className="text-brand-marinho" />
-                          <p className="font-sans text-[11px] text-slate-400 uppercase tracking-widest font-black">
-                            {[e.bairro, e.cidade, e.estado].filter(Boolean).join(' · ')}
-                          </p>
-                        </div>
+                    <div className="rounded-3xl border border-slate-100 bg-slate-50/50 p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
+                      
+                      {/* Placeholder from Google Maps / Local */}
+                      <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl bg-white border border-slate-200 overflow-hidden relative shrink-0 shadow-sm">
+                         <div className="absolute inset-0 flex flex-col justify-center items-center p-4 text-center">
+                            <span className="font-sans font-bold text-[10px] uppercase tracking-widest text-slate-400">Foto da Localização</span>
+                            <span className="font-sans text-[8px] text-slate-400 border border-slate-200 px-2 py-1 rounded mt-2">public/foto-local.jpg</span>
+                         </div>
+                         <img src="/foto-local.jpg" alt="Localização" className="absolute top-0 left-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-500" onLoad={(e) => { e.currentTarget.style.opacity = '1'; }} />
                       </div>
-                      <a
-                        href={mapUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 font-sans text-[10px] font-black uppercase tracking-[0.2em] text-white bg-brand-navy rounded-full px-7 py-4 hover:bg-brand-marinho transition-all duration-300 shadow-lg shadow-brand-navy/10 shrink-0"
-                      >
-                        <Navigation size={13} />
-                        Mapa Detalhado
-                      </a>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 w-full">
+                        <div className="space-y-2">
+                          {e.endereco && (
+                            <p className="font-serif font-bold text-xl text-brand-navy leading-tight">{e.endereco}</p>
+                          )}
+                          <div className="flex items-center gap-2">
+                            <MapPin size={12} className="text-brand-marinho" />
+                            <p className="font-sans text-[11px] text-slate-400 uppercase tracking-widest font-black">
+                              {[e.bairro, e.cidade, e.estado].filter(Boolean).join(' · ')}
+                            </p>
+                          </div>
+                        </div>
+                        <a
+                          href={mapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 font-sans text-[10px] font-black uppercase tracking-[0.2em] text-white bg-brand-navy rounded-full px-7 py-4 hover:bg-brand-marinho transition-all duration-300 shadow-lg shadow-brand-navy/10 shrink-0"
+                        >
+                          <Navigation size={13} />
+                          Mapa Detalhado
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </Reveal>
               )}
 
-              {/* Gallery */}
-              {fotos.length > 1 && (
-                <Reveal delay={0.15}>
-                  <div>
-                    <SectionTitle>Galeria</SectionTitle>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {fotos.slice(1).map((foto, i) => (
-                        <div
-                          key={i}
-                          className="relative aspect-square rounded-3xl overflow-hidden shadow-sm group border border-slate-100"
-                        >
-                          <Image
-                            src={foto}
-                            alt={`${e.nome} ${i + 2}`}
-                            fill
-                            sizes="(max-width: 768px) 50vw, 33vw"
-                            className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
-                          />
-                          <div className="absolute inset-0 bg-brand-navy/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Reveal>
-              )}
+
             </div>
 
             {/* ── Sidebar ── */}
@@ -472,14 +460,28 @@ export default async function EmpreendimentoPage({
         </div>
       </section>
 
-      {/* ── Memorial Descritivo ── largura total ─────────────────── */}
-      {e.pdf_url && (
+      {/* ── Galeria Expandida ── largura total ─────────────────── */}
+      {fotos.length > 1 && (
         <section className="pb-32">
           <div className="max-w-7xl mx-auto px-6 lg:px-16">
             <Reveal>
-              <SectionTitle>Memorial Descritivo</SectionTitle>
-              <div className="rounded-3xl overflow-hidden border border-slate-100 shadow-sm bg-white">
-                <PdfViewer url={e.pdf_url} />
+              <SectionTitle>Galeria do Empreendimento</SectionTitle>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6 mt-8">
+                {fotos.slice(1).map((foto, i) => (
+                  <div
+                    key={i}
+                    className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-sm group border border-slate-100"
+                  >
+                    <Image
+                      src={foto}
+                      alt={`${e.nome} ${i + 2}`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-brand-navy/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                  </div>
+                ))}
               </div>
             </Reveal>
           </div>

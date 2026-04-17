@@ -92,7 +92,7 @@ export function Hero() {
             transition={{ duration: 1, delay: 1 }}
             className="font-sans text-lg md:text-xl text-white/90 leading-relaxed mb-14 max-w-xl"
           >
-            Flats de alto padrão em Porto de Galinhas e Maragogi.
+            Flats de alto padrão no litoral sul de Pernambuco e norte alagoano.
             Onde a valorização imobiliária encontra o paraíso.
           </motion.p>
 
