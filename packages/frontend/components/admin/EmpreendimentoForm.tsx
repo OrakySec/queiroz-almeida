@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useDropzone } from 'react-dropzone'
 import api from '@/lib/api'
 import { FotoUploader } from './FotoUploader'
-import { Save, Loader2, Send, RotateCcw, Upload, X, ImageIcon, FileText, Trash2 } from 'lucide-react'
+import { Save, Loader2, Send, RotateCcw, Upload, X, ImageIcon, FileText, Trash2, Pencil, Plus } from 'lucide-react'
 import { useAdmin } from '@/context/AdminContext'
 
 const emptyToUndef = (v: unknown) => (v === '' || v == null ? undefined : v)
@@ -77,14 +77,31 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
   // Fotos já confirmadas (URLs no servidor)
   const [fotos, setFotos] = useState<string[]>(initialData?.fotos ?? [])
 
-  // Amenidades (checkboxes)
-  const [amenidades, setAmenidades] = useState<string[]>(
-    (initialData as any)?.amenidades ?? []
-  )
-  function toggleAmenidade(item: string) {
-    setAmenidades(prev =>
-      prev.includes(item) ? prev.filter(a => a !== item) : [...prev, item]
-    )
+  // Amenidades
+  const [amenidades,    setAmenidades]    = useState<string[]>((initialData as any)?.amenidades ?? [])
+  const [novaAmenidade, setNovaAmenidade] = useState('')
+  const [editingIndex,  setEditingIndex]  = useState<number | null>(null)
+  const [editingValue,  setEditingValue]  = useState('')
+
+  function adicionarAmenidade() {
+    const v = novaAmenidade.trim()
+    if (!v || amenidades.includes(v)) return
+    setAmenidades(prev => [...prev, v])
+    setNovaAmenidade('')
+  }
+  function removerAmenidade(index: number) {
+    setAmenidades(prev => prev.filter((_, i) => i !== index))
+    if (editingIndex === index) setEditingIndex(null)
+  }
+  function iniciarEdicao(index: number) {
+    setEditingIndex(index)
+    setEditingValue(amenidades[index])
+  }
+  function confirmarEdicao() {
+    if (editingIndex === null) return
+    const v = editingValue.trim()
+    if (v) setAmenidades(prev => prev.map((a, i) => i === editingIndex ? v : a))
+    setEditingIndex(null)
   }
 
   // Vagas (selects independentes do RHF)
@@ -444,33 +461,88 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
         {/* Amenidades */}
         <section className="bg-white rounded-2xl border border-brand-navy/5 shadow-sm p-6 lg:p-8">
           <h2 className="font-semibold text-brand-navy mb-2 text-lg">Amenidades / Diferenciais</h2>
-          <p className="text-xs text-brand-navy/40 mb-5">Marque os itens disponíveis no empreendimento</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {AMENIDADES_LISTA.map(item => (
-              <label key={item} className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors select-none ${
-                amenidades.includes(item)
-                  ? 'border-brand-marinho bg-brand-marinho/5 text-brand-marinho'
-                  : 'border-brand-navy/10 text-brand-navy/50 hover:border-brand-marinho/40'
-              }`}>
-                <input
-                  type="checkbox"
-                  checked={amenidades.includes(item)}
-                  onChange={() => toggleAmenidade(item)}
-                  className="hidden"
-                />
-                <span className={`w-3.5 h-3.5 rounded border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
-                  amenidades.includes(item) ? 'border-brand-marinho bg-brand-marinho' : 'border-brand-navy/20'
-                }`}>
-                  {amenidades.includes(item) && (
-                    <svg viewBox="0 0 10 8" fill="none" className="w-2 h-2">
-                      <path d="M1 4l2.5 2.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+          <p className="text-xs text-brand-navy/40 mb-5">Adicione, edite ou remova os itens disponíveis no empreendimento</p>
+
+          {/* Zona 1 — chips das amenidades selecionadas */}
+          {amenidades.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-5">
+              {amenidades.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-1 bg-brand-marinho/8 border border-brand-marinho/20 rounded-full px-3 py-1.5">
+                  {editingIndex === idx ? (
+                    <input
+                      autoFocus
+                      value={editingValue}
+                      onChange={e => setEditingValue(e.target.value)}
+                      onBlur={confirmarEdicao}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') { e.preventDefault(); confirmarEdicao() }
+                        if (e.key === 'Escape') setEditingIndex(null)
+                      }}
+                      className="text-xs font-medium text-brand-marinho bg-transparent outline-none border-b border-brand-marinho/40 min-w-0 w-28"
+                    />
+                  ) : (
+                    <span className="text-xs font-medium text-brand-marinho">{item}</span>
                   )}
-                </span>
-                <span className="text-xs font-medium leading-snug">{item}</span>
-              </label>
-            ))}
+                  <button
+                    type="button"
+                    onClick={() => iniciarEdicao(idx)}
+                    className="ml-1 text-brand-marinho/50 hover:text-brand-marinho transition-colors"
+                    title="Editar"
+                  >
+                    <Pencil size={11} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removerAmenidade(idx)}
+                    className="text-brand-marinho/50 hover:text-red-500 transition-colors"
+                    title="Remover"
+                  >
+                    <X size={11} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Zona 2 — input para adicionar amenidade personalizada */}
+          <div className="flex gap-2 mb-5">
+            <input
+              type="text"
+              placeholder="Adicionar amenidade personalizada..."
+              value={novaAmenidade}
+              onChange={e => setNovaAmenidade(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); adicionarAmenidade() } }}
+              className="flex-1 text-sm border border-brand-navy/15 rounded-xl px-4 py-2.5 outline-none focus:border-brand-marinho/50 placeholder:text-brand-navy/30"
+            />
+            <button
+              type="button"
+              onClick={adicionarAmenidade}
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-brand-marinho text-white text-sm font-medium rounded-xl hover:bg-brand-marinho/90 transition-colors"
+            >
+              <Plus size={14} />
+              Adicionar
+            </button>
           </div>
+
+          {/* Zona 3 — sugestões rápidas (predefinidas ainda não selecionadas) */}
+          {AMENIDADES_LISTA.filter(item => !amenidades.includes(item)).length > 0 && (
+            <div>
+              <p className="text-xs text-brand-navy/40 mb-2">Sugestões rápidas</p>
+              <div className="flex flex-wrap gap-2">
+                {AMENIDADES_LISTA.filter(item => !amenidades.includes(item)).map(item => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setAmenidades(prev => [...prev, item])}
+                    className="flex items-center gap-1 text-xs text-brand-navy/50 border border-brand-navy/10 rounded-full px-3 py-1.5 hover:border-brand-marinho/40 hover:text-brand-marinho transition-colors"
+                  >
+                    <Plus size={10} />
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Fotos */}
