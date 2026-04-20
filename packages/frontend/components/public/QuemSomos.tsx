@@ -5,24 +5,19 @@ import { Shield, TrendingUp, Award, MapPin } from 'lucide-react'
 
 const marcos = [
   {
-    ano: '2026',
+    ano: '2016',
     titulo: 'Fundação',
-    descricao: 'Nasce a Queiroz Almeida em Pernambuco, com foco exclusivo no litoral.',
+    descricao: 'Foco em obras e reformas industriais e comerciais por todo o Brasil.',
   },
   {
-    ano: '2019',
-    titulo: 'Primeira entrega',
-    descricao: 'Porto Lagoa Residence — pioneiro em flats de investimento na região.',
-  },
-  {
-    ano: '2022',
-    titulo: 'Expansão para Alagoas',
-    descricao: 'Chegada a Maragogi com o empreendimento Caminho do Mar.',
+    ano: '2023',
+    titulo: 'Início na Incorporação',
+    descricao: 'Início da atuação em incorporação em Porto de Galinhas com o Porto Lagoa.',
   },
   {
     ano: '2025',
-    titulo: '3 obras simultâneas',
-    descricao: 'Três empreendimentos em construção simultânea, consolidando a liderança.',
+    titulo: 'Expansão para Alagoas',
+    descricao: 'Expansão para o estado de Alagoas com o empreendimento Caminho do Mar.',
   },
 ]
 
@@ -187,7 +182,7 @@ export function QuemSomos() {
               A <strong className="text-brand-navy font-semibold">Queiroz Almeida Construtora e Incorporadora</strong> é reconhecida no mercado do litoral nordestino pela excelência na construção de flats de investimento de altíssimo padrão.
             </p>
             <p className="font-sans text-base text-brand-navy/65 leading-relaxed">
-              A empresa foi fundada em 2026 e possui diversas experiências no mercado de construção. Mas hoje atua fortemente no litoral, desenvolvendo e construindo projetos compactos, com localizações estratégicas voltadas para investidores que buscam valorização e rentabilidade.
+              Fundada em 2016 com forte atuação nacional de reformas, hoje a construtora atua de modo focado no litoral, desenvolvendo projetos compactos com localizações estratégicas voltados para investidores que buscam alta valorização e rentabilidade.
             </p>
           </motion.div>
         </div>
