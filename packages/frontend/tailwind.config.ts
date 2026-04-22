@@ -18,7 +18,7 @@ const config: Config = {
           borda:      'rgba(255, 255, 255, 0.1)',
           texto:      '#3D4F6B',
           'texto-light': '#94A3B8',
-          dark:       '#040813',
+          dark:       '#0D0546',
           // Aliases legados (arquivos que ainda usam paleta antiga)
           azul:       '#0A1128',
           'azul-sec': '#0E4F6A',
