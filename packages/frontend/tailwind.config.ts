@@ -10,7 +10,7 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          navy:       '#0A1128',
+          navy:       '#0D0546',
           marinho:    '#0E7490',
           'marinho-glow': '#22D3EE',
           silver:     '#94A3B8',
@@ -18,9 +18,9 @@ const config: Config = {
           borda:      'rgba(255, 255, 255, 0.1)',
           texto:      '#3D4F6B',
           'texto-light': '#94A3B8',
-          dark:       '#0D0546',
+          dark:       '#040813',
           // Aliases legados (arquivos que ainda usam paleta antiga)
-          azul:       '#0A1128',
+          azul:       '#0D0546',
           'azul-sec': '#0E4F6A',
           gelo:       '#F8FAFC',
           dourado:    '#C9A84C',
