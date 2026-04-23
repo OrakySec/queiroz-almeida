@@ -39,6 +39,7 @@ export interface Empreendimento {
   fotos: string[]
   video_url?: string
   pdf_url?: string
+  foto_localizacao?: string
   is_lancamento: boolean
   created_at: string
   updated_at: string

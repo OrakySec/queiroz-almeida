@@ -3,7 +3,7 @@ import { z } from 'zod'
 import slugify from 'slugify'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { requireRole } from '../middlewares/requireRole'
-import { uploadFoto, deleteFoto, uploadPdf, deletePdf } from '../services/minio.service'
+import { uploadFoto, deleteFoto, uploadPdf, deletePdf, uploadFotoLocalizacao, deleteFotoLocalizacao } from '../services/minio.service'
 import { prisma } from '../lib/prisma'
 
 const ACCEPTED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -321,6 +321,41 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
     await deleteFoto(url)
     const fotos = ((existing.fotos as string[]) || []).filter((f) => f !== url)
     const updated = await prisma.empreendimento.update({ where: { id }, data: { fotos } })
+    return reply.send(updated)
+  })
+
+  // POST /api/admin/empreendimentos/:id/foto-localizacao
+  app.post('/:id/foto-localizacao', { preHandler }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const existing = await prisma.empreendimento.findUnique({ where: { id } })
+    if (!existing) return reply.status(404).send({ message: 'Empreendimento não encontrado.' })
+
+    const part = await request.file()
+    if (!part) return reply.status(400).send({ message: 'Nenhum arquivo enviado.' })
+    if (!ACCEPTED_MIMETYPES.includes(part.mimetype)) {
+      return reply.status(400).send({ message: `Formato não aceito: ${part.mimetype}` })
+    }
+
+    if (existing.foto_localizacao) {
+      await deleteFotoLocalizacao(existing.foto_localizacao).catch(() => {})
+    }
+
+    const buffer = await part.toBuffer()
+    const url = await uploadFotoLocalizacao(id, part.filename, buffer, part.mimetype)
+    const updated = await prisma.empreendimento.update({ where: { id }, data: { foto_localizacao: url } })
+    return reply.send(updated)
+  })
+
+  // DELETE /api/admin/empreendimentos/:id/foto-localizacao
+  app.delete('/:id/foto-localizacao', { preHandler }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const existing = await prisma.empreendimento.findUnique({ where: { id } })
+    if (!existing) return reply.status(404).send({ message: 'Empreendimento não encontrado.' })
+
+    if (existing.foto_localizacao) {
+      await deleteFotoLocalizacao(existing.foto_localizacao).catch(() => {})
+    }
+    const updated = await prisma.empreendimento.update({ where: { id }, data: { foto_localizacao: null } })
     return reply.send(updated)
   })
 }

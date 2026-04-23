@@ -88,3 +88,26 @@ export async function deleteFoto(url: string): Promise<void> {
   const objectName = url.replace(prefix, '')
   await minio.removeObject(BUCKET, objectName)
 }
+
+export async function uploadFotoLocalizacao(
+  empreendimentoId: string,
+  filename: string,
+  buffer: Buffer,
+  mimetype: string
+): Promise<string> {
+  await ensureBucket()
+  const minio = getClient()
+  const ext = filename.split('.').pop() || 'jpg'
+  const objectName = `${empreendimentoId}/localizacao-${Date.now()}.${ext}`
+  await minio.putObject(BUCKET, objectName, buffer, buffer.length, {
+    'Content-Type': mimetype,
+  })
+  return `${PUBLIC_URL}/${BUCKET}/${objectName}`
+}
+
+export async function deleteFotoLocalizacao(url: string): Promise<void> {
+  const minio = getClient()
+  const prefix = `${PUBLIC_URL}/${BUCKET}/`
+  const objectName = url.replace(prefix, '')
+  await minio.removeObject(BUCKET, objectName)
+}

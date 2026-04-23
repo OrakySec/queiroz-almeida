@@ -41,6 +41,7 @@ const SELECT_PUBLIC = {
   fotos: true,
   video_url: true,
   pdf_url: true,
+  foto_localizacao: true,
   is_lancamento: true,
   created_at: true,
 }

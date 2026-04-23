@@ -348,14 +348,13 @@ export default async function EmpreendimentoPage({
                     <SectionTitle>Localização</SectionTitle>
                     <div className="rounded-3xl border border-slate-100 bg-slate-50/50 p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
                       
-                      {/* Placeholder from Google Maps / Local */}
-                      <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl bg-white border border-slate-200 overflow-hidden relative shrink-0 shadow-sm">
-                         <div className="absolute inset-0 flex flex-col justify-center items-center p-4 text-center">
-                            <span className="font-sans font-bold text-[10px] uppercase tracking-widest text-slate-400">Foto da Localização</span>
-                            <span className="font-sans text-[8px] text-slate-400 border border-slate-200 px-2 py-1 rounded mt-2">public/foto-local.jpg</span>
-                         </div>
-                         <img src="/foto-local.jpg" alt="Localização" className="absolute top-0 left-0 w-full h-full object-cover z-10" />
-                      </div>
+                      {/* Foto de Localização */}
+                      {e.foto_localizacao && (
+                        <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden relative shrink-0 shadow-sm">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={e.foto_localizacao} alt="Localização" className="absolute top-0 left-0 w-full h-full object-cover" />
+                        </div>
+                      )}
 
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 w-full">
                         <div className="space-y-2">

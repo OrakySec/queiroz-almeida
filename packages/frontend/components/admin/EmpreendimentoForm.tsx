@@ -128,6 +128,37 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
     }
   }
 
+  // Foto de Localização
+  const [fotoLocalizacaoUrl, setFotoLocalizacaoUrl] = useState<string | null>((initialData as any)?.foto_localizacao ?? null)
+  const [fotoLocUpload, setFotoLocUpload] = useState(false)
+
+  async function handleFotoLocUpload(file: File) {
+    if (!empId) return
+    setFotoLocUpload(true)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      const res = await api.post(`/api/admin/empreendimentos/${empId}/foto-localizacao`, form, {
+        headers: { 'Content-Type': undefined },
+      })
+      setFotoLocalizacaoUrl(res.data.foto_localizacao ?? null)
+    } catch {
+      alert('Erro ao enviar foto de localização')
+    } finally {
+      setFotoLocUpload(false)
+    }
+  }
+
+  async function handleFotoLocDelete() {
+    if (!empId) return
+    try {
+      await api.delete(`/api/admin/empreendimentos/${empId}/foto-localizacao`)
+      setFotoLocalizacaoUrl(null)
+    } catch {
+      alert('Erro ao remover foto de localização')
+    }
+  }
+
   // PDF (memorial descritivo)
   const [pdfUrl, setPdfUrl] = useState<string | null>((initialData as any)?.pdf_url ?? null)
   const [pdfUploading, setPdfUploading] = useState(false)
@@ -643,6 +674,54 @@ export function EmpreendimentoForm({ initialData, mode }: Props) {
                 {pdfUploading ? 'Enviando PDF...' : 'Clique para selecionar o PDF'}
               </p>
               <input type="file" accept="application/pdf" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f) }} />
+            </label>
+          )}
+        </section>
+
+        {/* Foto de Localização */}
+        <section className="bg-white rounded-2xl border border-brand-navy/5 shadow-sm p-6 lg:p-8">
+          <h2 className="font-semibold text-brand-navy mb-2 text-lg">Foto de Localização</h2>
+          <p className="text-xs text-brand-navy/40 mb-5">
+            Imagem exibida na seção de localização da página pública do empreendimento. JPG, PNG ou WebP.
+          </p>
+
+          {!empId ? (
+            <p className="text-sm text-brand-navy/40 italic">
+              Salve o empreendimento primeiro para anexar a foto de localização.
+            </p>
+          ) : fotoLocalizacaoUrl ? (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="w-40 h-28 rounded-xl overflow-hidden border border-brand-navy/10 shrink-0 bg-slate-50">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={fotoLocalizacaoUrl} alt="Localização" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-sm font-semibold text-brand-navy">Foto de localização anexada</p>
+                <p className="text-xs text-brand-navy/40 truncate max-w-xs">{fotoLocalizacaoUrl.split('/').pop()}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <label className={`flex items-center gap-2 px-4 py-2 rounded-full bg-brand-navy/5 text-brand-navy text-xs font-semibold cursor-pointer hover:bg-brand-navy/10 transition ${fotoLocUpload ? 'opacity-50 pointer-events-none' : ''}`}>
+                    {fotoLocUpload ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+                    Substituir
+                    <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFotoLocUpload(f) }} />
+                  </label>
+                  <button type="button" onClick={handleFotoLocDelete} className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 text-red-500 text-xs font-semibold hover:bg-red-100 transition">
+                    <Trash2 size={13} />
+                    Remover
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <label className={`flex flex-col items-center gap-3 p-8 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${fotoLocUpload ? 'border-brand-marinho bg-cyan-50 opacity-70 pointer-events-none' : 'border-brand-navy/10 hover:border-brand-marinho hover:bg-brand-navy/[0.02]'}`}>
+              {fotoLocUpload ? (
+                <Loader2 size={24} className="text-brand-marinho animate-spin" />
+              ) : (
+                <ImageIcon size={24} className="text-brand-navy/30" />
+              )}
+              <p className="text-sm text-brand-navy/40">
+                {fotoLocUpload ? 'Enviando foto...' : 'Clique para selecionar a foto de localização'}
+              </p>
+              <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFotoLocUpload(f) }} />
             </label>
           )}
         </section>

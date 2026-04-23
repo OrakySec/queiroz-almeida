@@ -49,6 +49,7 @@ function apiToForm(d: any) {
     whatsapp: d.whatsapp ?? '',
     destaque: d.is_lancamento ?? false,
     pdf_url: d.pdf_url ?? null,
+    foto_localizacao: d.foto_localizacao ?? null,
   }
 }
 

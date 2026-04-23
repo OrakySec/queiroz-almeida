@@ -76,6 +76,7 @@ model Empreendimento {
   fotos                 Json                 @default("[]")
   video_url             String?
   pdf_url               String?
+  foto_localizacao      String?
   is_lancamento         Boolean              @default(false)
   rejection_comment     String?
   created_by_id         String
