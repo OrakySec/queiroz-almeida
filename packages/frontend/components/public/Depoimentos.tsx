@@ -113,11 +113,11 @@ function TestimonialCard({ d, index }: { d: typeof depoimentos[0], index: number
 
 export function Depoimentos() {
   return (
-    <section id="depoimentos" className="bg-brand-dark py-20 lg:py-40 overflow-hidden relative">
+    <section id="depoimentos" className="bg-brand-navy py-20 lg:py-40 overflow-hidden relative">
       {/* Background Architectural Elements */}
       <div className="absolute inset-0 bg-blueprint opacity-[0.05] pointer-events-none" />
-      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-brand-dark via-transparent to-transparent pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-full h-96 bg-gradient-to-t from-brand-dark via-transparent to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-brand-navy via-transparent to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-96 bg-gradient-to-t from-brand-navy via-transparent to-transparent pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         
@@ -177,7 +177,7 @@ export function Depoimentos() {
               {depoimentos.slice(0, 5).map((d, i) => (
                 <div 
                   key={d.id} 
-                  className="w-9 h-9 md:w-11 md:h-11 rounded-full border-2 border-brand-dark bg-brand-navy overflow-hidden relative shadow-lg"
+                  className="w-9 h-9 md:w-11 md:h-11 rounded-full border-2 border-brand-navy bg-brand-navy overflow-hidden relative shadow-lg"
                   style={{ zIndex: 10 - i }}
                 >
                   <img 
