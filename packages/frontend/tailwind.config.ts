@@ -10,7 +10,7 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          navy:       '#161B33',
+          navy:       '#0D0546',
           marinho:    '#0E7490',
           'marinho-glow': '#22D3EE',
           silver:     '#94A3B8',
@@ -20,7 +20,7 @@ const config: Config = {
           'texto-light': '#94A3B8',
           dark:       '#0F1425',
           // Aliases legados (arquivos que ainda usam paleta antiga)
-          azul:       '#161B33',
+          azul:       '#0D0546',
           'azul-sec': '#0E4F6A',
           gelo:       '#F8FAFC',
           dourado:    '#C9A84C',

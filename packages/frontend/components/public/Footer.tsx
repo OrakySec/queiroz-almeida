@@ -15,7 +15,7 @@ const destinations = [
 
 export function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-brand-navy to-brand-dark overflow-hidden relative border-t border-white/5">
+    <footer className="bg-brand-navy overflow-hidden relative border-t border-white/5">
       {/* Background radial glow & blueprint */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-marinho/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute inset-0 bg-blueprint opacity-[0.03] pointer-events-none mix-blend-overlay" />
