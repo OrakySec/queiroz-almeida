@@ -19,7 +19,8 @@ async function getEmpreendimento(slug: string): Promise<Empreendimento | null> {
       { next: { revalidate: 60 } }
     )
     if (!res.ok) return null
-    return res.json()
+    const data = await res.json()
+    return data && typeof data === 'object' && !Array.isArray(data) ? data : null
   } catch {
     return null
   }

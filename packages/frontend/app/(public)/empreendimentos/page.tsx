@@ -14,7 +14,8 @@ async function getEmpreendimentos(): Promise<Empreendimento[]> {
       next: { revalidate: 60 },
     })
     if (!res.ok) return []
-    return res.json()
+    const data = await res.json()
+    return Array.isArray(data) ? data : []
   } catch {
     return []
   }
