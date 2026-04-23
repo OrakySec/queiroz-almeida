@@ -354,7 +354,7 @@ export default async function EmpreendimentoPage({
                             <span className="font-sans font-bold text-[10px] uppercase tracking-widest text-slate-400">Foto da Localização</span>
                             <span className="font-sans text-[8px] text-slate-400 border border-slate-200 px-2 py-1 rounded mt-2">public/foto-local.jpg</span>
                          </div>
-                         <img src="/foto-local.jpg" alt="Localização" className="absolute top-0 left-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-500" onLoad={(e) => { e.currentTarget.style.opacity = '1'; }} />
+                         <img src="/foto-local.jpg" alt="Localização" className="absolute top-0 left-0 w-full h-full object-cover z-10" />
                       </div>
 
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 w-full">
