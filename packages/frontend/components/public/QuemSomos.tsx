@@ -194,7 +194,7 @@ export function QuemSomos() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="md:col-span-2 group bg-brand-dark rounded-[2.5rem] p-10 relative overflow-hidden border border-white/5 shadow-2xl"
+            className="md:col-span-2 group bg-gradient-to-br from-brand-dark to-brand-navy rounded-[2.5rem] p-10 relative overflow-hidden border border-white/10 shadow-2xl"
           >
             <div className="absolute inset-0 bg-blueprint opacity-[0.05] group-hover:opacity-[0.1] transition-opacity duration-700" />
             
@@ -276,7 +276,7 @@ export function QuemSomos() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
-            className="md:col-span-2 group bg-brand-dark rounded-[2.5rem] p-10 relative overflow-hidden"
+            className="md:col-span-2 group bg-gradient-to-br from-brand-navy to-brand-dark rounded-[2.5rem] p-10 relative overflow-hidden border border-white/10 shadow-lg"
           >
             <motion.span 
               style={{ x: smoothParallaxYReverse }}
