@@ -180,7 +180,7 @@ export function ConstrucaoScrollVideo() {
 
             <Link
               href="/empreendimentos"
-              className="group flex items-center gap-3 font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-brand-navy border border-brand-navy/20 rounded-full px-4 py-2 md:px-5 md:py-2.5 hover:border-brand-marinho hover:text-brand-marinho transition-all duration-300 w-fit"
+              className="group flex items-center gap-3 font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] bg-brand-navy text-white px-6 py-3 rounded-full hover:bg-brand-marinho transition-all duration-300 w-fit shadow-lg shadow-brand-navy/20"
             >
               Ver obras em andamento
               <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
