@@ -5,14 +5,14 @@ import { ArrowRight, Building2, Hammer, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 
 const etapas = [
-  { icon: Hammer,       label: 'Sólida Fundação',    sub: 'Estabilidade e Alma do Projeto' },
-  { icon: Building2,    label: 'Engenharia Superior', sub: 'Onde o Design Ganha Forma'    },
-  { icon: CheckCircle2, label: 'Excelência & Chaves', sub: 'A Celebração do Seu Destino'  },
+  { icon: Hammer, label: 'Sólida Fundação', sub: 'Estabilidade e Alma do Projeto' },
+  { icon: Building2, label: 'Engenharia Superior', sub: 'Onde o Design Ganha Forma' },
+  { icon: CheckCircle2, label: 'Excelência & Chaves', sub: 'A Celebração do Seu Destino' },
 ]
 
 export function ConstrucaoScrollVideo() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const videoRef     = useRef<HTMLVideoElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -24,24 +24,24 @@ export function ConstrucaoScrollVideo() {
     const video = videoRef.current
     if (!video) return
 
-    let targetTime   = 0
-    let velocity     = 0   // inércia: velocidade atual do targetTime
-    let lastTarget   = 0   // target anterior (para calcular delta)
+    let targetTime = 0
+    let velocity = 0   // inércia: velocidade atual do targetTime
+    let lastTarget = 0   // target anterior (para calcular delta)
     let lastScrollAt = 0   // quando foi o último evento de scroll
-    let lastSeekAt   = 0
-    let rafId        = 0
-    let running      = true
+    let lastSeekAt = 0
+    let rafId = 0
+    let running = true
 
-    const FRICTION   = 0.60  // decaimento da inércia (0=para imediato, 1=nunca para)
-    const EWMA       = 0.30  // suavização da velocidade
-    const SETTLE_MS  = 60    // ms sem scroll antes de ativar a inércia
-    const EPSILON    = 0.0002 // velocidade mínima para continuar movendo
+    const FRICTION = 0.60  // decaimento da inércia (0=para imediato, 1=nunca para)
+    const EWMA = 0.30  // suavização da velocidade
+    const SETTLE_MS = 60    // ms sem scroll antes de ativar a inércia
+    const EPSILON = 0.0002 // velocidade mínima para continuar movendo
 
     // iOS warm-up: desbloqueia o decoder antes do usuário scrollar
     const warmUp = () => {
       video.play()
         .then(() => { video.pause(); video.currentTime = 0 })
-        .catch(() => {})
+        .catch(() => { })
     }
     video.addEventListener('loadedmetadata', warmUp, { once: true })
     const onPlay = () => { videoRef.current?.pause() }
@@ -53,13 +53,13 @@ export function ConstrucaoScrollVideo() {
       const v = videoRef.current
       if (!v || !isFinite(v.duration)) return
 
-      const now     = performance.now()
+      const now = performance.now()
       const settled = (now - lastScrollAt) > SETTLE_MS
 
       // Inércia: após parar o scroll, continua movendo com fricção
       if (settled && Math.abs(velocity) > EPSILON) {
         targetTime = Math.max(0, Math.min(v.duration - 0.05, targetTime + velocity))
-        velocity  *= FRICTION
+        velocity *= FRICTION
       }
 
       // Lerp: move currentTime suavemente em direção ao targetTime
@@ -76,9 +76,9 @@ export function ConstrucaoScrollVideo() {
       if (!v || !isFinite(v.duration)) return
       const newTarget = Math.max(0, Math.min(1, (latest - 0.1) / 0.8)) * (v.duration - 0.05)
       // EWMA: suaviza a velocidade para evitar spikes bruscos
-      velocity     = velocity * (1 - EWMA) + (newTarget - lastTarget) * EWMA
-      lastTarget   = newTarget
-      targetTime   = newTarget
+      velocity = velocity * (1 - EWMA) + (newTarget - lastTarget) * EWMA
+      lastTarget = newTarget
+      targetTime = newTarget
       lastScrollAt = performance.now()
     })
 
@@ -91,7 +91,7 @@ export function ConstrucaoScrollVideo() {
   }, [scrollYProgress])
 
   const textOpacity = useTransform(scrollYProgress, [0.05, 0.25], [0, 1])
-  const barScale    = useTransform(scrollYProgress, [0.1, 0.88],  [0, 1])
+  const barScale = useTransform(scrollYProgress, [0.1, 0.88], [0, 1])
 
   // Lógica de Ativação das Etapas (0, 1, 2) baseada no scroll
   const step1Opacity = useTransform(scrollYProgress, [0.1, 0.2, 0.4, 0.5], [0.4, 1, 1, 0.4])
@@ -134,10 +134,10 @@ export function ConstrucaoScrollVideo() {
             <div className="hidden sm:flex flex-col gap-4 mb-4 w-full relative">
               {/* Linha de Trilho Vertical */}
               <div className="absolute left-4 top-4 bottom-4 w-px bg-brand-navy/5" />
-              
+
               {etapas.map(({ icon: Icon, label, sub }, i) => (
-                <motion.div 
-                  key={label} 
+                <motion.div
+                  key={label}
                   style={{ opacity: stepOpacities[i] }}
                   className="flex items-start gap-6 group relative transition-all duration-500"
                 >

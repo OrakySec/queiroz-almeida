@@ -41,9 +41,9 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
+      {lancamento && <Lancamento empreendimento={lancamento} />}
       <ConstrucaoScrollVideo />
       <QuemSomos />
-      {lancamento && <Lancamento empreendimento={lancamento} />}
       {empreendimentos.length > 0 && (
         <EmpreendimentosSection empreendimentos={empreendimentos} />
       )}
