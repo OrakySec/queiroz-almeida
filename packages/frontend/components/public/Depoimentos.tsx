@@ -34,7 +34,7 @@ const depoimentos = [
     id: '4',
     nome: 'Mariana Souza',
     cidade: 'Brasília, DF',
-    texto: 'Comprei no Caminho do Mar em Maragogi. A estrutura do flat e o retorno com locação são excelentes.',
+    texto: 'Comprei no Porto Lagoa em Porto de Galinhas. A estrutura do flat e o retorno com locação são excelentes.',
     estrelas: 5,
     destaque: true,
     foto: '/assets/investidores/mariana.png'
