@@ -179,16 +179,14 @@ export function QuemSomos() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-          className="relative rounded-[2.5rem] overflow-hidden aspect-[16/8] md:aspect-[21/9] shadow-2xl group border border-brand-navy/5 mb-32 max-w-5xl mx-auto"
+          className="relative rounded-[2.5rem] overflow-hidden shadow-2xl group border border-brand-navy/5 mb-32 max-w-5xl mx-auto"
         >
-          <Image
+          <img
             src="/foto-equipe.jpeg"
             alt="Equipe Queiroz Almeida"
-            fill
-            className="object-cover transition-transform duration-[2s] group-hover:scale-105"
-            sizes="(max-width: 1024px) 100vw, 80vw"
+            className="w-full h-auto object-cover transition-transform duration-[2s] group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/40 via-transparent to-transparent opacity-60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/40 via-transparent to-transparent opacity-60 pointer-events-none" />
         </motion.div>
 
         {/* Diferenciais — Architectural Bento Grid */}
