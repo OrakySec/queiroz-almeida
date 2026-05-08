@@ -37,7 +37,7 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16 md:h-20">
             
             {/* Logo Group — Discrete Pill-Clipped Image (Force Native) */}
-            <Link href="/" className={`relative flex items-center group transition-all duration-500 ${scrolled ? 'ml-0' : 'ml-0'}`}>
+            <Link href="/" className={`relative flex items-center group transition-all duration-500 ${scrolled ? 'ml-2 md:ml-3' : 'ml-0'}`}>
               <img 
                 src="/logo.png?v=12" 
                 alt="Queiroz Almeida" 
