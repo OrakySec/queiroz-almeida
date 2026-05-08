@@ -131,6 +131,7 @@ export default async function EmpreendimentoPage({
             alt={e.nome}
             fill
             sizes="100vw"
+            quality={85}
             className="object-cover brightness-[0.45]"
             priority
           />
@@ -350,9 +351,14 @@ export default async function EmpreendimentoPage({
                       
                       {/* Foto de Localização */}
                       {e.foto_localizacao && (
-                        <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden relative shrink-0 shadow-sm">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={e.foto_localizacao} alt="Localização" className="absolute top-0 left-0 w-full h-full object-cover" />
+                        <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden relative shrink-0 shadow-sm bg-slate-100">
+                          <Image
+                            src={e.foto_localizacao}
+                            alt="Localização"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            className="object-cover"
+                          />
                         </div>
                       )}
 
@@ -476,6 +482,7 @@ export default async function EmpreendimentoPage({
                       src={foto}
                       alt={`${e.nome} ${i + 2}`}
                       fill
+                      quality={75}
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
                     />
