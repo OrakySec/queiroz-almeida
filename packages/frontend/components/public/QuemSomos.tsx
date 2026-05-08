@@ -130,8 +130,7 @@ export function QuemSomos() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
 
         {/* ... Header and Bento Grid ... */}
-        {/* Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32 items-start mb-24 lg:mb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32 items-start mb-16 lg:mb-20">
           <div>
             <motion.span
               initial={{ opacity: 0, x: -20 }}
@@ -141,7 +140,7 @@ export function QuemSomos() {
             >
               Quem Somos
             </motion.span>
-
+            
             <div className="overflow-hidden">
               <motion.h2
                 initial={{ y: '100%' }}
@@ -156,23 +155,6 @@ export function QuemSomos() {
                 gerações.
               </motion.h2>
             </div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-              className="mt-12 relative rounded-[2.5rem] overflow-hidden aspect-[16/9] shadow-2xl group border border-brand-navy/5"
-            >
-              <Image
-                src="/foto-equipe.jpeg"
-                alt="Equipe Queiroz Almeida"
-                fill
-                className="object-cover transition-transform duration-[2s] group-hover:scale-105"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/40 via-transparent to-transparent opacity-60" />
-            </motion.div>
           </div>
 
           <motion.div
@@ -190,6 +172,24 @@ export function QuemSomos() {
             </p>
           </motion.div>
         </div>
+
+        {/* Imagem Centralizada */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
+          className="relative rounded-[2.5rem] overflow-hidden aspect-[16/8] md:aspect-[21/9] shadow-2xl group border border-brand-navy/5 mb-32 max-w-5xl mx-auto"
+        >
+          <Image
+            src="/foto-equipe.jpeg"
+            alt="Equipe Queiroz Almeida"
+            fill
+            className="object-cover transition-transform duration-[2s] group-hover:scale-105"
+            sizes="(max-width: 1024px) 100vw, 80vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/40 via-transparent to-transparent opacity-60" />
+        </motion.div>
 
         {/* Diferenciais — Architectural Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-32">
