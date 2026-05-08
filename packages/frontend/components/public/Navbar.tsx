@@ -48,6 +48,7 @@ export function Navbar() {
                 }`}
                 style={{ 
                   height: 'auto',
+                  borderRadius: '100px'
                 }} 
               />
             </Link>
