@@ -41,7 +41,7 @@ export async function generateMetadata({
 
 function faixa(min?: number, max?: number, suffix = '') {
   if (min == null && max == null) return null
-  if (min != null && max != null && min !== max) return `${min}–${max}${suffix}`
+  if (min != null && max != null && min !== max) return `${min} - ${max}${suffix}`
   return `${min ?? max}${suffix}`
 }
 

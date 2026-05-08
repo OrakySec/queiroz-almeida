@@ -40,7 +40,7 @@ function formatPreco(valor?: number | string | null) {
 
 function faixa(min?: number, max?: number, suffix = '') {
   if (min == null && max == null) return null
-  if (min != null && max != null && min !== max) return `${min}–${max}${suffix}`
+  if (min != null && max != null && min !== max) return `${min} - ${max}${suffix}`
   return `${min ?? max}${suffix}`
 }
 
@@ -150,7 +150,7 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
                   >
                     <spec.icon size={16} className="text-brand-marinho group-hover:text-brand-marinho-glow transition-colors" />
                     <span className="font-sans text-xs font-black text-brand-navy group-hover:text-white transition-colors uppercase tracking-widest text-[10px]">
-                      {spec.value}
+                      {spec.label}: {spec.value}
                     </span>
                   </motion.div>
                 ))}
