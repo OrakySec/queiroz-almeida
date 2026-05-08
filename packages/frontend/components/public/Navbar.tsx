@@ -37,20 +37,21 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16 md:h-20">
             
             {/* Logo Group — Discrete Pill-Clipped Image (Force Native) */}
-            <Link href="/" className={`relative flex items-center group transition-all duration-500 ${scrolled ? '-ml-3.5 md:-ml-5' : '-ml-1 md:ml-0'}`}>
-              <img 
-                src="/logo.png?v=12" 
-                alt="Queiroz Almeida" 
-                className={`transition-all duration-500 object-contain block ${
-                  scrolled 
-                    ? 'w-[120px] md:w-[150px]' 
-                    : 'w-[150px] md:w-[190px]'
-                }`}
-                style={{ 
-                  height: 'auto', 
-                  borderRadius: '100px', 
-                }} 
-              />
+            <Link href="/" className="relative flex items-center group transition-all duration-500">
+              <div className={`transition-all duration-500 flex items-center justify-center ${scrolled ? 'bg-brand-navy rounded-full p-1.5 ml-1' : ''}`}>
+                <img 
+                  src="/logo.png?v=12" 
+                  alt="Queiroz Almeida" 
+                  className={`transition-all duration-500 object-contain block ${
+                    scrolled 
+                      ? 'w-[100px] md:w-[130px]' 
+                      : 'w-[150px] md:w-[190px]'
+                  }`}
+                  style={{ 
+                    height: 'auto', 
+                  }} 
+                />
+              </div>
             </Link>
 
             {/* Desktop Nav */}
