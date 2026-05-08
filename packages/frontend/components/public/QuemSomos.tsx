@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import { useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion'
 import { Shield, TrendingUp, Award, MapPin } from 'lucide-react'
@@ -157,17 +158,20 @@ export function QuemSomos() {
             </div>
             
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="mt-10 relative rounded-[2rem] overflow-hidden aspect-[21/9] bg-brand-navy/5 border border-brand-navy/10 flex items-center justify-center group"
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+              className="mt-12 relative rounded-[2.5rem] overflow-hidden aspect-[16/9] shadow-2xl group border border-brand-navy/5"
             >
-              <div className="absolute inset-0 bg-slate-100 flex flex-col items-center justify-center gap-3">
-                 <span className="font-sans text-[10px] font-black uppercase tracking-[0.2em] text-brand-navy/30">Espaço para Foto da Equipe</span>
-                 <p className="font-sans text-[9px] text-brand-navy/30 border border-brand-navy/10 px-3 py-1 rounded-full">public/foto-equipe.jpg</p>
-              </div>
-              <img src="/foto-equipe.jpg" alt="Equipe Queiroz Almeida" className="absolute top-0 left-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-500" onLoad={(e) => { e.currentTarget.style.opacity = '1'; }} />
+              <Image
+                src="/foto-equipe.jpeg"
+                alt="Equipe Queiroz Almeida"
+                fill
+                className="object-cover transition-transform duration-[2s] group-hover:scale-105"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/40 via-transparent to-transparent opacity-60" />
             </motion.div>
           </div>
 
