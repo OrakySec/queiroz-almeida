@@ -77,7 +77,7 @@ export function Hero() {
             <motion.h1
               initial={{ opacity: 0, y: 60 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.6 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
               className="font-serif font-bold text-white leading-[0.95] tracking-tight text-balance"
               style={{ fontSize: 'clamp(2.8rem, 8vw, 6.5rem)' }}
             >
@@ -90,7 +90,7 @@ export function Hero() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             className="font-sans text-lg md:text-xl text-white/90 leading-relaxed mb-14 max-w-xl"
           >
             Flats de alto padrão no litoral sul de Pernambuco e norte alagoano.

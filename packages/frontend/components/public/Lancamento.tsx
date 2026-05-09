@@ -83,8 +83,8 @@ export function Lancamento({ empreendimento: e }: { empreendimento: Empreendimen
                   alt={e.nome}
                   fill
                   priority
-                  quality={80}
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  quality={75}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                   className="object-cover transition-transform duration-[2s] group-hover/visual:scale-110"
                 />
               ) : (
