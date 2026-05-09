@@ -41,7 +41,9 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
-      {lancamento && <Lancamento empreendimento={lancamento} />}
+      {(lancamento || empreendimentos[0]) && (
+        <Lancamento empreendimento={lancamento || empreendimentos[0]} />
+      )}
       <ConstrucaoScrollVideo />
       <QuemSomos />
       {empreendimentos.length > 0 && (
