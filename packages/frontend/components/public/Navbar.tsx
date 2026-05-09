@@ -38,9 +38,12 @@ export function Navbar() {
             
             {/* Logo Group — Discrete Pill-Clipped Image (Force Native) */}
             <Link href="/" className={`relative flex items-center group transition-all duration-500 ${scrolled ? 'ml-2 md:ml-3' : 'ml-0'}`}>
-              <img 
-                src="/logo.png?v=12" 
+              <Image 
+                src="/logo.png" 
                 alt="Queiroz Almeida" 
+                width={190}
+                height={73}
+                priority
                 className={`transition-all duration-500 object-contain block ${
                   scrolled 
                     ? 'w-[120px] md:w-[150px]' 

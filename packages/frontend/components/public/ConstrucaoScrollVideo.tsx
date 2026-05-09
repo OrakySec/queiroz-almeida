@@ -195,7 +195,7 @@ export function ConstrucaoScrollVideo() {
                 muted
                 playsInline
                 autoPlay
-                preload="auto"
+                preload="metadata"
                 disableRemotePlayback
                 className="w-full h-auto block"
               >

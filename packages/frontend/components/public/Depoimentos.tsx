@@ -1,6 +1,7 @@
 'use client'
 import { Star, Quote, Award } from 'lucide-react'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 const depoimentos = [
   {
@@ -90,9 +91,11 @@ function TestimonialCard({ d, index }: { d: typeof depoimentos[0], index: number
         <div className="flex items-center gap-4 border-t border-white/5 pt-6 md:pt-8">
           <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-brand-marinho to-brand-navy rounded-full flex items-center justify-center border border-white/10 shadow-lg shrink-0 overflow-hidden relative">
             {d.foto ? (
-              <img 
+              <Image 
                 src={d.foto} 
                 alt={d.nome} 
+                width={80}
+                height={80}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
               />
             ) : (
@@ -102,7 +105,7 @@ function TestimonialCard({ d, index }: { d: typeof depoimentos[0], index: number
             )}
           </div>
           <div>
-            <h4 className="font-serif font-bold text-white text-base md:text-lg leading-tight">{d.nome}</h4>
+            <h3 className="font-serif font-bold text-white text-base md:text-lg leading-tight">{d.nome}</h3>
             <span className="font-sans text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-brand-marinho-glow/85">{d.cidade}</span>
           </div>
         </div>
@@ -180,9 +183,11 @@ export function Depoimentos() {
                   className="w-9 h-9 md:w-11 md:h-11 rounded-full border-2 border-brand-navy bg-brand-navy overflow-hidden relative shadow-lg"
                   style={{ zIndex: 10 - i }}
                 >
-                  <img 
+                  <Image 
                     src={d.foto} 
                     alt={d.nome} 
+                    width={44}
+                    height={44}
                     className="w-full h-full object-cover" 
                   />
                   <div className="absolute inset-0 bg-brand-marinho/10" />

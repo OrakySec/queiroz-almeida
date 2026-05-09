@@ -26,9 +26,11 @@ export function Footer() {
           {/* Col 1: Identity (5/12) */}
           <div className="lg:col-span-5 space-y-10">
             <Link href="/" className="inline-block transition-transform hover:scale-105 duration-500">
-              <img 
+              <Image 
                 src="/logo.png?v=7" 
                 alt="Queiroz Almeida" 
+                width={208}
+                height={80}
                 className="w-44 md:w-52 h-auto mix-blend-plus-lighter"
               />
             </Link>
@@ -124,7 +126,13 @@ export function Footer() {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none" />
             
             <span className="font-serif italic text-xs md:text-sm text-brand-silver/90">Desenvolvido por</span>
-            <img src="/assinatura.png" alt="Assinatura" className="h-10 md:h-12 w-auto object-contain" />
+            <Image 
+              src="/assinatura.png" 
+              alt="Assinatura" 
+              width={100}
+              height={48}
+              className="h-10 md:h-12 w-auto object-contain" 
+            />
           </a>
         </div>
       </div>

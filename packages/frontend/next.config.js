@@ -7,12 +7,25 @@ const nextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
     remotePatterns: [
       // dev local
       { protocol: 'http', hostname: 'localhost', port: '9000', pathname: '/**' },
       // qualquer subdomínio de teste / produção (wildcard de 1 nível)
       { protocol: 'https', hostname: '*.ykaromarques.com', pathname: '/**' },
       { protocol: 'https', hostname: '*.queirozalmeidaconstrutora.com.br', pathname: '/**' },
+      {
+        protocol: 'https',
+        hostname: 'storage.queirozalmeidaconstrutora.com.br',
+      },
+      {
+        protocol: 'https',
+        hostname: 'storage.teste.ykaromarques.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.teste.ykaromarques.com',
+      }
     ],
   },
   async headers() {

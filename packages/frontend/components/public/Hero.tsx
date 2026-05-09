@@ -29,9 +29,10 @@ export function Hero() {
       {/* Cinematic Background */}
       <motion.div className="absolute inset-0 z-0" style={{ y: videoY, scale }}>
         <video
-          autoPlay muted loop playsInline
-          className="absolute inset-0 w-full h-full object-cover grayscale-[20%] contrast-[1.1]"
-          poster="/hero-poster.jpg"
+          autoPlay muted loop playsInline preload="auto"
+          className="absolute inset-0 w-full h-full object-cover grayscale-[20%] contrast-[1.1] transition-opacity duration-1000"
+          onCanPlay={(e) => { e.currentTarget.style.opacity = '1'; }}
+          style={{ opacity: 0 }}
         >
           <source src="/hero-video.mp4" type="video/mp4" />
         </video>

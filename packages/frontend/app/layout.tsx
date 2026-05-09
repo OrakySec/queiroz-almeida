@@ -37,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className={`${outfit.variable} ${playfair.variable}`}>
       <head>
         <link rel="preconnect" href="https://storage.queirozalmeidaconstrutora.com.br" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api.teste.ykaromarques.com" crossOrigin="anonymous" />
       </head>
       <body className="font-sans antialiased text-brand-texto bg-white selection:bg-brand-marinho/20 selection:text-brand-marinho">
         {children}
