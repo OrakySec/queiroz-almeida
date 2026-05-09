@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useEffect } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import { ArrowRight, Building2, Hammer, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -18,6 +18,8 @@ export function ConstrucaoScrollVideo() {
     target: containerRef,
     offset: ['start end', 'end start'],
   })
+
+  const isInView = useInView(containerRef, { once: true, margin: "400px" })
 
   // Lerp scrub: suaviza a transição entre frames (especialmente no celular)
   useEffect(() => {
@@ -190,17 +192,19 @@ export function ConstrucaoScrollVideo() {
           {/* ── Coluna direita: Vídeo ─────────────────────────────── */}
           <div className="w-full md:flex-1 relative">
             <div className="relative overflow-hidden w-full h-auto">
-              <video
-                ref={videoRef}
-                muted
-                playsInline
-                autoPlay
-                preload="metadata"
-                disableRemotePlayback
-                className="w-full h-auto block"
-              >
-                <source src="/construct-video-scrub.mp4" type="video/mp4" />
-              </video>
+              {isInView && (
+                <video
+                  ref={videoRef}
+                  muted
+                  playsInline
+                  autoPlay
+                  preload="metadata"
+                  disableRemotePlayback
+                  className="w-full h-auto block"
+                >
+                  <source src="/construct-video-scrub.mp4" type="video/mp4" />
+                </video>
+              )}
             </div>
           </div>
 
