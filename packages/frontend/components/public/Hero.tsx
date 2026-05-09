@@ -29,10 +29,8 @@ export function Hero() {
       {/* Cinematic Background */}
       <motion.div className="absolute inset-0 z-0" style={{ y: videoY, scale }}>
         <video
-          autoPlay muted loop playsInline preload="auto"
-          className="absolute inset-0 w-full h-full object-cover grayscale-[20%] contrast-[1.1] transition-opacity duration-1000"
-          onCanPlay={(e) => { e.currentTarget.style.opacity = '1'; }}
-          style={{ opacity: 0 }}
+          autoPlay muted loop playsInline preload="metadata"
+          className="absolute inset-0 w-full h-full object-cover grayscale-[20%] contrast-[1.1]"
         >
           <source src="/hero-video.mp4" type="video/mp4" />
         </video>
@@ -74,28 +72,22 @@ export function Hero() {
 
           {/* Headline */}
           <div className="relative mb-8 overflow-hidden">
-            <motion.h1
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-              className="font-serif font-bold text-white leading-[0.95] tracking-tight text-balance"
+            <h1
+              className="font-serif font-bold text-white leading-[0.95] tracking-tight text-balance animate-in fade-in slide-in-from-bottom-4 duration-1000"
               style={{ fontSize: 'clamp(2.8rem, 8vw, 6.5rem)' }}
             >
               Invista no litoral com{' '}
               <em className="not-italic text-brand-marinho-glow">alto retorno.</em>
-            </motion.h1>
+            </h1>
           </div>
 
           {/* Subheadline */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-sans text-lg md:text-xl text-white/90 leading-relaxed mb-14 max-w-xl"
+          <p
+            className="font-sans text-lg md:text-xl text-white/90 leading-relaxed mb-14 max-w-xl animate-in fade-in duration-1000"
           >
             Flats de alto padrão no litoral sul de Pernambuco e norte alagoano.
             Onde a valorização imobiliária encontra o paraíso.
-          </motion.p>
+          </p>
 
           {/* Actions */}
           <motion.div
