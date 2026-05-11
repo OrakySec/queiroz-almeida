@@ -179,7 +179,7 @@ export function QuemSomos() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-          className="relative rounded-[2.5rem] overflow-hidden shadow-2xl group border border-brand-navy/5 mb-32 max-w-5xl mx-auto"
+          className="relative rounded-[2.5rem] overflow-hidden shadow-2xl group border border-brand-navy/5 mb-32 max-w-4xl mx-auto"
         >
           <Image
             src="/foto-equipe.jpeg"
