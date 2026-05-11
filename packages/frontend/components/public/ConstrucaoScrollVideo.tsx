@@ -26,10 +26,17 @@ export function ConstrucaoScrollVideo() {
     const video = videoRef.current
     if (!video) return
 
-    let targetTime = 0
-    let velocity = 0   // inércia: velocidade atual do targetTime
-    let lastTarget = 0   // target anterior (para calcular delta)
-    let lastScrollAt = 0   // quando foi o último evento de scroll
+    const initialLatest = scrollYProgress.get()
+    const getTarget = (latest: number) => {
+      const v = videoRef.current
+      if (!v || !isFinite(v.duration)) return 0
+      return Math.max(0, Math.min(1, (latest - 0.1) / 0.8)) * (v.duration - 0.05)
+    }
+
+    let targetTime = getTarget(initialLatest)
+    let lastTarget = targetTime
+    let velocity = 0
+    let lastScrollAt = performance.now()
     let lastSeekAt = 0
     let rafId = 0
     let running = true
@@ -42,7 +49,13 @@ export function ConstrucaoScrollVideo() {
     // iOS warm-up: desbloqueia o decoder antes do usuário scrollar
     const warmUp = () => {
       video.play()
-        .then(() => { video.pause(); video.currentTime = 0 })
+        .then(() => {
+          video.pause()
+          const currentTarget = getTarget(scrollYProgress.get())
+          video.currentTime = currentTarget
+          targetTime = currentTarget
+          lastTarget = currentTarget
+        })
         .catch(() => { })
     }
     video.addEventListener('loadedmetadata', warmUp, { once: true })
@@ -74,9 +87,7 @@ export function ConstrucaoScrollVideo() {
     rafId = requestAnimationFrame(tick)
 
     const unsub = scrollYProgress.on('change', (latest) => {
-      const v = videoRef.current
-      if (!v || !isFinite(v.duration)) return
-      const newTarget = Math.max(0, Math.min(1, (latest - 0.1) / 0.8)) * (v.duration - 0.05)
+      const newTarget = getTarget(latest)
       // EWMA: suaviza a velocidade para evitar spikes bruscos
       velocity = velocity * (1 - EWMA) + (newTarget - lastTarget) * EWMA
       lastTarget = newTarget
@@ -90,7 +101,7 @@ export function ConstrucaoScrollVideo() {
       unsub()
       video.removeEventListener('play', onPlay)
     }
-  }, [scrollYProgress])
+  }, [scrollYProgress, isInView])
 
   const textOpacity = useTransform(scrollYProgress, [0.05, 0.25], [0, 1])
   const barScale = useTransform(scrollYProgress, [0.1, 0.88], [0, 1])
@@ -198,7 +209,7 @@ export function ConstrucaoScrollVideo() {
                   muted
                   playsInline
                   autoPlay
-                  preload="metadata"
+                  preload="auto"
                   disableRemotePlayback
                   className="w-full h-auto block"
                 >

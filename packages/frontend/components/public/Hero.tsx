@@ -1,5 +1,5 @@
 'use client'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, Play, MapPin } from 'lucide-react'
 import Link from 'next/link'
@@ -13,6 +13,7 @@ const locations = [
 export function Hero() {
   const { open: openLead } = useLeadModal()
   const containerRef = useRef<HTMLElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -23,13 +24,23 @@ export function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.08])
 
+  // Force play on mobile/safari
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Autoplay blocked or other error - usually fine if muted
+      })
+    }
+  }, [])
+
   return (
     <section ref={containerRef} className="relative min-h-screen flex flex-col overflow-hidden bg-brand-dark">
       
       {/* Cinematic Background */}
       <motion.div className="absolute inset-0 z-0" style={{ y: videoY, scale }}>
         <video
-          autoPlay muted loop playsInline preload="metadata"
+          ref={videoRef}
+          autoPlay muted loop playsInline preload="auto"
           className="absolute inset-0 w-full h-full object-cover grayscale-[20%] contrast-[1.1]"
         >
           <source src="/hero-video.mp4" type="video/mp4" />
