@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     description: 'Invista nos melhores flats do litoral nordestino com alta rentabilidade e valorização.',
     type: 'website',
     locale: 'pt_BR',
-    url: 'https://queirozalmeida.com.br',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://queirozalmeidaconstrutora.com.br',
     siteName: 'Queiroz Almeida Construtora',
     images: [
       {
@@ -83,8 +83,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: 'Queiroz Almeida Construtora e Incorporadora',
-              url: 'https://queirozalmeida.com.br',
-              logo: 'https://queirozalmeida.com.br/logo.png',
+              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://queirozalmeidaconstrutora.com.br',
+              logo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://queirozalmeidaconstrutora.com.br'}/logo.png`,
               sameAs: [
                 'https://www.instagram.com/queirozalmeidaconstrutora/',
               ],

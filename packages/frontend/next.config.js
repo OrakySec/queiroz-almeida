@@ -14,6 +14,7 @@ const nextConfig = {
       // qualquer subdomínio de teste / produção (wildcard de 1 nível)
       { protocol: 'https', hostname: '*.ykaromarques.com', pathname: '/**' },
       { protocol: 'https', hostname: '*.queirozalmeidaconstrutora.com.br', pathname: '/**' },
+      { protocol: 'https', hostname: '*.queirozalmeida.com.br', pathname: '/**' },
       {
         protocol: 'https',
         hostname: 'storage.queirozalmeidaconstrutora.com.br',
