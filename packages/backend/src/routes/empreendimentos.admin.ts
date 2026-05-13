@@ -3,7 +3,7 @@ import { z } from 'zod'
 import slugify from 'slugify'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { requireRole } from '../middlewares/requireRole'
-import { uploadFoto, deleteFoto, uploadPdf, deletePdf, uploadFotoLocalizacao, deleteFotoLocalizacao } from '../services/minio.service'
+import { uploadFoto, deleteFoto, uploadPdf, deletePdf, uploadFotoLocalizacao, deleteFotoLocalizacao, fixUrls } from '../services/minio.service'
 import { prisma } from '../lib/prisma'
 
 const ACCEPTED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -113,7 +113,7 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
       },
       orderBy: { updated_at: 'desc' },
     })
-    return reply.send(empreendimentos)
+    return reply.send(fixUrls(empreendimentos))
   })
 
   // POST /api/admin/empreendimentos
@@ -132,7 +132,7 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
     const empreendimento = await prisma.empreendimento.create({
       data: { ...toDbData(data), slug, created_by_id: user.id, status: 'RASCUNHO' },
     })
-    return reply.status(201).send(empreendimento)
+    return reply.status(201).send(fixUrls(empreendimento))
   })
 
   // GET /api/admin/empreendimentos/:id
@@ -146,7 +146,7 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
       },
     })
     if (!empreendimento) return reply.status(404).send({ message: 'Empreendimento não encontrado.' })
-    return reply.send(empreendimento)
+    return reply.send(fixUrls(empreendimento))
   })
 
   // PUT /api/admin/empreendimentos/:id
@@ -179,7 +179,7 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
         ...(novoStatus === 'RASCUNHO' && existing.status === 'REJEITADO' ? { rejection_comment: null } : {}),
       },
     })
-    return reply.send(updated)
+    return reply.send(fixUrls(updated))
   })
 
   // PATCH /api/admin/empreendimentos/:id/status
@@ -273,7 +273,7 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
       where: { id },
       data: { fotos: [...fotosAtual, ...novasUrls] },
     })
-    return reply.send(updated)
+    return reply.send(fixUrls(updated))
   })
 
   // POST /api/admin/empreendimentos/:id/pdf
@@ -295,7 +295,7 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
     const buffer = await part.toBuffer()
     const url = await uploadPdf(id, buffer)
     const updated = await prisma.empreendimento.update({ where: { id }, data: { pdf_url: url } })
-    return reply.send(updated)
+    return reply.send(fixUrls(updated))
   })
 
   // DELETE /api/admin/empreendimentos/:id/pdf
@@ -307,7 +307,7 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
       await deletePdf(existing.pdf_url).catch(() => {})
     }
     const updated = await prisma.empreendimento.update({ where: { id }, data: { pdf_url: null } })
-    return reply.send(updated)
+    return reply.send(fixUrls(updated))
   })
 
   // DELETE /api/admin/empreendimentos/:id/fotos
@@ -321,7 +321,7 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
     await deleteFoto(url)
     const fotos = ((existing.fotos as string[]) || []).filter((f) => f !== url)
     const updated = await prisma.empreendimento.update({ where: { id }, data: { fotos } })
-    return reply.send(updated)
+    return reply.send(fixUrls(updated))
   })
 
   // POST /api/admin/empreendimentos/:id/foto-localizacao
@@ -343,7 +343,7 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
     const buffer = await part.toBuffer()
     const url = await uploadFotoLocalizacao(id, part.filename, buffer, part.mimetype)
     const updated = await prisma.empreendimento.update({ where: { id }, data: { foto_localizacao: url } })
-    return reply.send(updated)
+    return reply.send(fixUrls(updated))
   })
 
   // DELETE /api/admin/empreendimentos/:id/foto-localizacao
@@ -356,6 +356,6 @@ export async function empreendimentosAdminRoutes(app: FastifyInstance) {
       await deleteFotoLocalizacao(existing.foto_localizacao).catch(() => {})
     }
     const updated = await prisma.empreendimento.update({ where: { id }, data: { foto_localizacao: null } })
-    return reply.send(updated)
+    return reply.send(fixUrls(updated))
   })
 }

@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import { prisma } from '../lib/prisma'
+import { fixUrls } from '../services/minio.service'
 
 const SELECT_PUBLIC = {
   id: true,
@@ -54,7 +55,7 @@ export async function empreendimentosPublicRoutes(app: FastifyInstance) {
       select: SELECT_PUBLIC,
       orderBy: { created_at: 'desc' },
     })
-    return reply.send(empreendimentos)
+    return reply.send(fixUrls(empreendimentos))
   })
 
   // GET /api/empreendimentos/lancamento — destaque da home
@@ -73,7 +74,7 @@ export async function empreendimentosPublicRoutes(app: FastifyInstance) {
     }
 
     if (!empreendimento) return reply.status(404).send({ message: 'Nenhum empreendimento publicado.' })
-    return reply.send(empreendimento)
+    return reply.send(fixUrls(empreendimento))
   })
 
   // GET /api/empreendimentos/:slug — detalhe
@@ -86,6 +87,6 @@ export async function empreendimentosPublicRoutes(app: FastifyInstance) {
     })
 
     if (!empreendimento) return reply.status(404).send({ message: 'Empreendimento não encontrado.' })
-    return reply.send(empreendimento)
+    return reply.send(fixUrls(empreendimento))
   })
 }

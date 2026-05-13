@@ -75,18 +75,25 @@ export async function uploadPdf(
 }
 
 export async function deletePdf(url: string): Promise<void> {
-  const minio = getClient()
-  const prefix = `${PUBLIC_URL}/${BUCKET}/`
-  const objectName = url.replace(prefix, '')
-  await minio.removeObject(BUCKET, objectName)
+  try {
+    const minio = getClient()
+    const parts = url.split(`/${BUCKET}/`)
+    const objectName = parts[parts.length - 1]
+    await minio.removeObject(BUCKET, objectName)
+  } catch (error) {
+    console.error('Erro ao deletar PDF no MinIO (pode ser domínio antigo):', error)
+  }
 }
 
 export async function deleteFoto(url: string): Promise<void> {
-  const minio = getClient()
-  // Extrai o objectName da URL pública
-  const prefix = `${PUBLIC_URL}/${BUCKET}/`
-  const objectName = url.replace(prefix, '')
-  await minio.removeObject(BUCKET, objectName)
+  try {
+    const minio = getClient()
+    const parts = url.split(`/${BUCKET}/`)
+    const objectName = parts[parts.length - 1]
+    await minio.removeObject(BUCKET, objectName)
+  } catch (error) {
+    console.error('Erro ao deletar foto no MinIO (pode ser domínio antigo):', error)
+  }
 }
 
 export async function uploadFotoLocalizacao(
@@ -106,8 +113,40 @@ export async function uploadFotoLocalizacao(
 }
 
 export async function deleteFotoLocalizacao(url: string): Promise<void> {
-  const minio = getClient()
+  try {
+    const minio = getClient()
+    const parts = url.split(`/${BUCKET}/`)
+    const objectName = parts[parts.length - 1]
+    await minio.removeObject(BUCKET, objectName)
+  } catch (error) {
+    console.error('Erro ao deletar foto de localização no MinIO:', error)
+  }
+}
+
+/** Corrige as URLs de um objeto ou array de objetos para usar o domínio atual */
+export function fixUrls<T>(data: T): T {
+  if (!data) return data
   const prefix = `${PUBLIC_URL}/${BUCKET}/`
-  const objectName = url.replace(prefix, '')
-  await minio.removeObject(BUCKET, objectName)
+
+  const fix = (url: string) => {
+    if (typeof url !== 'string' || !url.includes(`/${BUCKET}/`)) return url
+    const parts = url.split(`/${BUCKET}/`)
+    return `${prefix}${parts[parts.length - 1]}`
+  }
+
+  if (Array.isArray(data)) {
+    return data.map(item => fixUrls(item)) as any
+  }
+
+  if (typeof data === 'object') {
+    const obj = { ...data } as any
+    if (obj.fotos && Array.isArray(obj.fotos)) {
+      obj.fotos = obj.fotos.map(fix)
+    }
+    if (obj.pdf_url) obj.pdf_url = fix(obj.pdf_url)
+    if (obj.foto_localizacao) obj.foto_localizacao = fix(obj.foto_localizacao)
+    return obj
+  }
+
+  return data
 }
