@@ -45,6 +45,15 @@ const nextConfig = {
       },
     ]
   },
+  async redirects() {
+    return [
+      {
+        source: '/email',
+        destination: 'https://mail.hostinger.com/auth/login',
+        permanent: false,
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig
