@@ -21,8 +21,8 @@ export async function sendLeadEmail(lead: LeadEmailData): Promise<void> {
   const r = getResend()
 
   await r.emails.send({
-    from: process.env.EMAIL_FROM || 'noreply@queirozalmeidaconstrutora.com.br',
-    to: process.env.EMAIL_TO || 'contato@queirozalmeidaconstrutora.com.br',
+    from: process.env.RESEND_FROM || 'noreply@queirozalmeidaconstrutora.com.br',
+    to: process.env.RESEND_TO || 'contato@queirozalmeidaconstrutora.com.br',
     subject: `Novo lead — ${lead.nome}${lead.interesse ? ` — ${lead.interesse}` : ''}`,
     html: `
       <h2>Novo lead recebido</h2>

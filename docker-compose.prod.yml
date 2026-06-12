@@ -97,6 +97,7 @@ services:
       FRONTEND_URL: https://${DOMAIN}
       RESEND_API_KEY: ${RESEND_API_KEY}
       RESEND_FROM: ${RESEND_FROM}
+      RESEND_TO: ${RESEND_TO}
       PORT: "3001"
       NODE_ENV: production
     depends_on:
