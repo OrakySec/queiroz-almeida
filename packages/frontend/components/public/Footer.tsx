@@ -59,7 +59,7 @@ export function Footer() {
                 </a>
               </div>
               
-              <a href="https://wa.me/5581999999999" target="_blank" rel="noopener noreferrer"
+              <a href="https://wa.me/5581984008353" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-3 w-fit bg-white/5 border border-white/10 px-6 py-3 rounded-2xl group hover:bg-brand-marinho-glow hover:border-brand-marinho-glow transition-all duration-500 shadow-xl"
               >
                 <div className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-brand-navy/20 group-hover:border-transparent transition-all">
