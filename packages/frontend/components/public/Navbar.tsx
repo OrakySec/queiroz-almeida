@@ -36,24 +36,32 @@ export function Navbar() {
         }`}>
           <div className="flex items-center justify-between h-16 md:h-20">
             
-            {/* Logo Group — Discrete Pill-Clipped Image (Force Native) */}
+            {/* Logo Group */}
             <Link href="/" className={`relative flex items-center group transition-all duration-500 ${scrolled ? 'ml-2 md:ml-3' : 'ml-0'}`}>
-              <Image 
-                src="/logo.png" 
-                alt="Queiroz Almeida" 
-                width={190}
-                height={73}
-                priority
-                className={`transition-all duration-500 object-contain block ${
-                  scrolled 
-                    ? 'w-[120px] md:w-[150px]' 
-                    : 'w-[150px] md:w-[190px]'
-                }`}
-                style={{ 
-                  height: 'auto',
-                  borderRadius: '100px'
-                }} 
-              />
+              <div className={`relative transition-all duration-500 ${
+                scrolled 
+                  ? 'h-9 md:h-10 w-[180px] md:w-[215px]' 
+                  : 'h-11 md:h-12 w-[220px] md:w-[255px]'
+              }`}>
+                <Image 
+                  src="/logo-horizontal.png?v=9" 
+                  alt="Queiroz Almeida Construtora" 
+                  fill
+                  priority
+                  className={`transition-opacity duration-500 object-contain object-left ${
+                    scrolled ? 'opacity-0' : 'opacity-100'
+                  }`}
+                />
+                <Image 
+                  src="/logo-horizontal-dark.png?v=9" 
+                  alt="Queiroz Almeida Construtora" 
+                  fill
+                  priority
+                  className={`transition-opacity duration-500 object-contain object-left ${
+                    scrolled ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              </div>
             </Link>
 
             {/* Desktop Nav */}

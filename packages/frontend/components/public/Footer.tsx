@@ -27,11 +27,11 @@ export function Footer() {
           <div className="lg:col-span-5 space-y-10">
             <Link href="/" className="inline-block transition-transform hover:scale-105 duration-500">
               <Image 
-                src="/logo.png?v=7" 
-                alt="Queiroz Almeida" 
-                width={208}
-                height={80}
-                className="w-44 md:w-52 h-auto mix-blend-plus-lighter"
+                src="/logo-horizontal.png?v=9" 
+                alt="Queiroz Almeida Construtora" 
+                width={280}
+                height={57}
+                className="w-52 md:w-64 h-auto"
               />
             </Link>
             <div className="space-y-6">

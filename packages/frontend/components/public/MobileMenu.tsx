@@ -47,14 +47,11 @@ export function MobileMenu({ isOpen, onClose }: Props) {
           {/* Header */}
           <div className="relative z-10 flex items-center justify-between px-8 h-24">
             <Image 
-              src="/logo.png?v=7" 
-              alt="Queiroz Almeida" 
-              width={120} 
-              height={60}
-              style={{ 
-                borderRadius: '100px', 
-                objectFit: 'contain'
-              }} 
+              src="/logo-horizontal.png?v=9" 
+              alt="Queiroz Almeida Construtora" 
+              width={180} 
+              height={37}
+              className="h-9 w-auto object-contain"
             />
             <button
               onClick={onClose}
