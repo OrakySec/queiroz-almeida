@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { requireRole } from '../middlewares/requireRole'
 import { sendLeadEmail } from '../services/email.service'
+import { sendLeadToPraedium } from '../services/praedium.service'
 import { prisma } from '../lib/prisma'
 
 const leadSchema = z.object({
@@ -26,6 +27,11 @@ export async function leadsRoutes(app: FastifyInstance) {
     // Tenta enviar e-mail, mas não bloqueia se falhar
     sendLeadEmail(lead).catch((err) => {
       console.error('Falha ao enviar e-mail de lead:', err)
+    })
+
+    // Envia o lead para o CRM Praedium (webhook de entrada), também sem bloquear a resposta
+    sendLeadToPraedium(lead).catch((err) => {
+      console.error('Falha ao enviar lead ao Praedium:', err)
     })
 
     return reply.status(201).send({ message: 'Obrigado! Entraremos em contato em breve.' })

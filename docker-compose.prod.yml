@@ -98,6 +98,7 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY}
       RESEND_FROM: ${RESEND_FROM}
       RESEND_TO: ${RESEND_TO}
+      PRAEDIUM_WEBHOOK_URL: ${PRAEDIUM_WEBHOOK_URL}
       PORT: "3001"
       NODE_ENV: production
     depends_on:
