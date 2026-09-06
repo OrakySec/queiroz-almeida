@@ -74,7 +74,10 @@ export async function sendLeadToPraedium(lead: LeadPraediumData): Promise<void> 
 
       clearTimeout(timeout)
 
-      if (res.ok) return // 200/201 — sucesso
+      if (res.ok) {
+        console.log(`Lead enviado ao Praedium com sucesso (HTTP ${res.status}):`, lead.email)
+        return
+      }
 
       const body = await res.text().catch(() => '')
 
