@@ -8,10 +8,13 @@
  * Formato esperado: https://api.praedium.com.br/v1/{conta}/{conexao}/conversion?access_token={chave}
  */
 
+import { getDialCode } from '../lib/dialCodes'
+
 interface LeadPraediumData {
   nome: string
   email: string
   whatsapp: string
+  pais?: string | null
   interesse?: string | null
   origem?: string | null
   tipo_usuario?: string | null
@@ -48,10 +51,17 @@ export async function sendLeadToPraedium(lead: LeadPraediumData): Promise<void> 
   // é garantido. Eles chegam como chaves extras no payload; para gravá-los em
   // campos personalizados do CRM, crie os campos no Praedium e mapeie-os em
   // Central de Conexões > (sua conexão) > Mapeamento de Campos.
+  // Telefone em formato internacional (+código+número) para que o Praedium
+  // identifique o país corretamente — sem o "+", ele assume o local padrão
+  // da conta (Brasil) mesmo para números estrangeiros.
+  const dialCode = getDialCode(lead.pais)
+  const phoneDigits = lead.whatsapp.replace(/\D/g, '')
+  const first_phone = `+${dialCode}${phoneDigits}`
+
   const payload = {
     name: lead.nome,
     primary_email: lead.email,
-    first_phone: lead.whatsapp,
+    first_phone,
     lead_stage: 'lead',
     interesse: lead.interesse || undefined,
     origem: lead.origem || undefined,

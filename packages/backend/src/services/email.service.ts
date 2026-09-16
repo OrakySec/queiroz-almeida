@@ -13,6 +13,7 @@ interface LeadEmailData {
   nome: string
   email: string
   whatsapp: string
+  pais?: string | null
   interesse?: string | null
   created_at: Date
 }
@@ -30,6 +31,7 @@ export async function sendLeadEmail(lead: LeadEmailData): Promise<void> {
         <tr><td><strong>Nome:</strong></td><td>${lead.nome}</td></tr>
         <tr><td><strong>E-mail:</strong></td><td>${lead.email}</td></tr>
         <tr><td><strong>WhatsApp:</strong></td><td>${lead.whatsapp}</td></tr>
+        <tr><td><strong>País:</strong></td><td>${lead.pais && lead.pais !== 'BR' ? `🌎 ${lead.pais}` : 'Brasil'}</td></tr>
         <tr><td><strong>Interesse:</strong></td><td>${lead.interesse || 'Não informado'}</td></tr>
         <tr><td><strong>Data:</strong></td><td>${lead.created_at.toLocaleString('pt-BR')}</td></tr>
       </table>

@@ -4,12 +4,14 @@ import { useEffect, useState, useCallback } from 'react'
 import { Search, Mail, MailOpen, Loader2, Phone, Trash2 } from 'lucide-react'
 import api from '@/lib/api'
 import { whatsAppLink } from '@/lib/utils'
+import { getCountry } from '@/lib/countries'
 
 interface Lead {
   id: string
   nome: string
   email: string
   whatsapp: string
+  pais: string | null
   interesse: string | null
   origem: string | null
   tipo_usuario: 'CLIENTE' | 'CORRETOR' | null
@@ -183,13 +185,17 @@ export default function LeadsPage() {
                     <div className="flex items-center gap-3 mt-2 flex-wrap">
                       {lead.whatsapp && (
                         <a
-                          href={whatsAppLink(lead.whatsapp, `Olá ${lead.nome}, vi seu interesse em nossos empreendimentos!`)}
+                          href={whatsAppLink(
+                            lead.whatsapp,
+                            `Olá ${lead.nome}, vi seu interesse em nossos empreendimentos!`,
+                            getCountry(lead.pais).dial
+                          )}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold hover:underline"
                         >
                           <Phone size={12} />
-                          {lead.whatsapp}
+                          {getCountry(lead.pais).flag} {lead.whatsapp}
                         </a>
                       )}
                     </div>

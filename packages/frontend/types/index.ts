@@ -49,6 +49,7 @@ export interface Lead {
   nome: string
   email: string
   whatsapp: string
+  pais?: string
   interesse?: string
 }
 

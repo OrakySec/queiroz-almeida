@@ -93,6 +93,7 @@ model Lead {
   nome           String
   email          String
   whatsapp       String
+  pais           String   @default("BR") // código ISO 3166-1 alpha-2 (ex.: BR, US, PT)
   interesse      String?
   origem         String?
   tipo_usuario   String?  // "CLIENTE" | "CORRETOR"

@@ -9,7 +9,8 @@ import { prisma } from '../lib/prisma'
 const leadSchema = z.object({
   nome: z.string().min(1),
   email: z.string().email(),
-  whatsapp: z.string().min(10),
+  whatsapp: z.string().min(7),
+  pais: z.string().length(2).optional().default('BR'),
   interesse: z.string().optional(),
   origem: z.string().optional(),
   tipo_usuario: z.enum(['CLIENTE', 'CORRETOR']).optional(),

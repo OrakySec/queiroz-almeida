@@ -5,10 +5,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { CheckCircle2, Loader2, ArrowRight } from 'lucide-react'
 import { formatWhatsApp } from '@/lib/utils'
+import { countries, getDialCode } from '@/lib/countries'
 
 const schema = z.object({
   nome: z.string().min(2, 'Informe seu nome completo'),
-  whatsapp: z.string().min(14, 'Informe um WhatsApp válido'),
+  whatsapp: z.string().refine((v) => v.replace(/\D/g, '').length >= 7, 'Informe um WhatsApp válido'),
+  pais: z.string().default('BR'),
   email: z.string().email('Informe um e-mail válido'),
   interesse: z.string().optional(),
   tipo_usuario: z.enum(['CLIENTE', 'CORRETOR'], { required_error: 'Selecione o tipo de usuário' }),
@@ -41,12 +43,14 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { interesse: interesseInicial || '' },
+    defaultValues: { interesse: interesseInicial || '', pais: 'BR' },
   })
 
   const whatsapp     = watch('whatsapp')
+  const pais         = watch('pais')
   const tipoUsuario  = watch('tipo_usuario')
   const tipoCorretor = watch('tipo_corretor')
+  const dialCode     = getDialCode(pais)
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -95,13 +99,28 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
         {/* WhatsApp */}
         <div className="group/input">
           <label className={labelClass}>WhatsApp</label>
-          <input
-            value={whatsapp}
-            onChange={(e) => setValue('whatsapp', formatWhatsApp(e.target.value), { shouldValidate: true })}
-            placeholder="(00) 00000-0000"
-            maxLength={15}
-            className={inputClass}
-          />
+          <div className="flex gap-2">
+            <select
+              value={pais}
+              onChange={(e) => {
+                setValue('pais', e.target.value)
+                setValue('whatsapp', formatWhatsApp(whatsapp, getDialCode(e.target.value)), { shouldValidate: true })
+              }}
+              aria-label="País"
+              className="shrink-0 w-[86px] bg-brand-navy/[0.03] border border-brand-navy/5 rounded-xl px-2 py-3 font-sans text-sm text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-marinho/20 focus:border-brand-marinho focus:bg-white transition-all duration-300"
+            >
+              {countries.map((c) => (
+                <option key={c.code} value={c.code}>{c.flag} +{c.dial}</option>
+              ))}
+            </select>
+            <input
+              value={whatsapp}
+              onChange={(e) => setValue('whatsapp', formatWhatsApp(e.target.value, dialCode), { shouldValidate: true })}
+              placeholder={pais === 'BR' ? '(00) 00000-0000' : 'Número com código de área'}
+              maxLength={20}
+              className={`${inputClass} flex-1 min-w-0`}
+            />
+          </div>
           {errors.whatsapp && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase tracking-widest leading-none">{errors.whatsapp.message}</p>}
         </div>
 
