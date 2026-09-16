@@ -9,7 +9,7 @@ import { countries, getDialCode } from '@/lib/countries'
 
 const schema = z.object({
   nome: z.string().min(2, 'Informe seu nome completo'),
-  whatsapp: z.string().refine((v) => v.replace(/\D/g, '').length >= 7, 'Informe um WhatsApp válido'),
+  whatsapp: z.string().refine((v) => v.replace(/\D/g, '').length >= 7, 'Informe um telefone válido'),
   pais: z.string().default('BR'),
   email: z.string().email('Informe um e-mail válido'),
   interesse: z.string().optional(),
@@ -98,7 +98,7 @@ export function FormLead({ interesseInicial, onSuccess }: Props) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* WhatsApp */}
         <div className="group/input">
-          <label className={labelClass}>WhatsApp</label>
+          <label className={labelClass}>Telefone</label>
           <div className="flex gap-2">
             <select
               value={pais}
