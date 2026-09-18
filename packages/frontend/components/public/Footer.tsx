@@ -116,22 +116,22 @@ export function Footer() {
               CNPJ: 25.009.690/0001-70
             </span>
           </div>
-          <a 
-            href="https://www.instagram.com/oykaromarques.ia/" 
-            target="_blank" 
+          <a
+            href="https://www.instagram.com/bry.marketing/"
+            target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-4 group relative overflow-hidden px-4 py-2 rounded-xl transition-all duration-500"
           >
             {/* Efeito de Brilho (Shine) no Hover */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none" />
-            
+
             <span className="font-serif italic text-xs md:text-sm text-brand-silver/90">Desenvolvido por</span>
-            <Image 
-              src="/assinatura.png" 
-              alt="Assinatura" 
+            <Image
+              src="/bry-marketing-logo.webp"
+              alt="BRY Marketing"
               width={100}
-              height={48}
-              className="h-10 md:h-12 w-auto object-contain" 
+              height={100}
+              className="h-10 md:h-12 w-auto object-contain rounded-lg"
             />
           </a>
         </div>
