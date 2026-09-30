@@ -10,6 +10,8 @@ env:
   REGISTRY: ghcr.io
   FRONTEND_IMAGE: ghcr.io/orakysec/qa-frontend
   BACKEND_IMAGE: ghcr.io/orakysec/qa-backend
+  MINIO_IMAGE: ghcr.io/orakysec/qa-minio
+  MC_IMAGE: ghcr.io/orakysec/qa-mc
 
 jobs:
   build-and-push:
@@ -29,6 +31,36 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      # MinIO e mc são compilados do código-fonte (ver docker/minio e docker/mc)
+      # já que a MinIO descontinuou a distribuição de imagens/binários prontos.
+      # Como ficam pinados numa versão congelada, só rebuilda quando o
+      # Dockerfile realmente mudar — evita recompilar Go a cada deploy.
+      - name: Detecta mudanças em docker/minio e docker/mc
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            minio:
+              - 'docker/minio/**'
+            mc:
+              - 'docker/mc/**'
+
+      - name: Build e Push — MinIO
+        if: steps.filter.outputs.minio == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker/minio
+          push: true
+          tags: ${{ env.MINIO_IMAGE }}:latest
+
+      - name: Build e Push — mc
+        if: steps.filter.outputs.mc == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker/mc
+          push: true
+          tags: ${{ env.MC_IMAGE }}:latest
 
       - name: Build e Push — Backend
         uses: docker/build-push-action@v5

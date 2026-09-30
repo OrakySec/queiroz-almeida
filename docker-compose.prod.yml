@@ -38,13 +38,21 @@ services:
       - internal
 
   minio:
-    image: minio/minio
+    # Imagem oficial descontinuada (Docker Hub/Quay/CDN) — compilada do
+    # código-fonte em docker/minio/Dockerfile. Ver comentário no Dockerfile.
+    image: ghcr.io/orakysec/qa-minio:latest
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:9000/minio/health/live" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     restart: always
     networks:
       - internal
@@ -60,7 +68,7 @@ services:
         - "traefik.http.services.qa-minio.loadbalancer.server.port=9000"
 
   minio-init:
-    image: minio/mc
+    image: ghcr.io/orakysec/qa-mc:latest
     depends_on:
       - minio
     entrypoint: >

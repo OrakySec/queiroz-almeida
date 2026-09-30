@@ -36,7 +36,10 @@ services:
     restart: unless-stopped
 
   minio:
-    image: minio/minio
+    # Imagem oficial descontinuada (Docker Hub/Quay/CDN) — compilada do
+    # código-fonte em docker/minio/Dockerfile. Ver comentário no Dockerfile.
+    # Para buildar localmente: docker build -t ghcr.io/orakysec/qa-minio:latest ./docker/minio
+    image: ghcr.io/orakysec/qa-minio:latest
     ports:
       - "9000:9000"   # API / acesso aos arquivos
       - "9001:9001"   # Console web (http://localhost:9001)
@@ -47,7 +50,7 @@ services:
       - minio_data:/data
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:9000/minio/health/live"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -55,7 +58,8 @@ services:
 
   # Cria o bucket automaticamente na primeira execução
   minio-init:
-    image: minio/mc
+    # docker build -t ghcr.io/orakysec/qa-mc:latest ./docker/mc
+    image: ghcr.io/orakysec/qa-mc:latest
     depends_on:
       minio:
         condition: service_healthy
