@@ -95,7 +95,10 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET}
-      MINIO_ENDPOINT: minio
+      # Nome completo do serviço no Swarm, não só "minio": os MinIOs de outros
+      # projetos também estão na rede YkaroNET com o nome "minio", e o DNS
+      # podia resolver pro MinIO errado (erro "Access Key Id ... does not exist").
+      MINIO_ENDPOINT: queiroz-almeida_minio
       MINIO_PORT: "9000"
       MINIO_USE_SSL: "false"
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
