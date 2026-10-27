@@ -27,8 +27,11 @@ export function FotoUploader({ empreendimentoId, fotos, onChange }: Props) {
         { headers: { 'Content-Type': 'multipart/form-data' } }
       )
       onChange(res.data.fotos as string[])
-    } catch {
-      alert('Erro ao enviar foto.')
+    } catch (err: any) {
+      const status = err?.response?.status
+      const detail = err?.response?.data?.message || err?.message || 'erro desconhecido'
+      const nomes = files.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(1)} MB, ${f.type || 'tipo desconhecido'})`).join('\n')
+      alert(`Erro ao enviar foto${status ? ` (HTTP ${status})` : ''}: ${detail}\n\n${nomes}`)
     } finally {
       setUploading(false)
     }
